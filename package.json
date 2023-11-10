@@ -1,0 +1,11 @@
+{
+  "name": "cipher-health",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.16"
+  }
+}
