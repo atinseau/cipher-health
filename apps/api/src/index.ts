@@ -1,32 +1,17 @@
-import Fastify from 'fastify'
-
-let i = 0;
-
-console.log('salut !')
-
-const app = Fastify({
-  logger: true,
-})
-
-app.get('/', async (request, reply) => {
-  i++
-  return {
-    message: 'Hello World'
-  }
-})
+import { createFastify } from './init'
 
 async function main() {
 
+  const fastify = createFastify()
+
   try {
-    await app.listen({
+    await fastify.listen({
       port: 3000
     })
-
   } catch (e) {
-    app.log.error(e)
+    fastify.log.error("ERROR: ", e)
     process.exit(1)
   }
-
 }
 
 main()
