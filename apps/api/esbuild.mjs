@@ -1,9 +1,12 @@
 import * as esbuild from 'esbuild'
 import { spawn } from 'child_process'
+import { readFileSync } from 'fs'
 
 const env = process.env.NODE_ENV || 'development'
 const outputDirectory = "build"
 let previousPid = -1
+
+const dependencies = Object.keys(JSON.parse(readFileSync('./package.json', 'utf-8')).dependencies || {})
 
 /**
  * @type {esbuild.Plugin}
@@ -16,7 +19,7 @@ const runnerPlugin = {
     build.onStart(() => {
       buildStart = Date.now()
     })
-    build.onEnd((result) => {
+    build.onEnd(() => {
 
       try {
         if (previousPid !== -1) {
@@ -48,9 +51,7 @@ const ctx = await esbuild.context({
   platform: 'node',
   treeShaking: true,
   bundle: true,
-  external: [
-    'fastify',
-  ],
+  external: dependencies,
   plugins: [runnerPlugin],
   sourcemap: true,
   minify: env === 'production',

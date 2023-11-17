@@ -4,6 +4,7 @@
     "module": "NodeNext"
   },
   "include": [
-    "src"
+    "src",
+    "global.d.ts"
   ]
 }

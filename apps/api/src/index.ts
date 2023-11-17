@@ -2,11 +2,11 @@ import { createFastify } from './init'
 
 async function main() {
 
-  const fastify = createFastify()
+  const fastify = await createFastify()
 
   try {
     await fastify.listen({
-      port: 3000
+      port: parseInt(fastify.env.PORT)
     })
   } catch (e) {
     fastify.log.error("ERROR: ", e)

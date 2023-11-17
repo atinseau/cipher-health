@@ -2,9 +2,7 @@ import { FastifyPluginCallback } from "fastify"
 
 
 
-const userPlugin: FastifyPluginCallback = (fastify, opts, done) => {
-
-
+const userPlugin: FastifyPluginCallback = async (fastify, _) => {
 
   fastify.get('/', async () => {
     return {
@@ -16,15 +14,13 @@ const userPlugin: FastifyPluginCallback = (fastify, opts, done) => {
 
     const { id } = req.params as { id: string }
 
-    req.sayHello(req.params)
+    console.log(await fastify.prisma.user.findMany())
 
     return {
       id: id,
       name: 'John Doe'
     }
   })
-
-  done();
 }
 
 export default userPlugin
