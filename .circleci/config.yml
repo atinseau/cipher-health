@@ -23,6 +23,15 @@ jobs:
       - run:
           name: "List files in the current directory"
           command: "ls -la"
+      - run:
+          name: "Install dependencies"
+          command: |
+            apt-get install curl
+            curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
+            apt-get install speedtest
+      - run:
+          name: "Run speedtest"
+          command: "speedtest"
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
