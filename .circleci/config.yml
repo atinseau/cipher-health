@@ -17,21 +17,6 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
-      - run:
-          name: "Print working directory"
-          command: "pwd"
-      - run:
-          name: "List files in the current directory"
-          command: "ls -la"
-      - run:
-          name: "Install dependencies"
-          command: |
-            sudo apt-get install curl
-            curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-            sudo apt-get install speedtest
-      - run:
-          name: "Run speedtest"
-          command: "echo YES | speedtest"
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
