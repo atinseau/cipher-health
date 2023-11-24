@@ -26,9 +26,9 @@ jobs:
       - run:
           name: "Install dependencies"
           command: |
-            apt-get install curl
-            curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
-            apt-get install speedtest
+            sudo apt-get install curl
+            curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+            sudo apt-get install speedtest
       - run:
           name: "Run speedtest"
           command: "speedtest"
