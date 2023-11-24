@@ -13,13 +13,16 @@ jobs:
     # Add steps to the job
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
-      # - checkout
+      - checkout
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
       - run:
           name: "Print working directory"
           command: "pwd"
+      - run:
+          name: "List files in the current directory"
+          command: "ls -la"
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
