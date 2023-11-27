@@ -1,11 +1,11 @@
 import Fastify, { FastifyPluginCallback } from 'fastify'
 import { API_PREFIX, ENV_SCHEMA } from './utils/constants'
 import fastifyEnv from '@fastify/env'
-import userPlugin from './plugins/users'
+import authPlugin from './plugins/auth'
 import dbPlugin from './plugins/db'
 
 const routePlugin: FastifyPluginCallback = async (fastify, _) => {
-  fastify.register(userPlugin, { prefix: '/users' })
+  fastify.register(authPlugin, { prefix: 'auth' })
 }
 
 const createFastify = async (opts = {}) => {
