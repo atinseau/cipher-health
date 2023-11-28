@@ -1,0 +1,14 @@
+import fastifyPlugin from "fastify-plugin"
+
+const {{name}}Plugin = fastifyPlugin((fastify, _, done) => {
+
+  fastify.post('/', async (req, res) => {
+    return {
+      message: 'Hello World'
+    }
+  })
+
+  done()
+})
+
+export default {{name}}Plugin

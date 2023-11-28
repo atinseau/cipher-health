@@ -3,9 +3,11 @@
   "private": true,
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build"
+    "build": "turbo build",
+    "turbo": "turbo"
   },
   "devDependencies": {
+    "@turbo/gen": "^1.10.16",
     "turbo": "^1.10.16"
   }
 }

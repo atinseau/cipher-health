@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext"
+    "module": "NodeNext",
+    "strictNullChecks": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
   },
   "include": [
     "src",

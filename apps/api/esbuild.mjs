@@ -3,6 +3,7 @@ import { spawn } from 'child_process'
 import { readFileSync } from 'fs'
 
 const env = process.env.NODE_ENV || 'development'
+
 const outputDirectory = "build"
 let previousPid = -1
 
@@ -32,7 +33,11 @@ const runnerPlugin = {
       try {
         const buildTime = Date.now() - buildStart
         const runner = spawn('node', [outputDirectory + '/index.js'], {
-          stdio: 'inherit'
+          stdio: 'inherit',
+          env: {
+            ...process.env,
+            NODE_ENV: env
+          }
         })
         runner.on('spawn', () => {
           console.log(`- Build completed in ${buildTime}ms`)

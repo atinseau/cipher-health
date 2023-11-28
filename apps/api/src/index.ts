@@ -1,17 +1,9 @@
-import { createFastify } from './init'
+import App from './server/app'
 
-async function main() {
+const app = new App()
 
-  const fastify = await createFastify()
-
-  try {
-    await fastify.listen({
-      port: parseInt(fastify.env.PORT)
-    })
-  } catch (e) {
-    fastify.log.error("ERROR: ", e)
-    process.exit(1)
-  }
-}
-
-main()
+app
+  .init()
+  .then(() => {
+    app.run()
+  })
