@@ -1,33 +1,34 @@
 import fastify, { FastifyInstance } from "fastify";
 
 import fastifyEnv from "@fastify/env";
-import { API_PREFIX, ENV_SCHEMA } from "../global/config/constants";
+import { ENV_SCHEMA } from "../global/config/constants";
 
 import cryptPlugin from "@/plugins/crypt";
 import dbPlugin from "@/plugins/db";
-import routerPlugin from "@/plugins/router";
 import userPlugin from "@/plugins/user";
+import routerPlugin from "@/router";
+
+export let fastifyInstance: FastifyInstance
 
 export default class App {
-  public fastify: FastifyInstance;
 
   constructor() {
-    this.fastify = fastify({
+    fastifyInstance = fastify({
       ...this.createLogger()
     })
   }
 
   public async init() {
-    await this.fastify.register(fastifyEnv, {
+    await fastifyInstance.register(fastifyEnv, {
       schema: ENV_SCHEMA,
       confKey: 'env',
       dotenv: true
     })
 
-    await this.fastify.register(cryptPlugin)
-    await this.fastify.register(dbPlugin)
-    await this.fastify.register(userPlugin)
-    await this.fastify.register(routerPlugin, { prefix: API_PREFIX })
+    await fastifyInstance.register(cryptPlugin)
+    await fastifyInstance.register(dbPlugin)
+    await fastifyInstance.register(userPlugin)
+    await fastifyInstance.register(routerPlugin)
   }
 
   private createLogger() {
@@ -50,11 +51,11 @@ export default class App {
 
   public async run() {
     try {
-      await this.fastify.listen({
-        port: parseInt(this.fastify.env.PORT)
+      await fastifyInstance.listen({
+        port: parseInt(fastifyInstance.env.PORT)
       })
     } catch (e) {
-      this.fastify.log.error("ERROR: ", e)
+      fastifyInstance.log.error("ERROR: ", e)
       process.exit(1)
     }
   }
