@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const signinSchema = z.object({
+export const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(50),
   confirmPassword: z.string(),
@@ -11,3 +11,8 @@ export const signinSchema = z.object({
   message: "Passwords don't match",
   path: ["confirmPassword"], // path of error
 });
+
+export const signinSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(50),
+})

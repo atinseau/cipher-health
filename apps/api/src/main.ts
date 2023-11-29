@@ -6,16 +6,21 @@ import { AuthModule } from './adapters/auth/auth.module';
 import { UserModule } from './adapters/user/user.module';
 import { PrismaModule } from './common/database/prisma.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { ProfileModule } from './adapters/profile/profile.module';
+import { RedisModule } from './common/redis/redis.module';
+
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
     }),
+    RedisModule,
     LoggerModule,
     PrismaModule,
     UserModule,
     AuthModule,
+    ProfileModule,
   ],
 })
 export class AppModule { }

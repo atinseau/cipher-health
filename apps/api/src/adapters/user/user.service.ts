@@ -2,10 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/common/database/prisma.service";
 import { Logger } from "@/common/logger/logger.service";
 import { UserCreate } from "./user.dto";
-import { SafeResult } from "@/types";
-import { User } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
+import { createResult } from "@/utils/errors";
 
 @Injectable()
 export class UserService {
@@ -16,7 +15,7 @@ export class UserService {
     private readonly loggerService: Logger
   ) { }
 
-  async create(user: UserCreate): Promise<SafeResult<User>> {
+  async create(user: UserCreate) {
     try {
       const result = await this.prismaService.user.create({
         data: {
@@ -25,28 +24,38 @@ export class UserService {
           password: await this.cryptoService.hash(user.password!)
         }
       })
-      return {
-        success: true,
-        data: result
-      }
+      return createResult(result)
     } catch (e) {
 
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
-        return {
-          success: false,
-          error: {
-            type: 'DUPLICATE_EMAIL',
-            message: 'Email already exists'
-          }
-        }
+        return createResult(null, false, {
+          type: 'DUPLICATE_EMAIL',
+          message: 'Email already exists'
+        })
       }
 
       this.loggerService.error(e)
-      return {
-        success: false,
-        error: e.message
-      }
+      return createResult(null, false, e.message as string)
     }
   }
 
+  async findByEmail(email: string) {
+    try {
+      const result = await this.prismaService.user.findUnique({
+        where: {
+          email
+        }
+      })
+      if (!result) {
+        return createResult(null, false, {
+          type: 'USER_NOT_FOUND',
+          message: 'User not found'
+        })
+      }
+      return createResult(result)
+    } catch (e) {
+      this.loggerService.error(e)
+      return createResult(null, false, e.message as string)
+    }
+  }
 }
