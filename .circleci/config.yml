@@ -10,7 +10,18 @@ jobs:
       - run: echo "Hi I'm on a Container Runner!"
       - run: echo "Hi I'm on a Container Runner!"
       - run: echo "Hi I'm on a Container Runner!"
+  build_1:
+    docker:
+      - image: cimg/base:current
+    resource_class: hvwdicg6jzccszjy8mjd9/runne
+    steps:
+      - run: echo "Hi I'm on a Container Runner!"
+      - run: echo "Hi I'm on a Container Runner!"
+      - run: echo "Hi I'm on a Container Runner!"
+      - run: echo "Hi I'm on a Container Runner!"
+      - run: echo "Hi I'm on a Container Runner!"
 workflows:
   build-workflow:
     jobs:
       - build
+      - build_1
