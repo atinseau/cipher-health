@@ -14,7 +14,6 @@ export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
 
     const accessToken = req.headers.authorization?.split(' ')[1]
-
     if (!accessToken) {
       throw createHttpError(HttpStatus.UNAUTHORIZED, 'Please provide an access token by signing in.')
     }
@@ -23,6 +22,8 @@ export class AuthMiddleware implements NestMiddleware {
     if (!result) {
       throw createHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
     }
+
+    req.body.user = result
 
     next()
   }

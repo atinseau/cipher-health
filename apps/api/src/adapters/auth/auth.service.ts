@@ -11,10 +11,16 @@ export class AuthService {
   ) {}
 
   async createTokens(user: User) {
-    const accessToken = await this.jwtService.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+
+    const payload = {
+      id: user.id,
+      email: user.email
+    }
+
+    const accessToken = await this.jwtService.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '10min'
     })
-    const refreshToken = await this.jwtService.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshToken = await this.jwtService.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: '7d'
     })
     return {
