@@ -6,7 +6,7 @@ import { AuthModule } from './adapters/auth/auth.module';
 import { UserModule } from './adapters/user/user.module';
 import { PrismaModule } from './common/database/prisma.module';
 import { LoggerModule } from './common/logger/logger.module';
-import { ProfileModule } from './adapters/profile/profile.module';
+import { ClientModule } from './adapters/client/client.module';
 import { RedisModule } from './common/redis/redis.module';
 
 
@@ -20,7 +20,7 @@ import { RedisModule } from './common/redis/redis.module';
     PrismaModule,
     UserModule,
     AuthModule,
-    ProfileModule,
+    ClientModule,
   ],
 })
 export class AppModule { }

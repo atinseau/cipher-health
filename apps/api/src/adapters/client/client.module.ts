@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
-import { ProfileController } from "./profile.controller";
+import { ClientController } from "./client.controller";
 import { AuthMiddleware } from "../auth/auth.middleware";
 import { JwtService } from "@/common/jwt/jwt.service";
 
@@ -8,13 +8,13 @@ import { JwtService } from "@/common/jwt/jwt.service";
     JwtService, // For AuthMiddleware
   ],
   controllers: [
-    ProfileController
+    ClientController
   ]
 })
-export class ProfileModule implements NestModule {
+export class ClientModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .forRoutes({ path: '/profile/me', method: RequestMethod.GET })
+      .forRoutes({ path: '/client/me', method: RequestMethod.GET })
   }
 }

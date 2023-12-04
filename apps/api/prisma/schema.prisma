@@ -6,30 +6,73 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum UserType {
+  CLIENT
+  WORKER
+}
 
 model User {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
   email String @unique
   password String?
   firstName String
   lastName String
 
+  // For 2FA, phone or email
+  verified Boolean @default(false)
+  phone String? @unique // if the user wants to use 2FA with his phone
+
   refreshTokens RefreshToken[]
+
+  // default to CLIENT because the signup process for 
+  // a worker is different so every user is a client by default
+  type UserType @default(CLIENT)
+
+  // if the user type is a client, he will have a client profile
+  client Client?
+  // if the user type is a worker, he will have a worker profile
+  worker Worker?
 }
 
 model RefreshToken {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  expiresAt DateTime
   userId String
   token String @unique
-  expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// This is a client aka a patient
+model Client {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  // the user who owns this client profile
+  user User @relation(fields: [userId], references: [id])
+  userId String @unique
+}
+
+// This is a doctor or someone who can create a teleconsultation
+// and also invite a client (patient) to join the teleconsultation
+// of course, he will be able to charge the client for the prestation
+model Worker {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // the user who owns this client profile
+  user User @relation(fields: [userId], references: [id])
+  userId String @unique
 }

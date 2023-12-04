@@ -5,10 +5,8 @@ import { UserService } from "../user/user.service";
 import { createHttpError } from "@/utils/errors";
 import { omit } from "lodash";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
-@Controller('profile')
-export class ProfileController {
+@Controller('client')
+export class ClientController {
 
   constructor(
     private readonly redisService: RedisService,

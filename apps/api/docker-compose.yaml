@@ -5,3 +5,14 @@ services:
     image: redis:7.2.3
     ports:
       - 6379:6379
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
