@@ -25,14 +25,14 @@ export class JwtService {
     })
   }
 
-  verify(token: string, secret: string) {
-    return new Promise<false | string | JwtPayload>((resolve) => {
+  verify<T = string | JwtPayload>(token: string, secret: string) {
+    return new Promise<false | T>((resolve) => {
       verify(token, secret, (err, decoded) => {
         if (err || !decoded) {
           resolve(false)
           return
         }
-        resolve(decoded)
+        resolve(decoded as T)
       })
     })
   }

@@ -1,5 +1,5 @@
 import { JwtService } from "@/common/jwt/jwt.service";
-import { createHttpError } from "@/utils/errors";
+import { createRawHttpError } from "@/utils/errors";
 import { HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 
@@ -15,12 +15,12 @@ export class AuthMiddleware implements NestMiddleware {
 
     const accessToken = req.headers.authorization?.split(' ')[1]
     if (!accessToken) {
-      throw createHttpError(HttpStatus.UNAUTHORIZED, 'Please provide an access token by signing in.')
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide an access token by signing in.')
     }
 
     const result = await this.jwtService.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
     if (!result) {
-      throw createHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
     }
 
     req.body.user = result

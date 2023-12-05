@@ -2,9 +2,11 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { signinSchema, signupSchema } from './auth.schema';
 import { UserService } from '../user/user.service';
 import { omit } from 'lodash';
-import { createHttpError } from '@/utils/errors';
+import { createHttpError, createRawHttpError } from '@/utils/errors';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { AuthService } from './auth.service';
+import { JwtService } from '@/common/jwt/jwt.service';
+import { UserToken } from '../user/user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,6 +15,7 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly cryptoService: CryptoService,
     private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
   ) { }
 
   @Post('signup')
@@ -22,18 +25,17 @@ export class AuthController {
     const output = signupSchema.safeParse(body)
 
     if (!output.success)
-      throw createHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
+      throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
 
     const result = await this.userService.create(omit(output.data, [
       'confirmPassword'
     ]))
 
     if (!result.success) {
-      if (
-        typeof result.error !== 'string'
-        && result.error.type === 'DUPLICATE_EMAIL'
-      ) throw createHttpError(HttpStatus.CONFLICT, result.error.message)
-      throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, result.error)
+      throw createHttpError(result, {
+        DUPLICATE_EMAIL: HttpStatus.CONFLICT,
+        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR
+      })
     }
 
     return {
@@ -48,27 +50,52 @@ export class AuthController {
     const output = signinSchema.safeParse(body)
 
     if (!output.success)
-      throw createHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
+      throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
 
     const result = await this.userService.findByEmail(output.data.email)
 
     if (!result.success) {
-      if (typeof result.error !== 'string' && result.error.type === 'USER_NOT_FOUND')
-        throw createHttpError(HttpStatus.NOT_FOUND, result.error.message)
-      throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, result.error)
+      throw createHttpError(result, {
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR
+      })
     }
 
     if (!result.data.password) {
-      throw createHttpError(
+      throw createRawHttpError(
         HttpStatus.FORBIDDEN,
         'This account was created with a social login provider. Please use that provider or create a password for this account to sign in.'
       )
     }
 
     if (!await this.cryptoService.compare(output.data.password, result.data.password)) {
-      throw createHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
     }
 
     return await this.authService.createTokens(result.data)
+  }
+
+  @Post('refresh')
+  @HttpCode(200)
+  async refresh(@Body('refreshToken') refreshToken?: string) {
+    if (!refreshToken) {
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide a refresh token.')
+    }
+
+    const jwtResult = await this.jwtService.verify<UserToken>(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+    if (!jwtResult) {
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
+    }
+
+    const result = await this.userService.findById(jwtResult.id)
+    if (!result.success) {
+      throw createHttpError(result, {
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR
+      })
+    }
+
+    // console.log(result)
+
   }
 }

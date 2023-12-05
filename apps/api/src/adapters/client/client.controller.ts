@@ -17,9 +17,10 @@ export class ClientController {
   async me(@Body('user') user: UserToken) {
     const result = await this.userService.findByEmail(user.email)
     if (!result.success) {
-      if (typeof result.error !== 'string' && result.error.type === 'USER_NOT_FOUND')
-        throw createHttpError(HttpStatus.NOT_FOUND, result.error.message)
-      throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, result.error)
+      throw createHttpError(result, {
+        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND
+      })
     }
 
     return {

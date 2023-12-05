@@ -5,6 +5,7 @@ import { UserCreate } from "./user.dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { createResult } from "@/utils/errors";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class UserService {
@@ -39,12 +40,10 @@ export class UserService {
     }
   }
 
-  async findByEmail(email: string) {
+  private async find(where: Prisma.UserWhereUniqueInput) {
     try {
       const result = await this.prismaService.user.findUnique({
-        where: {
-          email
-        }
+        where
       })
       if (!result) {
         return createResult(null, false, {
@@ -57,5 +56,17 @@ export class UserService {
       this.loggerService.error(e)
       return createResult(null, false, e.message as string)
     }
+  }
+
+  async findById(id: string) {
+    return this.find({
+      id
+    })
+  }
+
+  async findByEmail(email: string) {
+    return this.find({
+      email
+    })
   }
 }
