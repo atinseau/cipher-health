@@ -25,9 +25,7 @@ export class ClientController {
 
     return {
       success: true,
-      data: omit(result.data, [
-        'password'
-      ])
+      data: this.userService.sanitize(result.data)
     }
   }
 }

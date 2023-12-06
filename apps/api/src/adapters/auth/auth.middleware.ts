@@ -1,4 +1,5 @@
 import { JwtService } from "@/common/jwt/jwt.service";
+import { RedisService } from "@/common/redis/redis.service";
 import { createRawHttpError } from "@/utils/errors";
 import { HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
@@ -8,8 +9,8 @@ import { NextFunction, Request, Response } from "express";
 export class AuthMiddleware implements NestMiddleware {
 
   constructor(
-    private readonly jwtService: JwtService
-  ) {}
+    private readonly jwtService: JwtService,
+  ) { }
 
   async use(req: Request, res: Response, next: NextFunction) {
 
@@ -19,11 +20,14 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     const result = await this.jwtService.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-    if (!result) {
+   
+    // If the token is invalid/expired or blacklisted, throw an error
+    if (!result || await this.jwtService.isBlacklisted(accessToken)) {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
     }
 
     req.body.user = result
+    req.body.accessToken = accessToken
 
     next()
   }

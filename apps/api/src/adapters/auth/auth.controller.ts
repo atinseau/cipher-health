@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { signinSchema, signupSchema } from './auth.schema';
 import { UserService } from '../user/user.service';
 import { omit } from 'lodash';
@@ -18,6 +18,11 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) { }
 
+  @Get('/health')
+  async health() {
+    return 'OK'
+  }
+
   @Post('signup')
   @HttpCode(201)
   async signup(@Body() body: any) {
@@ -34,7 +39,7 @@ export class AuthController {
     if (!result.success) {
       throw createHttpError(result, {
         DUPLICATE_EMAIL: HttpStatus.CONFLICT,
-        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR
+        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
       })
     }
 
@@ -72,12 +77,18 @@ export class AuthController {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
     }
 
+    // Ban all previous sessions (soft delete all refresh tokens)
+    // Potentially some access tokens could still be valid, but they will be invalid after they expire
+    await this.userService.clearPreviousSessions(result.data)
     return await this.authService.createTokens(result.data)
   }
 
   @Post('refresh')
   @HttpCode(200)
-  async refresh(@Body('refreshToken') refreshToken?: string) {
+  async refresh(
+    @Body('accessToken') accessToken: string,
+    @Body('refreshToken') refreshToken?: string
+  ) {
     if (!refreshToken) {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide a refresh token.')
     }
@@ -95,7 +106,25 @@ export class AuthController {
       })
     }
 
-    // console.log(result)
+    // Check if the refresh token is valid and not deleted
+    const userRefreshToken = result.data.refreshTokens.find(token => token.token === refreshToken)
+    if (!userRefreshToken || userRefreshToken.deletedAt) {
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
+    }
 
+    // result.data.refreshTokens
+
+    // Also ban the current access token (add it to the blacklist)
+    const isAdded = await this.jwtService.addToBlacklist(accessToken)
+
+    // Ban all previous sessions (soft delete all refresh tokens)
+    const isClear = await this.userService.clearPreviousSessions(result.data)
+
+    if (!isAdded || !isClear) {
+      throw createRawHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Could not renew access token.')
+    }
+
+    // Renew the session with new access and refresh tokens
+    return await this.authService.createTokens(result.data)
   }
 }

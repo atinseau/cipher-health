@@ -5,7 +5,8 @@ import { UserCreate } from "./user.dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { createResult } from "@/utils/errors";
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
+import { omit } from "lodash";
 
 @Injectable()
 export class UserService {
@@ -43,7 +44,14 @@ export class UserService {
   private async find(where: Prisma.UserWhereUniqueInput) {
     try {
       const result = await this.prismaService.user.findUnique({
-        where
+        where,
+        include: {
+          refreshTokens: {
+            where: {
+              deletedAt: null
+            }
+          },
+        },
       })
       if (!result) {
         return createResult(null, false, {
@@ -60,7 +68,7 @@ export class UserService {
 
   async findById(id: string) {
     return this.find({
-      id
+      id,
     })
   }
 
@@ -68,5 +76,32 @@ export class UserService {
     return this.find({
       email
     })
+  }
+
+  async clearPreviousSessions(user: User) {
+    try {
+      await this.prismaService.refreshToken.updateMany({
+        where: {
+          userId: user.id,
+          deletedAt: null
+        },
+        data: {
+          deletedAt: new Date()
+        }
+      })
+      return true
+    } catch (e) {
+      this.loggerService.error(e)
+      return false
+    }
+  }
+
+  sanitize(user: User) {
+    return omit(user, [
+      'password',
+      'refreshTokens',
+      'type',
+      'deletedAt',
+    ])
   }
 }
