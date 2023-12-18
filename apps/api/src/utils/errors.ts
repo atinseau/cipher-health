@@ -1,11 +1,15 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 
-type SuccessResult<TData> = {
+export type SuccessResult<TData> = {
   success: true,
   data: TData
 }
 
-type ErrorResult<TError extends { type: string, message: string } | string = string> = {
+export type UnwrapError<
+  T extends ErrorResult<any> | SuccessResult<any>
+> = Exclude<T, ErrorResult<any>>['data']
+
+export type ErrorResult<TError extends { type: string, message: string } | string = string> = {
   success: false,
   error: TError extends string
   ? {
@@ -48,8 +52,16 @@ export function createResult<
 }
 
 
-export const createRawHttpError = (status: HttpStatus, message: any) => {
-  return new HttpException(message, status)
+export const createRawHttpError = (
+  status: HttpStatus,
+  message: any
+) => {
+  let output = typeof message === 'object' && 'error' in message ? message.error.message : message
+  let formattedMessage = {
+    success: false,
+    [Array.isArray(output) ? 'errors' : 'error']: output
+  }
+  return new HttpException(formattedMessage, status)
 }
 
 export const createHttpError = <
@@ -60,7 +72,9 @@ export const createHttpError = <
   > = ErrorResult<{ type: TErrorKey, message: string } | string>
 >(
   result: T,
-  errorMap: Record<T['error']['type'] | 'UNKNOWN_ERROR', HttpStatus>
+  errorMap: Record<Exclude<T['error']['type'], 'UNKNOWN_ERROR'>, HttpStatus> & {
+    UNKNOWN_ERROR?: HttpStatus,
+  }
 ) => {
   // TODO: use logger with correlation id here
   if (result.success) {
@@ -68,6 +82,9 @@ export const createHttpError = <
     return
   }
 
-  const status = errorMap[result.error.type] || errorMap.UNKNOWN_ERROR
-  return createRawHttpError(status, result.error.message)
+  // 'UNKNOWN_ERROR' in optionnal in errorMap but is required in ErrorResult
+  // so we need to cast it to a non-optional type to search for it in errorMap
+  const type = result.error.type as keyof typeof errorMap
+  const status = errorMap[type] || errorMap.UNKNOWN_ERROR || HttpStatus.INTERNAL_SERVER_ERROR
+  return createRawHttpError(status, result)
 }

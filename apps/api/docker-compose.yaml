@@ -1,10 +1,15 @@
 version: '3'
 
+volumes:
+  dragonflydata:
+
 services:
-  redis:
-    image: redis:7.2.3
+  dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ulimits:
+      memlock: -1
     ports:
-      - 6379:6379
+      - "6379:6379"
   db:
     image: postgres
     restart: always

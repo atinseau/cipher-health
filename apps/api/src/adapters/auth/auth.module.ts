@@ -21,6 +21,8 @@ export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .forRoutes({ path: '/auth/refresh', method: RequestMethod.POST })
+      .forRoutes(
+        { path: '/auth/signout', method: RequestMethod.GET },
+      )
   }
 }

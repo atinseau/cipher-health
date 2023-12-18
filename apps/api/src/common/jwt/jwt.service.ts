@@ -46,6 +46,10 @@ export class JwtService {
 
 
   async addToBlacklist(token: string) {
+    if (!token) {
+      return false
+    }
+
     try {
       await this.redisService.redis.hSet('blacklist', token, 1)
       return true

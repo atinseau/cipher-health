@@ -3,20 +3,22 @@ import { JwtService } from "@/common/jwt/jwt.service";
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { v4 as uuid } from 'uuid'
+import { UserService } from "../user/user.service";
+import { createResult } from "@/utils/errors";
 
 @Injectable()
 export class AuthService {
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prismaService: PrismaService
-  ) {}
+    private readonly prismaService: PrismaService,
+    private readonly userService: UserService,
+  ) { }
 
   async createTokens(user: User) {
 
     const payload = {
       id: user.id,
-      email: user.email,
       cid: uuid() // Correlational ID
     }
 
@@ -42,6 +44,16 @@ export class AuthService {
       accessToken,
       refreshToken
     }
+  }
+
+  async logout(user: User, accessToken: string) {
+    const isCleaned = await this.userService.clearPreviousSessions(user)
+    const isBanned = await this.jwtService.addToBlacklist(accessToken)
+
+    if (!isCleaned || !isBanned) {
+      return createResult(null, false,  'Could not logout for unknown reasons')
+    }
+    return createResult(true)
   }
 
 }

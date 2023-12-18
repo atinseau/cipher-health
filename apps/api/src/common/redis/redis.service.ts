@@ -12,7 +12,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.redis = createClient({
       url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
     })
-    await this.redis.connect()
+    await this.redis.connect().then(() => {
+      console.log('Redis connected')
+    })
   }
 
   async onModuleDestroy() {

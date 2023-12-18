@@ -12,7 +12,6 @@ export type UserCreate = Omit<User,
 
 export type UserToken = {
   id: string
-  email: string
   iat: number
   exp: number
 }

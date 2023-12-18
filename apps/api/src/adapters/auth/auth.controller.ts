@@ -39,13 +39,15 @@ export class AuthController {
     if (!result.success) {
       throw createHttpError(result, {
         DUPLICATE_EMAIL: HttpStatus.CONFLICT,
-        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
       })
     }
 
     return {
       success: true,
-      data: result.data.id
+      data: {
+        id: result.data.user.id,
+        passphrase: result.data.passphrase
+      }
     }
   }
 
@@ -62,7 +64,6 @@ export class AuthController {
     if (!result.success) {
       throw createHttpError(result, {
         USER_NOT_FOUND: HttpStatus.NOT_FOUND,
-        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR
       })
     }
 
@@ -80,7 +81,35 @@ export class AuthController {
     // Ban all previous sessions (soft delete all refresh tokens)
     // Potentially some access tokens could still be valid, but they will be invalid after they expire
     await this.userService.clearPreviousSessions(result.data)
-    return await this.authService.createTokens(result.data)
+
+    // TODO: ban access tokens in redis
+
+    return {
+      success: true,
+      data: await this.authService.createTokens(result.data)
+    }
+  }
+
+  @Get('signout')
+  async signout(
+    @Body('user') user: UserToken,
+    @Body('accessToken') accessToken: string
+  ) {
+    const result = await this.userService.findById(user.id)
+    if (!result.success) {
+      throw createHttpError(result, {
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+      })
+    }
+
+    const logoutResult = await this.authService.logout(result.data, accessToken)
+    if (!logoutResult.success) {
+      throw createRawHttpError(HttpStatus.INTERNAL_SERVER_ERROR, logoutResult)
+    }
+
+    return {
+      success: true,
+    }
   }
 
   @Post('refresh')
@@ -98,11 +127,17 @@ export class AuthController {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 
-    const result = await this.userService.findById(jwtResult.id)
+    const result = await this.userService.findById(jwtResult.id, {
+      refreshTokens: {
+        where: {
+          deletedAt: null
+        }
+      }
+    })
+
     if (!result.success) {
       throw createHttpError(result, {
         USER_NOT_FOUND: HttpStatus.NOT_FOUND,
-        UNKNOWN_ERROR: HttpStatus.INTERNAL_SERVER_ERROR
       })
     }
 
@@ -112,19 +147,22 @@ export class AuthController {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 
-    // result.data.refreshTokens
+    // Ban all previous sessions (soft delete all refresh tokens, and add access token to blacklist)
+    const logoutResult = await this.authService.logout(result.data, accessToken)
 
-    // Also ban the current access token (add it to the blacklist)
-    const isAdded = await this.jwtService.addToBlacklist(accessToken)
-
-    // Ban all previous sessions (soft delete all refresh tokens)
-    const isClear = await this.userService.clearPreviousSessions(result.data)
-
-    if (!isAdded || !isClear) {
-      throw createRawHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Could not renew access token.')
+    // The most common reason for this failure is that the access token is not provided in the request body
+    // or redis is not running and the access token cannot be added to the blacklist
+    // so the resulting behavior is:
+    // - no new access token and refresh token are returned to the client
+    // - and only the access token will be valid until it expires
+    if (!logoutResult.success) {
+      throw createRawHttpError(HttpStatus.INTERNAL_SERVER_ERROR, logoutResult)
     }
 
     // Renew the session with new access and refresh tokens
-    return await this.authService.createTokens(result.data)
+    return {
+      success: true,
+      data: await this.authService.createTokens(result.data)
+    }
   }
 }
