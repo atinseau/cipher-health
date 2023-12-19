@@ -8,6 +8,7 @@ import { PrismaModule } from './common/database/prisma.module';
 import { LoggerModule } from './common/logger/logger.module';
 import { ClientModule } from './adapters/client/client.module';
 import { RedisModule } from './common/redis/redis.module';
+import { PhoneModule } from './common/phone/phone.module';
 
 
 @Module({
@@ -15,6 +16,7 @@ import { RedisModule } from './common/redis/redis.module';
     ConfigModule.forRoot({
       isGlobal: true
     }),
+    PhoneModule,
     RedisModule,
     LoggerModule,
     PrismaModule,
@@ -27,9 +29,7 @@ export class AppModule { }
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   app.setGlobalPrefix(API_PREFIX)
-
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

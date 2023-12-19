@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/common/database/prisma.service";
 import { Logger } from "@/common/logger/logger.service";
-import { UserCreate } from "./user.dto";
+import { UserCreate, UserModel } from "./user.dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
-import { UnwrapError, createResult } from "@/utils/errors";
+import { createResult } from "@/utils/errors";
 import { Prisma, User } from "@prisma/client";
 import { merge, omit } from "lodash";
 
@@ -85,6 +85,25 @@ export class UserService {
     }
   }
 
+  private async update(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput) {
+    try {
+      const result = await this.prismaService.user.update({
+        where,
+        data
+      })
+      return createResult(result)
+    } catch (e) {
+
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+        return createResult(null, false, {
+          type: 'USER_NOT_FOUND',
+          message: 'User not found'
+        })
+      }
+      return createResult(null, false, e.message as string)
+    }
+  }
+
   async findById(id: string, include?: Prisma.UserInclude) {
     return this.find({
       id,
@@ -95,6 +114,12 @@ export class UserService {
     return this.find({
       email
     }, include)
+  }
+
+  async updateById(id: string, data: Prisma.UserUpdateInput) {
+    return this.update({
+      id
+    }, data)
   }
 
   async clearPreviousSessions(user: User) {
@@ -115,7 +140,7 @@ export class UserService {
     }
   }
 
-  sanitize(user: UnwrapError<AsyncReturnType<typeof this.find>>) {
+  sanitize(user: UserModel) {
 
     // Reduce the size of the encryption profile to convert the buffers to hex strings
     if (user.encryptionProfile) {

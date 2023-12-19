@@ -74,7 +74,7 @@ export const createHttpError = <
   result: T,
   errorMap: Record<Exclude<T['error']['type'], 'UNKNOWN_ERROR'>, HttpStatus> & {
     UNKNOWN_ERROR?: HttpStatus,
-  }
+  } = {} as any
 ) => {
   // TODO: use logger with correlation id here
   if (result.success) {

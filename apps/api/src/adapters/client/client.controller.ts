@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpStatus } from "@nestjs/common";
-import { UserToken } from "../user/user.dto";
+import { UserModel, UserToken } from "../user/user.dto";
 import { UserService } from "../user/user.service";
 import { createHttpError } from "@/utils/errors";
 
@@ -11,19 +11,10 @@ export class ClientController {
   ) { }
 
   @Get('/me')
-  async me(@Body('user') user: UserToken) {
-    const result = await this.userService.findById(user.id, {
-      encryptionProfile: true
-    })
-    if (!result.success) {
-      throw createHttpError(result, {
-        USER_NOT_FOUND: HttpStatus.NOT_FOUND
-      })
-    }
-
+  async me(@Body('user') user: UserModel) {
     return {
       success: true,
-      data: this.userService.sanitize(result.data)
+      data: this.userService.sanitize(user)
     }
   }
 }

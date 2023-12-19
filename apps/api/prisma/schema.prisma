@@ -30,6 +30,23 @@ model EncryptionProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Profile {
+  
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // all the fields below are common to both types of users (client and worker)
+  // a profile is created after the user is verified, after that, he can complete his profile
+  // when the user completes his profile (all Profile fields and all specific fields for his type)
+  // the "completed" field in the user model will be set to true
+
+  // ...
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
@@ -41,11 +58,24 @@ model User {
   lastName  String
   // For 2FA, phone or email
   verified  Boolean   @default(false)
-  phone     String?   @unique // if the user wants to use 2FA with his phone
+  verificationToken String?
+  lastVerificationRequest DateTime?
+
+  phone     String   @unique // if the user wants to use 2FA with his phone
+
+  // use this boolean to know if the user has completed his profile
+  // in all cases (client or worker), the user must complete his profile
+  // and all specific fields for his type (client or worker)
+  completed Boolean @default(false)
 
   refreshTokens RefreshToken[]
 
   encryptionProfile EncryptionProfile?
+
+  // the profile is a one-to-one relationship
+  // that contains the user's data for both client and worker
+  // the profile is created after the user is verified
+  profile Profile?
 
   // default to CLIENT because the signup process for 
   // a worker is different so every user is a client by default

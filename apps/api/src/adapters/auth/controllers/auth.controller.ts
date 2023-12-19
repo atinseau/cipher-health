@@ -1,12 +1,13 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { signinSchema, signupSchema } from './auth.schema';
-import { UserService } from '../user/user.service';
+import { signinSchema, signupSchema } from '../auth.schema';
+import { UserService } from '../../user/user.service';
 import { omit } from 'lodash';
 import { createHttpError, createRawHttpError } from '@/utils/errors';
 import { CryptoService } from '@/common/crypto/crypto.service';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth.service';
 import { JwtService } from '@/common/jwt/jwt.service';
-import { UserToken } from '../user/user.dto';
+import { UserModel, UserToken } from '../../user/user.dto';
+import { VerifyController } from './verify.controller';
 
 @Controller('auth')
 export class AuthController {
@@ -92,17 +93,10 @@ export class AuthController {
 
   @Get('signout')
   async signout(
-    @Body('user') user: UserToken,
+    @Body('user') user: UserModel,
     @Body('accessToken') accessToken: string
   ) {
-    const result = await this.userService.findById(user.id)
-    if (!result.success) {
-      throw createHttpError(result, {
-        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
-      })
-    }
-
-    const logoutResult = await this.authService.logout(result.data, accessToken)
+    const logoutResult = await this.authService.logout(user, accessToken)
     if (!logoutResult.success) {
       throw createRawHttpError(HttpStatus.INTERNAL_SERVER_ERROR, logoutResult)
     }

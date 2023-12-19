@@ -2,6 +2,8 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/c
 import { ClientController } from "./client.controller";
 import { AuthMiddleware } from "../auth/auth.middleware";
 import { JwtService } from "@/common/jwt/jwt.service";
+import { UserVerifiedMiddleware } from "../user/middleware/user-verified.middleware";
+import { UserMiddleware } from "../user/middleware/user.middleware";
 
 @Module({
   providers: [
@@ -14,7 +16,11 @@ import { JwtService } from "@/common/jwt/jwt.service";
 export class ClientModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware)
+      .apply(
+        AuthMiddleware, // verify token
+        UserMiddleware, // fetch user
+        UserVerifiedMiddleware // check if user is verified
+      )
       .forRoutes({ path: '/client/me', method: RequestMethod.GET })
   }
 }

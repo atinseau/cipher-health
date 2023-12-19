@@ -47,6 +47,11 @@ export class AuthService {
   }
 
   async logout(user: User, accessToken: string) {
+
+    if (!user || !accessToken) {
+      return createResult(null, false, 'Could not logout for unknown reasons')
+    }
+
     const isCleaned = await this.userService.clearPreviousSessions(user)
     const isBanned = await this.jwtService.addToBlacklist(accessToken)
 

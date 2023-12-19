@@ -1,5 +1,4 @@
 import { JwtService } from "@/common/jwt/jwt.service";
-import { RedisService } from "@/common/redis/redis.service";
 import { createRawHttpError } from "@/utils/errors";
 import { HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
@@ -26,7 +25,7 @@ export class AuthMiddleware implements NestMiddleware {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
     }
 
-    req.body.user = result
+    req.body.userToken = result
     req.body.accessToken = accessToken
 
     next()

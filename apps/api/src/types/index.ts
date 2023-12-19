@@ -9,6 +9,7 @@ declare global {
       REFRESH_TOKEN_SECRET: string
       REDIS_HOST: string
       REDIS_PORT: string
+      NODE_ENV: 'development' | 'production'
     }
   }
 }

@@ -1,13 +1,21 @@
-import { User } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
+
+export type UserModel = Prisma.UserGetPayload<{
+  select: {
+    [K in keyof Required<Prisma.UserSelect>]: true
+  }
+}>
 
 export type UserCreate = Omit<User,
   | 'id'
-  | 'phone'
   | 'deletedAt'
   | 'type'
   | 'createdAt'
   | 'updatedAt'
   | 'verified'
+  | 'verificationToken'
+  | 'lastVerificationRequest'
+  | 'completed'
 >
 
 export type UserToken = {

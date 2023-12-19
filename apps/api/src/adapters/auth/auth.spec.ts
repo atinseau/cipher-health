@@ -6,6 +6,7 @@ function testPassword(password: string) {
       email: 'john@doe.fr',
       password: password,
       confirmPassword: password,
+      phone: '0606060606',
       firstName: 'John',
       lastName: 'Doe',
     })

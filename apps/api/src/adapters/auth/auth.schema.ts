@@ -17,6 +17,7 @@ export const signupSchema = z.object({
   confirmPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
+  phone: z.string(), // TODO: add phone validation, enforce international phone numbers only (E.164)
 })
 .refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
