@@ -20,7 +20,7 @@ export class UserMiddleware implements NestMiddleware {
     }
 
     const result = await this.userService.findById(userToken.id, {
-      encryptionProfile: true
+      encryptionProfile: true,
     })
 
     if (!result.success) {

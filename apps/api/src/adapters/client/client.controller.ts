@@ -1,7 +1,6 @@
-import { Body, Controller, Get, HttpStatus } from "@nestjs/common";
-import { UserModel, UserToken } from "../user/user.dto";
+import { Body, Controller, Get } from "@nestjs/common";
+import { UserModel } from "../user/user.dto";
 import { UserService } from "../user/user.service";
-import { createHttpError } from "@/utils/errors";
 
 @Controller('client')
 export class ClientController {

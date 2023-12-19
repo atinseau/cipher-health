@@ -6,7 +6,9 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { createResult } from "@/utils/errors";
 import { Prisma, User } from "@prisma/client";
-import { merge, omit } from "lodash";
+import { merge, omit, omitBy } from "lodash";
+import { profileCreationSchema } from "./profile.schema";
+import { z } from "zod";
 
 @Injectable()
 export class UserService {
@@ -30,26 +32,7 @@ export class UserService {
           password: await this.cryptoService.hash(user.password),
         }
       })
-
-      // create the encryption profile with the keys
-      // recovery key and user key that is both able to decrypt the encryption key
-      const encryptionProfile = await this.cryptoService.createEncryptionProfil(user.password)
-
-      // Create and attach the encryption profile to the user
-      await this.prismaService.encryptionProfile.create({
-        data: {
-          userId: result.id,
-          ...encryptionProfile.keys
-        }
-      })
-
-      const encryptedPassphrase = await this.cryptoService.encrypt(encryptionProfile.passphrase, user.password)
-
-      return createResult({
-        user: result,
-        // to prevent man in the middle attach, we encrypt the passphrase with the user password before sending it
-        passphrase: encryptedPassphrase.toString('hex')
-      })
+      return createResult(result)
     } catch (e) {
 
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
@@ -93,7 +76,7 @@ export class UserService {
       })
       return createResult(result)
     } catch (e) {
-
+      this.loggerService.error(e)
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
         return createResult(null, false, {
           type: 'USER_NOT_FOUND',
@@ -120,6 +103,59 @@ export class UserService {
     return this.update({
       id
     }, data)
+  }
+
+  async findProfileByUserId(userId: string) {
+    try {
+      const result = await this.prismaService.profile.findUnique({
+        where: {
+          userId
+        }
+      })
+      if (!result) {
+        return createResult(null, false, {
+          type: 'PROFILE_NOT_FOUND',
+          message: 'There is no profile for this user'
+        })
+      }
+      return createResult(result)
+    } catch (e) {
+      this.loggerService.error(e)
+      return createResult(null, false, e.message as string)
+    }
+  }
+
+  async createProfile(user: UserModel, payload: z.infer<typeof profileCreationSchema>) {
+    try {
+      const result = await this.prismaService.profile.create({
+        data: {
+          ...payload,
+          userId: user.id
+        }
+      })
+
+      // update the user status to TYPED_PROFILE_PENDING
+      // common profile is successfull created so only the specific fields due to the user type
+      // is missing
+      const updateResult = await this.updateById(user.id, {
+        status: 'TYPED_PROFILE_PENDING'
+      })
+
+      if (!updateResult.success) {
+        return updateResult
+      }
+
+      return createResult(result)
+    } catch (e) {
+      this.loggerService.error(e)
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2003') {
+        return createResult(null, false, {
+          type: 'USER_NOT_FOUND',
+          message: 'User not found'
+        })
+      }
+      return createResult(null, false, e.message as string)
+    }
   }
 
   async clearPreviousSessions(user: User) {
@@ -159,11 +195,27 @@ export class UserService {
       ])
     }
 
-    return omit(user, [
+    if (user.profile) {
+      // @ts-ignore
+      user.profile = omit(user.profile, [
+        'id',
+        'createdAt',
+        'updatedAt',
+        'userId'
+      ])
+    }
+
+    const cleanedUser = omit(user, [
       'password',
       'refreshTokens', // manually populate with include property
+      'verified',
+      'verificationToken',
+      'lastVerificationRequest',
+      'status',
       'type',
       'deletedAt',
     ])
+
+    return omitBy(cleanedUser, (value) => value === null)
   }
 }

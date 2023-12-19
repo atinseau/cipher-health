@@ -46,8 +46,7 @@ export class AuthController {
     return {
       success: true,
       data: {
-        id: result.data.user.id,
-        passphrase: result.data.passphrase
+        id: result.data.id,
       }
     }
   }

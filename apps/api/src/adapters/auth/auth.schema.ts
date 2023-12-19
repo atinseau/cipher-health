@@ -15,8 +15,6 @@ export const signupSchema = z.object({
       message: 'Password is too weak, it should contain at least 8 characters, one uppercase, one lowercase, one number and one special character (#?!@$%.^&*-)'
     }),
   confirmPassword: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
   phone: z.string(), // TODO: add phone validation, enforce international phone numbers only (E.164)
 })
 .refine((data) => data.password === data.confirmPassword, {

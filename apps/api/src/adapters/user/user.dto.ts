@@ -15,7 +15,7 @@ export type UserCreate = Omit<User,
   | 'verified'
   | 'verificationToken'
   | 'lastVerificationRequest'
-  | 'completed'
+  | 'status'
 >
 
 export type UserToken = {

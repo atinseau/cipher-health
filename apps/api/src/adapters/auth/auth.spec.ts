@@ -7,8 +7,6 @@ function testPassword(password: string) {
       password: password,
       confirmPassword: password,
       phone: '0606060606',
-      firstName: 'John',
-      lastName: 'Doe',
     })
     return true
   } catch (e) {

@@ -4,6 +4,7 @@ import { AuthMiddleware } from "../auth/auth.middleware";
 import { JwtService } from "@/common/jwt/jwt.service";
 import { UserVerifiedMiddleware } from "../user/middleware/user-verified.middleware";
 import { UserMiddleware } from "../user/middleware/user.middleware";
+import { ClientMiddleware } from "./client.middleware";
 
 @Module({
   providers: [
@@ -19,7 +20,8 @@ export class ClientModule implements NestModule {
       .apply(
         AuthMiddleware, // verify token
         UserMiddleware, // fetch user
-        UserVerifiedMiddleware // check if user is verified
+        UserVerifiedMiddleware, // check if user is verified
+        ClientMiddleware, // check if the user type is "client"
       )
       .forRoutes({ path: '/client/me', method: RequestMethod.GET })
   }
