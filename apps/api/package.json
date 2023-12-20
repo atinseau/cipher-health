@@ -6,10 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "up": "docker-compose up --build -d",
-    "down": "docker-compose down",
-    "predev": "pnpm run up",
-    "postdev": "pnpm run down",
     "build": "nest build",
     "start": "NODE_ENV=production node dist/main",
     "dev": "NODE_ENV=development nest start --watch",

@@ -5,11 +5,9 @@ import { profileCreationSchema } from "../profile.schema";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { UserGuard } from "../guards/user.guard";
 import { UserVerifiedGuard } from "../guards/user-verified.guard";
-import { RequiredProfile, User } from "../user.decorator";
+import { User } from "../user.decorator";
 import { UserProfileGuard } from "../guards/user-profile.guard";
-import { AuthGuard } from "@/adapters/auth/guards/auth.guard";
-
-
+import { AuthGuard } from "@/adapters/auth/auth.guard";
 
 @UseGuards(
   AuthGuard,

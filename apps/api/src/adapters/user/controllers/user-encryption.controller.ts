@@ -5,10 +5,8 @@ import { CryptoService } from "@/common/crypto/crypto.service";
 import { PrismaService } from "@/common/database/prisma.service";
 import { UserGuard } from "../guards/user.guard";
 import { UserVerifiedGuard } from "../guards/user-verified.guard";
-import { AuthGuard } from "@/adapters/auth/guards/auth.guard";
 import { User } from "../user.decorator";
-
-
+import { AuthGuard } from "@/adapters/auth/auth.guard";
 
 @UseGuards(
   AuthGuard,

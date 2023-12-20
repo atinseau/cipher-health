@@ -16,8 +16,13 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+        - ./init.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+        - ./data/db:/var/lib/postgresql/data
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_password
+      POSTGRES_DB: api_db
+      POSTGRES_CRM_USER: crm_user
+      POSTGRES_CRM_PASSWORD: crm_password
+      POSTGRES_CRM_DB: crm_db
