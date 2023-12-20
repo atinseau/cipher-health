@@ -2,4 +2,4 @@
 
 # Remove all node_modules folders
 
-find . -name "node_modules" -type d -prune -exec rm -rf '{}'
+find . -type d -name "node_modules" -exec rm -rf "{}" \; &> /dev/null

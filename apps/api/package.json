@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "postinstall": "prisma generate",
     "build": "nest build",
     "start": "NODE_ENV=production node dist/main",
     "dev": "NODE_ENV=development nest start --watch",
