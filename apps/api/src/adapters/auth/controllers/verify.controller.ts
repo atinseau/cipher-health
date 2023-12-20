@@ -7,7 +7,7 @@ import { PhoneService } from "@/common/phone/phone.service";
 import { RandomService } from "@/common/random/random.service";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "../auth.guard";
+import { AuthGuard } from "../guards/auth.guard";
 
 
 @UseGuards(AuthGuard, UserGuard)

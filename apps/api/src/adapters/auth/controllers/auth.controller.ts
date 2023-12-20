@@ -10,7 +10,7 @@ import { UserModel, UserToken } from '../../user/user.dto';
 import { UserGuard } from '@/adapters/user/guards/user.guard';
 import { User } from '@/adapters/user/user.decorator';
 import { AccessToken } from '../auth.decorator';
-import { AuthGuard } from '../auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {

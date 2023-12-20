@@ -13,6 +13,7 @@ datasource db {
 enum UserType {
   CLIENT
   WORKER
+  ADMIN
 }
 
 enum Gender {
@@ -20,13 +21,12 @@ enum Gender {
   FEMALE
 }
 
-// the status of the user's profile
+// the status of the user's profile (except for ADMIN users)
 // - PROFILE_PENDING: the user has been verified but he hasn't completed his profile yet
 // - TYPED_PROFILE_PENDING: the user has completed his profile but he hasn't completed his specific profile yet (client or worker)
 // - COMPLETED: the user has completed his profile and his specific profile (client or worker)
 enum Status {
   PROFILE_PENDING
-  // ENCRYPTION_PROFILE_PENDING <-- maybe use this later to know when the user can create his encryption profile
   TYPED_PROFILE_PENDING
   COMPLETED
 }
@@ -95,6 +95,7 @@ model User {
   // in all cases (client or worker), the user must complete his profile
   // and all specific fields for his type (client or worker)
   // check the "Status" enum for more details
+  // always null for ADMIN users
   status Status?
 
   refreshTokens RefreshToken[]
@@ -104,6 +105,7 @@ model User {
   // the profile is a one-to-one relationship
   // that contains the user's data for both client and worker
   // the profile is created after the user is verified
+  // always null for ADMIN users
   profile Profile?
 
   // default to CLIENT because the signup process for 
@@ -112,6 +114,7 @@ model User {
 
   // client and worker are one-to-one relationships
   // it's a "typed profile" because the user can be a client or a worker
+  // client and worker will always be null for ADMIN users
 
   // if the user type is a client, he will have a client profile
   client Client?
