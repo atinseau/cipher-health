@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { signinSchema, signupSchema } from '../auth.schema';
 import { UserService } from '../../user/user.service';
 import { omit } from 'lodash';
@@ -8,6 +8,10 @@ import { AuthService } from '../auth.service';
 import { JwtService } from '@/common/jwt/jwt.service';
 import { UserModel, UserToken } from '../../user/user.dto';
 import { VerifyController } from './verify.controller';
+import { UserGuard } from '@/adapters/user/guards/user.guard';
+import { User } from '@/adapters/user/user.decorator';
+import { AccessToken } from '../auth.decorator';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -91,9 +95,10 @@ export class AuthController {
   }
 
   @Get('signout')
+  @UseGuards(AuthGuard, UserGuard)
   async signout(
-    @Body('user') user: UserModel,
-    @Body('accessToken') accessToken: string
+    @User() user: UserModel,
+    @AccessToken() accessToken: string
   ) {
     const logoutResult = await this.authService.logout(user, accessToken)
     if (!logoutResult.success) {
@@ -108,9 +113,12 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(200)
   async refresh(
-    @Body('accessToken') accessToken: string,
-    @Body('refreshToken') refreshToken?: string
+    @Body('accessToken') accessToken: string, // in the body because it's unauthenticated request
+    @Body('refreshToken') refreshToken?: string // in the body because it's unauthenticated request
   ) {
+
+    // TODO: add check for accessToken is defined
+
     if (!refreshToken) {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide a refresh token.')
     }

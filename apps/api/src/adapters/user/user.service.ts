@@ -42,7 +42,7 @@ export class UserService {
         })
       }
 
-      this.loggerService.error(e)
+      this.loggerService.error(e, 'UserService')
       return createResult(null, false, e.message as string)
     }
   }
@@ -63,7 +63,7 @@ export class UserService {
       }
       return createResult(result)
     } catch (e) {
-      this.loggerService.error(e)
+      this.loggerService.error(e, 'UserService')
       return createResult(null, false, e.message as string)
     }
   }
@@ -76,7 +76,7 @@ export class UserService {
       })
       return createResult(result)
     } catch (e) {
-      this.loggerService.error(e)
+      this.loggerService.error(e, 'UserService')
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
         return createResult(null, false, {
           type: 'USER_NOT_FOUND',
@@ -120,7 +120,7 @@ export class UserService {
       }
       return createResult(result)
     } catch (e) {
-      this.loggerService.error(e)
+      this.loggerService.error(e, 'UserService')
       return createResult(null, false, e.message as string)
     }
   }
@@ -147,7 +147,7 @@ export class UserService {
 
       return createResult(result)
     } catch (e) {
-      this.loggerService.error(e)
+      this.loggerService.error(e, 'UserService')
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2003') {
         return createResult(null, false, {
           type: 'USER_NOT_FOUND',
@@ -171,7 +171,7 @@ export class UserService {
       })
       return true
     } catch (e) {
-      this.loggerService.error(e)
+      this.loggerService.error(e, 'UserService')
       return false
     }
   }

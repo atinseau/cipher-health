@@ -9,7 +9,15 @@ export class JwtService {
   constructor(
     private readonly redisService: RedisService,
     private readonly logger: Logger
-  ) {}
+  ) { }
+
+  public getAccessTokenExpiry() {
+    return process.env.ACCESS_TOKEN_EXPIRY || '10m'
+  }
+
+  public getRefreshTokenExpiry() {
+    return process.env.REFRESH_TOKEN_EXPIRY || '7d'
+  }
 
   sign<Payload extends Record<string, any>>(
     payload: Payload,
@@ -32,7 +40,7 @@ export class JwtService {
     })
   }
 
-  verify<T = string | JwtPayload>(token: string, secret: string) {
+  verify<T = JwtPayload>(token: string, secret: string) {
     return new Promise<false | T>((resolve) => {
       verify(token, secret, (err, decoded) => {
         if (err || !decoded) {

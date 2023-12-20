@@ -23,17 +23,29 @@ export class AuthService {
     }
 
     const accessToken = await this.jwtService.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '10min'
+      expiresIn: this.jwtService.getAccessTokenExpiry()
     })
     const refreshToken = await this.jwtService.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: '7d'
+      expiresIn: this.jwtService.getRefreshTokenExpiry()
     })
 
     try {
+      const refreshTokenVerified = await this.jwtService.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+      if (!refreshTokenVerified) {
+        throw new Error('Invalid refresh token')
+      }
+
+      const expiresAt = new Date()
+
+      // Get the expiration date from "exp" of the refresh token
+      // it will be used later to delete a refresh token that is expired but now soft-deleted
+      expiresAt.setTime((refreshTokenVerified.exp || 0) * 1000)
+
       await this.prismaService.refreshToken.create({
         data: {
           token: refreshToken,
           userId: user.id,
+          expiresAt
         }
       })
     } catch (e) {

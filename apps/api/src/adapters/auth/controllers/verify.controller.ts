@@ -1,13 +1,16 @@
+import { UserGuard } from "@/adapters/user/guards/user.guard";
+import { User } from "@/adapters/user/user.decorator";
 import { UserModel } from "@/adapters/user/user.dto";
 import { UserService } from "@/adapters/user/user.service";
 import { CryptoService } from "@/common/crypto/crypto.service";
-import { PrismaService } from "@/common/database/prisma.service";
 import { PhoneService } from "@/common/phone/phone.service";
 import { RandomService } from "@/common/random/random.service";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
-import { Body, Controller, Get, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "../guards/auth.guard";
 
 
+@UseGuards(AuthGuard, UserGuard)
 @Controller('auth/verify')
 export class VerifyController {
 
@@ -19,7 +22,7 @@ export class VerifyController {
   ) { }
 
   @Get()
-  async verify(@Body('user') user: UserModel) {
+  async verify(@User() user: UserModel) {
 
     if (user.verified) {
       throw createRawHttpError(HttpStatus.BAD_REQUEST, 'User already verified')
@@ -69,7 +72,7 @@ export class VerifyController {
 
   @Post('callback')
   async callback(
-    @Body('user') user: UserModel,
+    @User() user: UserModel,
     @Body('code') code: string
   ) {
 

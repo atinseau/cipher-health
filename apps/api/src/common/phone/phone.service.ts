@@ -41,7 +41,7 @@ export class PhoneService implements OnModuleInit {
           })
           return createResult(res)
         } catch (e) {
-          this.loggerService.error(e)
+          this.loggerService.error(e, 'PhoneService')
           return createResult(null, false, 'Unable to send message')
         }
       }

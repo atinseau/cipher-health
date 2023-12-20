@@ -1,17 +1,22 @@
 import { JwtService } from "@/common/jwt/jwt.service";
 import { createRawHttpError } from "@/utils/errors";
-import { HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
-import { NextFunction, Request, Response } from "express";
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
+import { Request } from "express";
 
 
 @Injectable()
-export class AuthMiddleware implements NestMiddleware {
+export class AuthGuard implements CanActivate {
 
   constructor(
     private readonly jwtService: JwtService,
   ) { }
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  canActivate(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest<Request>();
+    return this.validateRequest(request);
+  }
+
+  async validateRequest(req: Request) {
 
     const accessToken = req.headers.authorization?.split(' ')[1]
     if (!accessToken) {
@@ -19,15 +24,15 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     const result = await this.jwtService.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-   
+
     // If the token is invalid/expired or blacklisted, throw an error
     if (!result || await this.jwtService.isBlacklisted(accessToken)) {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
     }
 
-    req.body.userToken = result
-    req.body.accessToken = accessToken
+    req.userJwt = result
+    req.accessToken = accessToken
 
-    next()
+    return true
   }
 }

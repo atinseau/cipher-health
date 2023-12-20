@@ -1,11 +1,20 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { UserModel } from "../user.dto";
 import { createRawHttpError } from "@/utils/errors";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { PrismaService } from "@/common/database/prisma.service";
+import { UserGuard } from "../guards/user.guard";
+import { UserVerifiedGuard } from "../guards/user-verified.guard";
+import { AuthGuard } from "@/adapters/auth/guards/auth.guard";
+import { User } from "../user.decorator";
 
 
 
+@UseGuards(
+  AuthGuard,
+  UserGuard,
+  UserVerifiedGuard
+)
 @Controller('user/encryption')
 export class UserEncryptionController {
 
@@ -22,7 +31,7 @@ export class UserEncryptionController {
   @Post('profile/create')
   @HttpCode(201)
   async createEncryptionProfile(
-    @Body('user') user: UserModel,
+    @User() user: UserModel,
     @Body('password') password: string
   ) {
 
