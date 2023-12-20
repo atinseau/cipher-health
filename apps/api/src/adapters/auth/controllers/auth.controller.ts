@@ -7,11 +7,10 @@ import { CryptoService } from '@/common/crypto/crypto.service';
 import { AuthService } from '../auth.service';
 import { JwtService } from '@/common/jwt/jwt.service';
 import { UserModel, UserToken } from '../../user/user.dto';
-import { VerifyController } from './verify.controller';
 import { UserGuard } from '@/adapters/user/guards/user.guard';
 import { User } from '@/adapters/user/user.decorator';
 import { AccessToken } from '../auth.decorator';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('auth')
 export class AuthController {

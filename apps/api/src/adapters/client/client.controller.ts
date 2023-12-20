@@ -4,7 +4,7 @@ import { UserService } from "../user/user.service";
 import { UserGuard } from "../user/guards/user.guard";
 import { UserVerifiedGuard } from "../user/guards/user-verified.guard";
 import { ClientGuard } from "./guards/client.guard";
-import { AuthGuard } from "../auth/guards/auth.guard";
+import { AuthGuard } from "../auth/auth.guard";
 
 @UseGuards(
   AuthGuard,
