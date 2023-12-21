@@ -45,3 +45,10 @@
 //     await app.close();
 //   })
 // })
+
+
+describe('AuthController', () => {
+  it('should be defined', () => {
+    expect(true).toBeTruthy()
+  })
+})

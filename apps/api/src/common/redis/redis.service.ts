@@ -1,19 +1,24 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 
 import { createClient, RedisClientType } from 'redis'
+import { Logger } from "../logger/logger.service";
 
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-  
+
   public redis: RedisClientType
+
+  constructor(
+    private readonly loggerService: Logger
+  ) {}
 
   async onModuleInit() {
     this.redis = createClient({
       url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
     })
     await this.redis.connect().then(() => {
-      console.log('Redis connected')
+      this.loggerService.log('Redis is connected', 'RedisService')
     })
   }
 

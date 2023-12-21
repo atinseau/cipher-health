@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { signinSchema, signupSchema } from '../auth.schema';
 import { UserService } from '../../user/user.service';
 import { omit } from 'lodash';
@@ -11,6 +11,8 @@ import { UserGuard } from '@/adapters/user/guards/user.guard';
 import { User } from '@/adapters/user/user.decorator';
 import { AccessToken } from '../auth.decorator';
 import { AuthGuard } from '../guards/auth.guard';
+import { Throttle } from '@nestjs/throttler';
+import { UserType } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -27,18 +29,31 @@ export class AuthController {
     return 'OK'
   }
 
+  /**
+   * The "stwt" param is used to differentiate which type of user is signing up (act like an invitation ).
+   * is verified with the STWT_SECRET env variable.
+   * If the token is not valid, the request is rejected.
+   * 
+   * if stwt is not provided, the user will always be created as a CLIENT.
+   */
   @Post('signup')
   @HttpCode(201)
-  async signup(@Body() body: any) {
+  async signup(
+    @Body() body: any,
+    @Param('stwt') stwt?: string // Signup Token With Type (stwt)
+  ) {
 
     const output = signupSchema.safeParse(body)
 
     if (!output.success)
       throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
 
-    const result = await this.userService.create(omit(output.data, [
-      'confirmPassword'
-    ]))
+
+    const result = await this.userService.create({
+      ...omit(output.data, [
+        'confirmPassword'
+      ]),
+    })
 
     if (!result.success) {
       throw createHttpError(result, {
@@ -55,8 +70,12 @@ export class AuthController {
   }
 
   @Post('signin')
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   @HttpCode(200)
-  async signin(@Body() body: any) {
+  async signin(
+    @Body() body: any,
+    @Query('type') type: UserType = 'CLIENT'
+  ) {
     const output = signinSchema.safeParse(body)
 
     if (!output.success)
@@ -81,11 +100,14 @@ export class AuthController {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
     }
 
+    if (result.data.type !== type) {
+      // it's a bit misleading, but it's for security reasons
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
+    }
+
     // Ban all previous sessions (soft delete all refresh tokens)
     // Potentially some access tokens could still be valid, but they will be invalid after they expire
     await this.userService.clearPreviousSessions(result.data)
-
-    // TODO: ban access tokens in redis
 
     return {
       success: true,
@@ -110,6 +132,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   @HttpCode(200)
   async refresh(
     @Body('accessToken') accessToken: string, // in the body because it's unauthenticated request

@@ -5,10 +5,11 @@ import { UserCreate, UserModel } from "./user.dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { createResult } from "@/utils/errors";
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User, UserType } from "@prisma/client";
 import { merge, omit, omitBy } from "lodash";
 import { profileCreationSchema } from "./profile.schema";
 import { z } from "zod";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 
 @Injectable()
 export class UserService {
@@ -16,22 +17,52 @@ export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly cryptoService: CryptoService,
-    private readonly loggerService: Logger
+    private readonly loggerService: Logger,
+    private readonly eventEmitter: EventEmitter2
   ) { }
+
+  /**
+   * This function is called when the user is created
+   * If the user is an admin, he can be verified or not
+   * if the admin don't need to be verified, the status is set to PROFILE_PENDING
+   * 
+   * if the user is not an admin, he must be verified by email in any case
+   */
+  private getInitalStatus(type: UserType, verified?: boolean): Partial<User> {
+    if (type === 'ADMIN') {
+      return {
+        verified: verified || false,
+        status: verified === true ? 'PROFILE_PENDING' : undefined
+      }
+    }
+    return {}
+  }
 
   /**
    * The password type checking should be done in the function that calls this one
    * that why we force the password to be defined here
    */
-  async create(user: UserCreate & { password: string }) {
+  async create(user: UserCreate & {
+    password: string,
+    type?: UserType,
+    verified?: boolean,
+  }) {
     try {
+
+      const type = user?.type || 'CLIENT'
+
       const result = await this.prismaService.user.create({
         data: {
           ...user,
+          ...this.getInitalStatus(type, user.verified),
+          type,
           // Password will always be defined here because of the schema
           password: await this.cryptoService.hash(user.password),
         }
       })
+
+      this.eventEmitter.emit('user.created', result)
+
       return createResult(result)
     } catch (e) {
 

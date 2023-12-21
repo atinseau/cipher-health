@@ -1,4 +1,4 @@
-import { UserModel } from "@/adapters/user/user.dto"
+import { UserModel } from "../adapters/user/user.dto"
 import { JwtPayload } from "jsonwebtoken"
 
 declare global {
@@ -11,7 +11,13 @@ declare global {
       REFRESH_TOKEN_SECRET: string
       REDIS_HOST: string
       REDIS_PORT: string
+      TWILIO_ACCOUNT_SID: string
+      TWILIO_AUTH_TOKEN: string
       NODE_ENV: 'development' | 'production'
+      MAIL_USER: string
+      MAIL_PASSWORD: string
+      ADMIN_PASSWORD: string
+      ADMIN_EMAIL: string
     }
   }
 
@@ -24,4 +30,9 @@ declare global {
   }
 }
 
-export {}
+
+export type {
+  UserModel
+}
+
+export type * from '@prisma/client'

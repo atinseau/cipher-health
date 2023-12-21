@@ -5,10 +5,12 @@ import { UserController } from './controllers/user.controller';
 import { UserEncryptionController } from './controllers/user-encryption.controller';
 import { JwtService } from '@/common/jwt/jwt.service';
 import { UserTasks } from './user.tasks';
+import { UserEvents } from './user.events';
 
 @Global()
 @Module({
   providers: [
+    UserEvents,
     UserService,
     UserTasks,
     JwtService,

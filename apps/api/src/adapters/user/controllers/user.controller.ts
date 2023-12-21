@@ -7,7 +7,7 @@ import { UserGuard } from "../guards/user.guard";
 import { UserVerifiedGuard } from "../guards/user-verified.guard";
 import { User } from "../user.decorator";
 import { UserProfileGuard } from "../guards/user-profile.guard";
-import { AuthGuard } from "@/adapters/auth/auth.guard";
+import { AuthGuard } from "@/adapters/auth/guards/auth.guard";
 
 @UseGuards(
   AuthGuard,

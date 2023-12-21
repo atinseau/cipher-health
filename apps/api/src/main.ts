@@ -14,6 +14,9 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import helmet from 'helmet';
 import { ThrottlerExceptionFilter } from './common/throttler/throttler-exception.filter';
+import { MailModule } from './common/mail/mail.module';
+import { AdminModule } from './adapters/admin/admin.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -24,13 +27,16 @@ import { ThrottlerExceptionFilter } from './common/throttler/throttler-exception
     ConfigModule.forRoot({
       isGlobal: true
     }),
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    PrismaModule,
     PhoneModule,
+    MailModule,
     RedisModule,
     LoggerModule,
-    PrismaModule,
     UserModule,
     AuthModule,
+    AdminModule,
     ClientModule,
   ],
   providers: [

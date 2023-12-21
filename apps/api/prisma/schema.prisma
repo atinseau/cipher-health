@@ -21,7 +21,6 @@ enum Gender {
   FEMALE
 }
 
-// the status of the user's profile (except for ADMIN users)
 // - PROFILE_PENDING: the user has been verified but he hasn't completed his profile yet
 // - TYPED_PROFILE_PENDING: the user has completed his profile but he hasn't completed his specific profile yet (client or worker)
 // - COMPLETED: the user has completed his profile and his specific profile (client or worker)
@@ -105,7 +104,6 @@ model User {
   // the profile is a one-to-one relationship
   // that contains the user's data for both client and worker
   // the profile is created after the user is verified
-  // always null for ADMIN users
   profile Profile?
 
   // default to CLIENT because the signup process for 
@@ -120,6 +118,9 @@ model User {
   client Client?
   // if the user type is a worker, he will have a worker profile
   worker Worker?
+
+  // if the user is an admin, he will have an admin profile
+  admin Admin?
 }
 
 model RefreshToken {
@@ -160,6 +161,19 @@ model Worker {
   // ...
 
   // the user who owns this client profile
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // extra fields for the admin
+  // ...
+
+  // the user who owns this admin profile
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 }

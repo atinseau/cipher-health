@@ -1,0 +1,11 @@
+{
+  "name": "@cipher-health/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "@cipher-health/api": "workspace:*"
+  },
+  "exports": {
+    ".": "./index.ts"
+  }
+}

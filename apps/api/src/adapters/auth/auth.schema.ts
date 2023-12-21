@@ -23,6 +23,11 @@ export const signupSchema = z.object({
 });
 
 export const signinSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8).max(50),
+  email: z
+    .string()
+    .email(),
+  password: z
+    .string()
+    .min(8, 'Password is too short - should be 8 chars minimum.')
+    .max(50, 'Password is too long - should be 50 chars maximum.'),
 })

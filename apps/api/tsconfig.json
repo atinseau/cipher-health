@@ -8,6 +8,8 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -21,5 +23,5 @@
     "paths": {
       "@/*": ["src/*"],
     }
-  }
+  },
 }
