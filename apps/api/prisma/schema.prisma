@@ -21,15 +21,6 @@ enum Gender {
   FEMALE
 }
 
-// - PROFILE_PENDING: the user has been verified but he hasn't completed his profile yet
-// - TYPED_PROFILE_PENDING: the user has completed his profile but he hasn't completed his specific profile yet (client or worker)
-// - COMPLETED: the user has completed his profile and his specific profile (client or worker)
-enum Status {
-  PROFILE_PENDING
-  TYPED_PROFILE_PENDING
-  COMPLETED
-}
-
 model EncryptionProfile {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
@@ -90,12 +81,8 @@ model User {
 
   phone String @unique // if the user wants to use 2FA with his phone
 
-  // use this status key to know if the user has completed his profile
-  // in all cases (client or worker), the user must complete his profile
-  // and all specific fields for his type (client or worker)
-  // check the "Status" enum for more details
-  // always null for ADMIN users
-  status Status?
+  // set to true when the user completes his profile and his typed profile (client or worker or admin)
+  completed Boolean @default(false)
 
   refreshTokens RefreshToken[]
 
@@ -171,7 +158,7 @@ model Admin {
   updatedAt DateTime @updatedAt
 
   // extra fields for the admin
-  // ...
+  permissions String[]
 
   // the user who owns this admin profile
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

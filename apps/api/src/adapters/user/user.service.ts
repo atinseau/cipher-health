@@ -32,21 +32,13 @@ export class UserService {
     if (type === 'ADMIN') {
       return {
         verified: verified || false,
-        status: verified === true ? 'PROFILE_PENDING' : undefined
       }
     }
     return {}
   }
 
-  /**
-   * The password type checking should be done in the function that calls this one
-   * that why we force the password to be defined here
-   */
-  async create(user: UserCreate & {
-    password: string,
-    type?: UserType,
-    verified?: boolean,
-  }) {
+
+  async create(user: UserCreate) {
     try {
 
       const type = user?.type || 'CLIENT'
@@ -165,17 +157,6 @@ export class UserService {
         }
       })
 
-      // update the user status to TYPED_PROFILE_PENDING
-      // common profile is successfull created so only the specific fields due to the user type
-      // is missing
-      const updateResult = await this.updateById(user.id, {
-        status: 'TYPED_PROFILE_PENDING'
-      })
-
-      if (!updateResult.success) {
-        return updateResult
-      }
-
       return createResult(result)
     } catch (e) {
       this.loggerService.error(e, 'UserService')
@@ -209,6 +190,14 @@ export class UserService {
 
   sanitize(user: UserModel) {
 
+    const BASE_RELATION_REMOVED_FIELDS = [
+      'id',
+      'userId',
+      'createdAt',
+      'updatedAt',
+      'deletedAt',
+    ]
+
     // Reduce the size of the encryption profile to convert the buffers to hex strings
     if (user.encryptionProfile) {
       // prevent sending to client a buffer instead of hex string (more readable)
@@ -218,22 +207,19 @@ export class UserService {
       })
       // @ts-ignore
       user.encryptionProfile = omit(user.encryptionProfile, [
-        'userId',
+        ...BASE_RELATION_REMOVED_FIELDS,
         'recoveryKey',
-        'createdAt',
-        'updatedAt',
-        'deletedAt',
       ])
     }
 
     if (user.profile) {
       // @ts-ignore
-      user.profile = omit(user.profile, [
-        'id',
-        'createdAt',
-        'updatedAt',
-        'userId'
-      ])
+      user.profile = omit(user.profile, BASE_RELATION_REMOVED_FIELDS)
+    }
+
+    if (user.admin) {
+      // @ts-ignore
+      user.admin = omit(user.admin, BASE_RELATION_REMOVED_FIELDS)
     }
 
     const cleanedUser = omit(user, [

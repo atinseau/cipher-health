@@ -4,9 +4,6 @@ CREATE TYPE "UserType" AS ENUM ('CLIENT', 'WORKER', 'ADMIN');
 -- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE');
 
--- CreateEnum
-CREATE TYPE "Status" AS ENUM ('PROFILE_PENDING', 'TYPED_PROFILE_PENDING', 'COMPLETED');
-
 -- CreateTable
 CREATE TABLE "EncryptionProfile" (
     "id" TEXT NOT NULL,
@@ -53,7 +50,7 @@ CREATE TABLE "User" (
     "verificationToken" TEXT,
     "lastVerificationRequest" TIMESTAMP(3),
     "phone" TEXT NOT NULL,
-    "status" "Status",
+    "completed" BOOLEAN NOT NULL DEFAULT false,
     "type" "UserType" NOT NULL DEFAULT 'CLIENT',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -97,6 +94,7 @@ CREATE TABLE "Admin" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "permissions" TEXT[],
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")

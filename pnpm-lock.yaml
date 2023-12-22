@@ -259,6 +259,10 @@ importers:
         version: 5.3.2
 
   packages/sdk:
+    dependencies:
+      async-mutex:
+        specifier: ^0.4.0
+        version: 0.4.0
     devDependencies:
       '@cipher-health/api':
         specifier: workspace:*
@@ -3493,6 +3497,12 @@ packages:
     dependencies:
       tslib: 2.6.2
     dev: true
+
+  /async-mutex@0.4.0:
+    resolution: {integrity: sha512-eJFZ1YhRR8UN8eBLoNzcDPcy/jqjsg6I1AP+KvWQX80BqOSW1oJPJXDylPUEeMr2ZQvHgnQ//Lp6f3RQ1zI7HA==}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
 
   /asynciterator.prototype@1.0.0:
     resolution: {integrity: sha512-wwHYEIS0Q80f5mosx3L/dfG5t5rjEa9Ft51GTaNt862EnpyGHpgz2RkZvLPp1oF5TnAiTohkEKVEu8pQPJI7Vg==}

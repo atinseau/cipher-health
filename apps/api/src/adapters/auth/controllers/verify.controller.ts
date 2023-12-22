@@ -106,7 +106,6 @@ export class VerifyController {
       verified: true,
       verificationToken: null,
       lastVerificationRequest: null,
-      status: 'PROFILE_PENDING' // if the user is verified, then the profile is pending for creation
     })
 
     if (!updateResult.success) {

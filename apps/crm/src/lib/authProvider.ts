@@ -1,12 +1,9 @@
 import { AuthProvider } from "react-admin";
-import { Authentificator } from '@cipher-health/sdk'
-
-const authentificator = new Authentificator({
-  mode: 'ADMIN'
-});
+import { authentificator } from "../auth";
 
 export const authProvider: AuthProvider = {
   login: async ({ username, password }) => {
+    console.log('login')
     try {
       await authentificator.login({
         email: username,
@@ -17,20 +14,29 @@ export const authProvider: AuthProvider = {
       return Promise.reject((e as Error).message);
     }
   },
-  checkAuth: () => {
-    return authentificator.isConnected
+  checkAuth: async () => {
+    console.log('checkAuth')
+    const isConnected = await authentificator.isConnected()
+    return isConnected
       ? Promise.resolve()
-      : Promise.reject('Not authenticated');
+      : Promise.reject();
   },
-  getPermissions: () => {
+  getPermissions: async () => {
     console.log('getPermissions')
-    // Required for the authentication to work
-    return Promise.resolve();
+    try {
+      const me = await authentificator.me()
+      return Promise.resolve(me.admin?.permissions || [])
+    } catch (e) {
+      return Promise.reject();
+    }
   },
   checkError: () => {
+    // not implemented yet
+    console.log('checkError')
     return Promise.resolve();
   },
   getIdentity: async () => {
+    console.log('getIdentity')
     try {
       const me = await authentificator.me()
 
@@ -48,6 +54,7 @@ export const authProvider: AuthProvider = {
     }
   },
   logout: async () => {
+    console.log('logout')
     try {
       await authentificator.logout()
       return Promise.resolve();

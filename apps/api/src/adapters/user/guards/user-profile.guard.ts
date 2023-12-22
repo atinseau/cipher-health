@@ -28,8 +28,6 @@ export class UserProfileGuard implements CanActivate {
     }
 
     const userProfile = await this.userService.findProfileByUserId(user.id)
-
-    const path = req.route.path as string
     if (!userProfile.success && requiredProfile !== undefined) {
       throw createRawHttpError(HttpStatus.NOT_FOUND, 'There is no profile for this user.')
     }

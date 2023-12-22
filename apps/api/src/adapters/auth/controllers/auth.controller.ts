@@ -11,7 +11,7 @@ import { UserGuard } from '@/adapters/user/guards/user.guard';
 import { User } from '@/adapters/user/user.decorator';
 import { AccessToken } from '../auth.decorator';
 import { AuthGuard } from '../guards/auth.guard';
-import { Throttle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UserType } from '@prisma/client';
 
 @Controller('auth')
@@ -100,8 +100,10 @@ export class AuthController {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
     }
 
+    // if the user is not of the type requested, reject the request
     if (result.data.type !== type) {
       // it's a bit misleading, but it's for security reasons
+      // we don't want to tell the user that the email exists in the database
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
     }
 
@@ -116,6 +118,7 @@ export class AuthController {
   }
 
   @Get('signout')
+  @SkipThrottle() // no need to throttle this request
   @UseGuards(AuthGuard, UserGuard)
   async signout(
     @User() user: UserModel,
