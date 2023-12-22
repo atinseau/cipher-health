@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth/guards/auth.guard";
 import { UserGuard } from "../user/guards/user.guard";
 import { UserVerifiedGuard } from "../user/guards/user-verified.guard";
@@ -7,19 +7,22 @@ import { User } from "../user/user.decorator";
 import { UserModel } from "../user/user.dto";
 import { UserProfileGuard } from "../user/guards/user-profile.guard";
 import { UserService } from "../user/user.service";
+import { AdminService } from "./admin.service";
+import { FilterQuery, IFilterQuery } from "@/utils/decorators/FilterQuery";
 
 @UseGuards(
   AuthGuard,
   UserGuard,
+  AdminGuard,
   UserVerifiedGuard,
   UserProfileGuard,
-  AdminGuard,
 )
 @Controller('admin')
 export class AdminController {
 
   constructor(
     private readonly userService: UserService,
+    private readonly adminService: AdminService,
   ) {}
 
   /**
@@ -31,6 +34,20 @@ export class AdminController {
     return {
       success: true,
       data: this.userService.sanitize(user)
+    }
+  }
+
+
+  @Get('all')
+  async getAdmins(@FilterQuery() filterQuery: IFilterQuery) {
+
+    console.log(filterQuery)
+
+    const admins = await this.adminService.findAll()
+
+    return {
+      success: true,
+      data: admins.data.map((admin) => this.userService.sanitize(admin))
     }
   }
 

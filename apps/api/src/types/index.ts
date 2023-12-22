@@ -23,16 +23,13 @@ declare global {
 
   namespace Express {
     export interface Request {
-     userJwt?: JwtPayload
-     user?: UserModel
-     accessToken: string
+      userJwt?: JwtPayload
+      user?: UserModel
+      accessToken: string
     }
   }
 }
 
 
-export type {
-  UserModel
-}
-
+export type * from '../adapters/user/user.dto'
 export type * from '@prisma/client'

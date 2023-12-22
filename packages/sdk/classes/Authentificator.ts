@@ -130,7 +130,7 @@ export class Authentificator {
     return res.data
   }
 
-  // public getClient() {
-  //   return this.client
-  // }
+  getClient() {
+    return this.client
+  }
 }

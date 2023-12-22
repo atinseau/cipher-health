@@ -3,11 +3,13 @@ import { ClientError } from './ClientError'
 
 import { Mutex } from 'async-mutex'
 
+type Params = Record<string, string | number>
+
 type RequestOrder<T extends 'GET' | 'POST'> = {
   endpoint: string
   ttl?: number // time to live of the req cache
   skipHooks?: HookType[]
-  params?: Record<string, string>
+  params?: Params
 } & (
     T extends 'POST'
     ? { body?: Record<string, any> }
@@ -35,9 +37,22 @@ export class Client {
     return endpoint[0] === '/' ? endpoint : '/' + endpoint
   }
 
-  private createUrl(endpoint: string, params?: Record<string, string>) {
+  private createUrl(endpoint: string, params?: Params) {
     const url = new URL(HOST + this.formatEndpoint(endpoint))
-    url.search = new URLSearchParams(params).toString()
+    const formattedParams = Object.keys(params || {}).reduce((acc, key) => {
+      if (typeof params[key] === 'number') {
+        return {
+          ...acc,
+          [key]: params[key].toString()
+        }
+      }
+      return {
+        ...acc,
+        [key]: params[key]
+      }
+    }, {})
+
+    url.search = new URLSearchParams(formattedParams).toString()
     return url
   }
 
@@ -127,7 +142,7 @@ export class Client {
     }
   }
 
-  async get<T extends Record<string, any>>(order: RequestOrder<'GET'>) {
+  async get<T extends Record<string, any> | null>(order: RequestOrder<'GET'>) {
     const { endpoint, params } = order
     const url = this.createUrl(endpoint, params)
 

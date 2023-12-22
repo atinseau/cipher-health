@@ -90,4 +90,28 @@ export class AdminService implements OnApplicationBootstrap {
 
     return createResult(userModel)
   }
+
+
+  async findAll() {
+    const admins = await this.prismaService.user.findMany({
+      include: {
+        profile: true,
+        admin: true,
+      },
+      where: {
+        type: 'ADMIN',
+        profile: {
+          id: {
+            not: undefined
+          }
+        },
+        admin: {
+          id: {
+            not: undefined
+          }
+        }
+      }
+    })
+    return createResult(admins as UserModel[])
+  }
 }

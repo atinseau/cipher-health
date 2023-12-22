@@ -1,11 +1,15 @@
 import { DataProvider, GetListParams, GetListResult } from "react-admin";
+import { getAdminListResult } from "../resources/AdminResource/adminListResult";
 
 async function getList(resource: string, params: GetListParams): Promise<GetListResult> {
-  console.log(resource, params)
-
-  return {
-    data: [{ id: '1', title: "salut" }],
-    total: 1
+  switch (resource) {
+    case 'admin':
+      return getAdminListResult(params)
+    default:
+      return {
+        data: [],
+        total: 0
+      }
   }
 }
 
