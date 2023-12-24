@@ -18,20 +18,42 @@ type RequestOrder<T extends 'GET' | 'POST'> = {
 
 type HookType = 'afterRequest' | 'beforeRequest'
 
-type HookController = {
-  retry: () => void
-}
+type AfterRequestHook = (
+  res: Response,
+  controller: {
+    retry: () => Promise<void>
+    retryCount: number
+  }
+) => Promise<void>
 
-type HookCallback = (res: Response, controller: HookController) => Promise<void>
+type BeforeRequestHook = (
+  // ...
+) => Promise<void>
+
+type HookCallback<T extends HookType> = T extends 'afterRequest'
+  ? AfterRequestHook
+  : BeforeRequestHook
+
+type RequestContext = Record<string, {
+  mutex: Mutex,
+  output: any
+}>
+
+type ClientOptions = {
+  threadSafe?: boolean
+}
 
 export class Client {
 
   private customHeaders: Record<string, string> = {}
-  private hooks: Record<HookType, HookCallback> = {} as any
-
+  private hooks: Record<HookType, HookCallback<any>> = {} as any
   private cache: Record<string, { output: any, timestamp: number }> = {}
+  private requestContext: RequestContext = {}
+  private options: ClientOptions = {}
 
-  private mutexs: Record<string, Mutex> = {}
+  constructor(options?: ClientOptions) {
+    this.options = options || { threadSafe: false }
+  }
 
   private formatEndpoint(endpoint: string) {
     return endpoint[0] === '/' ? endpoint : '/' + endpoint
@@ -56,12 +78,46 @@ export class Client {
     return url
   }
 
-  private async request<T>(url: string, options: RequestInit & { config: { ttl?: number, skipHooks?: HookType[] } }): Promise<[T, ClientError | Error | null]> {
-    let res: Response
+
+  /**
+   * This function is thread safe (if threadSafe is set to true, by default it's false)
+   * that means that if multiple requests are made at the same time
+   * only one will resolve the request, the others will wait for the first one to finish
+   */
+  private async request<T>(
+    url: string,
+    options: RequestInit & { config: { ttl?: number, skipHooks?: HookType[] } }
+  ): Promise<[T, ClientError | Error | null]> {
 
     const config = options.config;
 
-    async function execute() {
+    // If there is cache, no need to continue
+    // We return the cached value
+    if (this.cache[url] && Date.now() - this.cache[url].timestamp < config.ttl) {
+      return this.cache[url].output as any
+    }
+
+    // If the request is already being made
+    // we wait for it to finish and return the output
+    if (this.options.threadSafe && this.requestContext[url]?.mutex.isLocked()) {
+      await this.requestContext[url].mutex.waitForUnlock()
+      return this.requestContext[url].output
+    }
+
+
+    let res: Response
+    let retryCount = 0
+
+    if (this.options.threadSafe && !this.requestContext[url]) {
+      this.requestContext[url] = {} as any
+      this.requestContext[url].mutex = new Mutex()
+    }
+
+    const release = this.options.threadSafe
+      ? await this.requestContext[url].mutex.acquire()
+      : undefined
+
+    async function execute(this: Client) {
       res = await fetch(url, {
         ...options,
         headers: {
@@ -69,33 +125,20 @@ export class Client {
           ...this.customHeaders,
         }
       })
-    }
 
-    if (!this.mutexs[url]) {
-      this.mutexs[url] = new Mutex()
-    }
-
-    const release = await this.mutexs[url].acquire()
-    if (this.cache[url] && Date.now() - this.cache[url].timestamp < config.ttl) {
-      release()
-      return this.cache[url].output as any
-    }
-
-    const fn = execute.bind(this)
-    await fn()
-    if (this.hooks['afterRequest'] && !config.skipHooks?.includes('afterRequest')) {
-      try {
-        await this.hooks['afterRequest'](res, {
-          retry: () => fn()
-        })
-      } catch (e) {
-        release()
-        return [
-          null,
-          e
-        ]
+      if (this.hooks['afterRequest'] && !config.skipHooks?.includes('afterRequest')) {
+        try {
+          await this.hooks['afterRequest'](res, {
+            retry: execute.bind(this),
+            retryCount: retryCount++
+          })
+        } catch (e) {
+          console.error('Error in afterRequest hook', e)
+        }
       }
     }
+
+    await execute.bind(this)()
 
     let data = await res.json()
     let error = res.ok ? null : new ClientError({
@@ -117,11 +160,15 @@ export class Client {
       }
     }
 
-    release()
+    if (this.options.threadSafe && release) {
+      release()
+      this.requestContext[url].output = output
+    }
+
     return output as any
   }
 
-  public addHook(hook: HookType, callback: HookCallback) {
+  public addHook<T extends HookType>(hook: T, callback: HookCallback<T>) {
     this.hooks[hook] = callback
   }
 
@@ -142,13 +189,18 @@ export class Client {
     }
   }
 
-  async get<T extends Record<string, any> | null>(order: RequestOrder<'GET'>) {
-    const { endpoint, params } = order
+  async get<T extends Record<string, any> | null>(order: RequestOrder<'GET'> | string) {
+
+    let preparedOrder: RequestOrder<'GET'> = typeof order === 'string'
+      ? { endpoint: order }
+      : order
+
+    const { endpoint, params } = preparedOrder
     const url = this.createUrl(endpoint, params)
 
     const request = await this.request<T>(url.toString(), {
       method: 'GET',
-      config: order,
+      config: preparedOrder,
     })
     return request
   }

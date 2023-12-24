@@ -1,10 +1,10 @@
 import { GetListParams, GetListResult } from "react-admin"
-import { authentificator } from "../../auth"
-import { UserModel } from "@cipher-health/api"
+import { authentificator } from "../../../auth"
+import { UserModel } from "@cipher-health/sdk"
 
 const client = authentificator.getClient()
 
-export async function getAdminListResult(params: GetListParams): Promise<GetListResult> {
+export async function getAdminList(params: GetListParams): Promise<GetListResult> {
   
   const [res, error] = await client.get<{ data: UserModel[] }>({
     endpoint: '/admin/all',
@@ -25,11 +25,14 @@ export async function getAdminListResult(params: GetListParams): Promise<GetList
   }
 
   const { data } = res
-
-  console.log(data)
   
   return {
-    data: [{ id: '1', title: "salut" }],
-    total: 1
+    data: data.map((user) => ({
+      id: user.id,
+      fullName: `${user.profile?.firstName} ${user.profile?.lastName}`,
+      email: user.email,
+      permissions: user.admin?.permissions || []
+    })),
+    total: data.length
   }
 }

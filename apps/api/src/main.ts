@@ -20,10 +20,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    // TODO: configure throttler on all routes
+    // ThrottlerModule.forRoot([{
+    //   ttl: 60000,
+    //   limit: 100,
+    // }]),
     ConfigModule.forRoot({
       isGlobal: true
     }),
@@ -39,12 +40,12 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AdminModule,
     ClientModule,
   ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard
-    }
-  ]
+  // providers: [
+  //   {
+  //     provide: APP_GUARD,
+  //     useClass: ThrottlerGuard
+  //   }
+  // ]
 })
 export class AppModule { }
 

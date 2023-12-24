@@ -8,7 +8,7 @@ import { UserModel } from "../user/user.dto";
 import { UserProfileGuard } from "../user/guards/user-profile.guard";
 import { UserService } from "../user/user.service";
 import { AdminService } from "./admin.service";
-import { FilterQuery, IFilterQuery } from "@/utils/decorators/FilterQuery";
+import { ListQuery, IListQuery } from "@/utils/decorators/searchQuery";
 
 @UseGuards(
   AuthGuard,
@@ -39,9 +39,9 @@ export class AdminController {
 
 
   @Get('all')
-  async getAdmins(@FilterQuery() filterQuery: IFilterQuery) {
+  async getAdmins(@ListQuery() listQuery: IListQuery) {
 
-    console.log(filterQuery)
+    console.log(listQuery)
 
     const admins = await this.adminService.findAll()
 

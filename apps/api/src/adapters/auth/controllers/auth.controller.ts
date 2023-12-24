@@ -11,7 +11,7 @@ import { UserGuard } from '@/adapters/user/guards/user.guard';
 import { User } from '@/adapters/user/user.decorator';
 import { AccessToken } from '../auth.decorator';
 import { AuthGuard } from '../guards/auth.guard';
-import { SkipThrottle, Throttle } from '@nestjs/throttler';
+// import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UserType } from '@prisma/client';
 
 @Controller('auth')
@@ -70,7 +70,6 @@ export class AuthController {
   }
 
   @Post('signin')
-  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   @HttpCode(200)
   async signin(
     @Body() body: any,
@@ -118,7 +117,6 @@ export class AuthController {
   }
 
   @Get('signout')
-  @SkipThrottle() // no need to throttle this request
   @UseGuards(AuthGuard, UserGuard)
   async signout(
     @User() user: UserModel,
@@ -135,7 +133,6 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   @HttpCode(200)
   async refresh(
     @Body('accessToken') accessToken: string, // in the body because it's unauthenticated request

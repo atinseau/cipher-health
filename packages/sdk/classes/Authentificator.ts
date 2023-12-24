@@ -1,3 +1,4 @@
+import { Mutex } from "async-mutex";
 import { Client } from "./Client"
 
 import { UserType, UserModel } from '@cipher-health/api'
@@ -12,16 +13,29 @@ export class Authentificator {
   private client: Client;
   private options: AuthentificatorOptions;
 
-  constructor(options: AuthentificatorOptions) {
-    this.options = options;
-    this.client = new Client();
+  private refreshMutex = new Mutex()
+
+  constructor(options?: AuthentificatorOptions) {
+    this.options = options || { mode: 'CLIENT' };
+    this.client = new Client({
+      threadSafe: true
+    });
 
     this.client.addHook('afterRequest', async (res, controller) => {
-      if (res.status === 401) {
+      // If the token is expired, the server will return a 401
+      // We try to refresh the token and retry the request
+      // If the refresh fails, the initial request will fail
+      // and it's the responsability to the user to handle the error
+      if (res.status === 401 && controller.retryCount === 0) {
         await this.refresh()
         return controller.retry()
       }
     })
+
+    // not implemented yet
+    // this.client.addHook('beforeRequest', async () => {
+    // ...
+    // })
 
     this.applyHeaders()
   }
@@ -39,7 +53,18 @@ export class Authentificator {
     this.client.removeHeaders()
   }
 
+  /**
+   * This function is thread safe
+   * that means that if multiple requests are made at the same time
+   * only one will refresh the token, the others will wait for the first one to finish
+   */
   private async refresh() {
+
+    if (this.refreshMutex.isLocked()) {
+      return this.refreshMutex.waitForUnlock()
+    }
+
+    const release = await this.refreshMutex.acquire()
     const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>({
       endpoint: '/auth/refresh',
       skipHooks: ['afterRequest'],
@@ -50,15 +75,23 @@ export class Authentificator {
     })
 
     if (error) {
+      release()
       throw error
     }
 
     localStorage.setItem('accessToken', res.data.accessToken)
     localStorage.setItem('refreshToken', res.data.refreshToken)
     this.applyHeaders()
+    release()
   }
 
   async login({ email, password }: { email: string, password: string }) {
+
+    // if already connected, do nothing
+    if (await this.isConnected()) {
+      return
+    }
+
     const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>({
       endpoint: '/auth/signin',
       skipHooks: ['afterRequest'],
@@ -70,6 +103,7 @@ export class Authentificator {
         password,
       }
     })
+
     if (error) {
       throw error
     }
@@ -79,6 +113,12 @@ export class Authentificator {
   }
 
   async logout() {
+
+    // If there is no token, do nothing
+    if (!this.isSoftConnected()) {
+      return
+    }
+
     // Throw nothing if the user is not connected
     // just continue the logout process
     await this.client.get({
@@ -93,9 +133,12 @@ export class Authentificator {
     this.resetHeaders()
   }
 
+  private isSoftConnected() {
+    return !!localStorage.getItem('accessToken') && !!localStorage.getItem('refreshToken')
+  }
+
   async isConnected() {
-    const softConnected = !!localStorage.getItem('accessToken') && !!localStorage.getItem('refreshToken')
-    if (!softConnected) {
+    if (!this.isSoftConnected()) {
       return false
     }
 
@@ -122,7 +165,7 @@ export class Authentificator {
 
     const [res, error] = await this.client.get<{ data: UserModel }>({
       endpoint: endpoint,
-      ttl: 1000
+      ttl: 5000
     })
     if (error) {
       throw error
@@ -130,6 +173,11 @@ export class Authentificator {
     return res.data
   }
 
+  /**
+   * Return the underlying client in the authentificator
+   * This is useful to get an "authenticated" client that is thread safe
+   * and that will automatically refresh the token if is needed when a request fail with a 401
+   */
   getClient() {
     return this.client
   }

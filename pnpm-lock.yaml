@@ -162,9 +162,6 @@ importers:
 
   apps/crm:
     dependencies:
-      '@cipher-health/api':
-        specifier: workspace:*
-        version: link:../api
       '@cipher-health/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk

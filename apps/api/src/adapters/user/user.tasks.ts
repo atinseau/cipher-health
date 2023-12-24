@@ -12,7 +12,7 @@ export class UserTasks {
     private readonly loggerService: Logger,
     private readonly prismaService: PrismaService,
   ) { }
-    
+
   /**
    * The purpose of this task is to remove all expired refresh tokens from the database
    * in order to keep the database clean and to avoid having a huge table
@@ -24,9 +24,18 @@ export class UserTasks {
     try {
       const result = await this.prismaService.refreshToken.deleteMany({
         where: {
-          expiresAt: {
-            lte: new Date()
-          }
+          OR: [
+            {
+              expiresAt: {
+                lte: new Date()
+              }
+            },
+            {
+              deletedAt: {
+                not: null
+              }
+            }
+          ]
         }
       })
       this.loggerService.log(`Refresh tokens purged: ${result.count}`, 'UserTasksService')

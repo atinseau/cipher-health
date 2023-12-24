@@ -1,13 +1,13 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export type IFilterQuery = {
+export type IListQuery = {
   page: number
   perPage: number
   sort: string
   order: 'ASC' | 'DESC'
 }
 
-export const FilterQuery = createParamDecorator(
+export const ListQuery = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const query = ctx.switchToHttp().getRequest().query
 

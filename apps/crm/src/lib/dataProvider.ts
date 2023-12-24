@@ -1,10 +1,11 @@
-import { DataProvider, GetListParams, GetListResult } from "react-admin";
-import { getAdminListResult } from "../resources/AdminResource/adminListResult";
+import { DataProvider, GetListParams, GetListResult, GetOneParams, GetOneResult } from "react-admin";
+import { getAdminList } from "../resources/AdminResource/queries/getList";
+import { getAdminOne } from "../resources/AdminResource/queries/getOne";
 
 async function getList(resource: string, params: GetListParams): Promise<GetListResult> {
   switch (resource) {
     case 'admin':
-      return getAdminListResult(params)
+      return getAdminList(params)
     default:
       return {
         data: [],
@@ -13,7 +14,22 @@ async function getList(resource: string, params: GetListParams): Promise<GetList
   }
 }
 
+async function getOne(resource: string, params: GetOneParams): Promise<GetOneResult> {
+  switch (resource) {
+    case 'admin':
+      return getAdminOne(params)
+    default:
+      return {
+        data: {
+          id: 'ok'
+        }
+      }
+  }
+
+}
+
 // @ts-ignore
 export const dataProvider: DataProvider = {
-  getList: getList
+  getList,
+  getOne,
 }
