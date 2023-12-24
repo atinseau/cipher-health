@@ -18,7 +18,7 @@ export class Authentificator {
   constructor(options?: AuthentificatorOptions) {
     this.options = options || { mode: 'CLIENT' };
     this.client = new Client({
-      threadSafe: true
+      threadSafe: true,
     });
 
     this.client.addHook('afterRequest', async (res, controller) => {

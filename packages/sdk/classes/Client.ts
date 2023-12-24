@@ -5,12 +5,19 @@ import { Mutex } from 'async-mutex'
 
 type Params = Record<string, string | number>
 
-type RequestOrder<T extends 'GET' | 'POST'> = {
-  endpoint: string
+type RequestOptions = {
   ttl?: number // time to live of the req cache
   skipHooks?: HookType[]
+  skipRetry?: boolean
+  maxRetry?: number
+}
+
+type RequestOrder<T extends 'GET' | 'POST'> = {
+  endpoint: string
   params?: Params
-} & (
+}
+  & RequestOptions
+  & (
     T extends 'POST'
     ? { body?: Record<string, any> }
     : {}
@@ -27,7 +34,7 @@ type AfterRequestHook = (
 ) => Promise<void>
 
 type BeforeRequestHook = (
-  // ...
+  init: RequestInit & { options: RequestOptions }
 ) => Promise<void>
 
 type HookCallback<T extends HookType> = T extends 'afterRequest'
@@ -41,18 +48,23 @@ type RequestContext = Record<string, {
 
 type ClientOptions = {
   threadSafe?: boolean
+  maxRetry?: number
 }
 
 export class Client {
 
   private customHeaders: Record<string, string> = {}
-  private hooks: Record<HookType, HookCallback<any>> = {} as any
+  private hooks: { [key in HookType]: HookCallback<key> } = {} as any
   private cache: Record<string, { output: any, timestamp: number }> = {}
   private requestContext: RequestContext = {}
   private options: ClientOptions = {}
 
   constructor(options?: ClientOptions) {
-    this.options = options || { threadSafe: false }
+    this.options = {
+      threadSafe: false,
+      maxRetry: 3,
+      ...options || {}
+    }
   }
 
   private formatEndpoint(endpoint: string) {
@@ -78,6 +90,29 @@ export class Client {
     return url
   }
 
+  private async parseResponse(res: Response): Promise<[any | null, ClientError | Error | null]> {
+    let data = await res.text()
+    let error: ClientError | Error | null = null
+
+    // Try to parse the response
+    try {
+      data = JSON.parse(data)
+      if (!res.ok) {
+        throw new Error()
+      }
+    } catch (_) {
+      error = new ClientError({
+        data,
+        status: res.status,
+      })
+      data = null
+    }
+
+    return [
+      data,
+      error
+    ]
+  }
 
   /**
    * This function is thread safe (if threadSafe is set to true, by default it's false)
@@ -86,10 +121,10 @@ export class Client {
    */
   private async request<T>(
     url: string,
-    options: RequestInit & { config: { ttl?: number, skipHooks?: HookType[] } }
+    init: RequestInit & { options: RequestOptions }
   ): Promise<[T, ClientError | Error | null]> {
 
-    const config = options.config;
+    const config = init.options;
 
     // If there is cache, no need to continue
     // We return the cached value
@@ -107,6 +142,16 @@ export class Client {
 
     let res: Response
     let retryCount = 0
+    let maxRetry = config.skipRetry
+      ? 0 // If skipRetry, retry function will do nothing
+      : this.options.maxRetry
+
+    // Apply custom max retry if defined
+    if (config.maxRetry > 0) {
+      maxRetry = config.maxRetry
+    } else if (config.maxRetry && config.maxRetry < 0) {
+      console.warn('maxRetry must be greater than 0, to bypass retry set skipRetry to true')
+    }
 
     if (this.options.threadSafe && !this.requestContext[url]) {
       this.requestContext[url] = {} as any
@@ -118,20 +163,30 @@ export class Client {
       : undefined
 
     async function execute(this: Client) {
+
+      if (maxRetry !== -1 && retryCount > maxRetry) {
+        return
+      }
+
       res = await fetch(url, {
-        ...options,
+        ...init,
         headers: {
-          ...options.headers,
           ...this.customHeaders,
+          ...init.headers,
         }
       })
 
+
       if (this.hooks['afterRequest'] && !config.skipHooks?.includes('afterRequest')) {
         try {
+          let next = Promise.resolve()
           await this.hooks['afterRequest'](res, {
-            retry: execute.bind(this),
+            retry: async () => {
+              next = execute.bind(this)()
+            },
             retryCount: retryCount++
           })
+          await next
         } catch (e) {
           console.error('Error in afterRequest hook', e)
         }
@@ -140,16 +195,7 @@ export class Client {
 
     await execute.bind(this)()
 
-    let data = await res.json()
-    let error = res.ok ? null : new ClientError({
-      data,
-      status: res.status,
-    })
-
-    const output = [
-      data,
-      error
-    ]
+    const output = await this.parseResponse(res)
 
     // If ttl is defined, we cache the request
     // and set and expiration date
@@ -169,7 +215,7 @@ export class Client {
   }
 
   public addHook<T extends HookType>(hook: T, callback: HookCallback<T>) {
-    this.hooks[hook] = callback
+    this.hooks[hook] = callback as any
   }
 
   addHeaders(headers: Record<string, string>) {
@@ -200,7 +246,7 @@ export class Client {
 
     const request = await this.request<T>(url.toString(), {
       method: 'GET',
-      config: preparedOrder,
+      options: preparedOrder,
     })
     return request
   }
@@ -212,7 +258,7 @@ export class Client {
     const request = await this.request<T>(url.toString(), {
       method: 'POST',
       body: JSON.stringify(body),
-      config: order,
+      options: order,
       headers: {
         'Content-Type': 'application/json'
       },

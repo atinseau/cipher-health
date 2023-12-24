@@ -7,8 +7,10 @@ type ClientErrorOptions = {
 
 export class ClientError extends Error {
 
+  public status: number
+
   constructor(options: ClientErrorOptions) {
-    const error = options.data.error || options.data.errors
+    const error = options?.data?.error || options?.data?.errors || options?.data
     let message = error
 
     // MALFORMED_REQUEST, ZOD_ERROR
@@ -16,5 +18,7 @@ export class ClientError extends Error {
       message = error[0].message
     }
     super(message)
+
+    this.status = options.status
   }
 }

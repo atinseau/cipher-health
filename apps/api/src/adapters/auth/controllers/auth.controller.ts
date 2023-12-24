@@ -147,6 +147,7 @@ export class AuthController {
 
     const jwtResult = await this.jwtService.verify<UserToken>(refreshToken, process.env.REFRESH_TOKEN_SECRET)
     if (!jwtResult) {
+      console.log('case 1')
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 
@@ -167,6 +168,7 @@ export class AuthController {
     // Check if the refresh token is valid and not deleted
     const userRefreshToken = result.data.refreshTokens.find(token => token.token === refreshToken)
     if (!userRefreshToken || userRefreshToken.deletedAt) {
+      console.log('case 2')
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 

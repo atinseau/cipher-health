@@ -2,13 +2,41 @@
   "name": "@cipher-health/sdk",
   "version": "0.0.0",
   "private": true,
-  "devDependencies": {
-    "@cipher-health/api": "workspace:*"
+  "scripts": {
+    "test": "jest"
   },
   "exports": {
     ".": "./index.ts"
   },
   "dependencies": {
     "async-mutex": "^0.4.0"
+  },
+  "devDependencies": {
+    "@cipher-health/api": "workspace:*",
+    "@types/jest": "^29.5.11",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts",
+      "tsx"
+    ],
+    "rootDir": "test",
+    "preset": "ts-jest/presets/js-with-ts",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    },
+    "testRegex": ".spec.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
   }
 }

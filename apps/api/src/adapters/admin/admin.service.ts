@@ -91,7 +91,6 @@ export class AdminService implements OnApplicationBootstrap {
     return createResult(userModel)
   }
 
-
   async findAll() {
     const admins = await this.prismaService.user.findMany({
       include: {
@@ -113,5 +112,23 @@ export class AdminService implements OnApplicationBootstrap {
       }
     })
     return createResult(admins as UserModel[])
+  }
+
+  async findById(id: string) {
+    try {
+      const admin = await this.userService.findById(id, {
+        admin: true,
+        profile: true,
+      })
+      if (!admin.success) {
+        return createResult(null, false, {
+          type: 'USER_NOT_FOUND',
+          message: 'Cannot find admin'
+        })
+      }
+      return createResult(admin.data as UserModel)
+    } catch (e) {
+      return createResult(null, false, e.message as string)
+    }
   }
 }

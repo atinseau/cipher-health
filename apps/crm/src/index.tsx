@@ -1,19 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { App } from './App';
+// import React from 'react';
+// import ReactDOM from 'react-dom/client';
+// import { App } from './App';
 
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
-);
+// ReactDOM.createRoot(document.getElementById('root')!).render(
+//     <React.StrictMode>
+//         <App />
+//     </React.StrictMode>
+// );
 
 
 
 // PLAYGROUND
 
 // import { authentificator } from "./auth";
+
+// const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 // async function bootstrap() {
 
@@ -25,9 +27,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 //     const client = authentificator.getClient()
 
-//     client.get('/admin/all')
-//     client.get('/admin/all')
-//     client.get('/admin/all')
+//     client.addHook('afterRequest', async (req, controller) => {
+//       if (!req.ok)
+//         controller.retry()
+//     })
+
+//     client.get({
+//       endpoint: '/admin/53c2b6c9-be05-4693-91ab-bad8939cfd82',
+//       // skipRetry: true
+//     })
+//     client.get('/admin/53c2b6c9-be05-4693-91ab-bad8939cfd82')
+//     await client.get('/admin/53c2b6c9-be05-4693-91ab-bad8939cfd82')
 
 //     await authentificator.logout()
 //   } catch (e) {

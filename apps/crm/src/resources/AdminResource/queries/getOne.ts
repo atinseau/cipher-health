@@ -1,8 +1,16 @@
 import { GetOneParams, GetOneResult } from "react-admin"
+import { authentificator } from "../../../auth"
+import type { UserModel } from "@cipher-health/sdk"
+
+const client = authentificator.getClient()
 
 export async function getAdminOne(params: GetOneParams): Promise<GetOneResult> {
 
-  console.log(params)
+  const [res, error] = await client.get<{ data: UserModel }>({
+    endpoint: '/admin/' + params.id,
+  })
+
+  console.log(error)
 
   return {
     data: {

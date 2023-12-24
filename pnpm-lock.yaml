@@ -267,6 +267,15 @@ importers:
       '@cipher-health/api':
         specifier: workspace:*
         version: link:../../apps/api
+      '@types/jest':
+        specifier: ^29.5.11
+        version: 29.5.11
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@20.10.4)(ts-node@10.9.2)
+      ts-jest:
+        specifier: ^29.1.1
+        version: 29.1.1(@babel/core@7.23.6)(jest@29.7.0)(typescript@5.3.3)
 
 packages:
 
