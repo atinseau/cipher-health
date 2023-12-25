@@ -166,6 +166,9 @@ export class AuthController {
     }
 
     // Check if the refresh token is valid and not deleted
+
+    console.log(result.data.refreshTokens)
+
     const userRefreshToken = result.data.refreshTokens.find(token => token.token === refreshToken)
     if (!userRefreshToken || userRefreshToken.deletedAt) {
       console.log('case 2')
