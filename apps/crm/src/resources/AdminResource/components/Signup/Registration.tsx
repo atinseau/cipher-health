@@ -14,11 +14,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import z from 'zod';
 import { useClient } from "@cipher-health/sdk/react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useNotify } from "react-admin";
-import SignupContainer from "./SignupContainer";
 import { invalidLinkError } from "./errors";
+import CountrySelect, { countries } from "./CountrySelect";
 
 const defaultValues = {
   "email": "arthurtinseau@live.fr",
@@ -36,13 +36,21 @@ const signupSchema = z.object({
     }),
   confirmPassword: z.string().min(1),
   phone: z.string().min(1), // TODO: add phone validation, enforce international phone numbers only (E.164)
+  country: z.string().refine((country) => {
+    return countries.some((c) => c.code === country)
+  }, {
+    message: 'Invalid country'
+  })
 })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"], // path of error
   });
 
-export default function Registration({ next, stwt }: { next: () => void, stwt: string }) {
+export default function Registration({ stwt, checkProgress }: {
+  stwt: string,
+  checkProgress: () => void
+}) {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const notify = useNotify()
@@ -51,7 +59,7 @@ export default function Registration({ next, stwt }: { next: () => void, stwt: s
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const { handleSubmit, register, formState, watch } = useForm<z.infer<typeof signupSchema>>({
+  const { handleSubmit, register, formState, watch, control } = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues,
   })
@@ -99,10 +107,10 @@ export default function Registration({ next, stwt }: { next: () => void, stwt: s
       notify(invalidLinkError)
       return
     }
-    next()
+    checkProgress()
   }, [])
 
-  const getError = useCallback((key: keyof z.infer<typeof signupSchema>): TextFieldProps => {
+  const getError = useCallback((key: keyof z.infer<typeof signupSchema>) => {
     let error = formState.errors[key]
 
     if (errors[key]) {
@@ -128,7 +136,10 @@ export default function Registration({ next, stwt }: { next: () => void, stwt: s
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Typography mb={"5px"} variant="body1" color="GrayText">Informations</Typography>
         <TextField sx={{ mb: "10px" }} margin="none" label="Votre email" {...register('email')} {...getError('email')} />
-        <TextField margin="none" label="Votre téléphone" {...register('phone')} {...getError('phone')} />
+        <Box sx={{ display: 'flex', gap: "6px" }}>
+          <CountrySelect control={control} getError={getError} />
+          <TextField fullWidth margin="none" label="Votre téléphone" {...register('phone')} {...getError('phone')} />
+        </Box>
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column" }}>

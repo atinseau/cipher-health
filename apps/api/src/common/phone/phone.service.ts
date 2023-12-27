@@ -4,6 +4,8 @@ import { OnModuleInit } from "@nestjs/common";
 import { createResult } from "@/utils/errors";
 import { Logger } from "../logger/logger.service";
 
+import { default as phoneFormatter } from 'phone'
+
 
 @Injectable()
 export class PhoneService implements OnModuleInit {
@@ -12,7 +14,7 @@ export class PhoneService implements OnModuleInit {
 
   constructor(
     private readonly loggerService: Logger
-  ) {}
+  ) { }
 
   onModuleInit() {
     this.client = twilio(
@@ -26,17 +28,32 @@ export class PhoneService implements OnModuleInit {
   }
 
   // TODO: support international phone numbers
-  private formatPhone(phone: string) {
-    return phone
+  public formatPhone(phone: string, country = 'FR') {
+
+    const formatted = phoneFormatter(phone, {
+      country
+    })
+
+    return formatted.isValid
+      ? formatted.phoneNumber
+      : null
   }
 
   createMessage(payload: { target: string, body: string }) {
     return {
       send: async () => {
         try {
+
+          const formatted = this.formatPhone(payload.target)
+
+          if (!formatted) return createResult(null, false, {
+            type: 'PHONE_FORMAT_ERROR',
+            message: 'Invalid phone number'
+          })
+
           const res = await this.client.messages.create({
             from: '+12058943557',
-            to: this.formatPhone(payload.target),
+            to: formatted,
             body: payload.body,
           })
           return createResult(res)

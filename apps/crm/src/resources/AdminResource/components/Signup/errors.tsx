@@ -9,3 +9,11 @@ export const invalidLinkError = <Alert variant="filled" severity="error">
 export const unknownError = <Alert variant="filled" severity="error">
   <Typography variant="body2">Une erreur est survenue, veuillez réessayer.</Typography>
 </Alert>
+
+export const expiredCodeError = <Alert variant="filled" severity="error">
+  <Typography variant="body2">Le code a expiré, veuillez réessayer.</Typography>
+</Alert>
+
+export const codeSent = <Alert variant="filled" severity="success">
+  <Typography variant="body2">Le code a été envoyé.</Typography>
+</Alert>

@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid'
 import { UserService } from "../user/user.service";
 import { createResult } from "@/utils/errors";
 import { Logger } from "@/common/logger/logger.service";
+import { CryptoService } from "@/common/crypto/crypto.service";
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly loggerService: Logger,
+    private readonly cryptoService: CryptoService,
   ) { }
 
   async createTokens(user: User) {
@@ -90,14 +92,44 @@ export class AuthService {
     }
   }
 
-  async verifyStwt(stwt: string) {
+  async findStwtByToken(token: string) {
     try {
-      const stwtResult = await this.jwtService.verify<{ type: UserType }>(stwt, process.env.STWT_SECRET)
-      if (!stwtResult) {
+      const stwt = await this.prismaService.stwt.findUnique({
+        where: {
+          token
+        }
+      })
+
+      if (!stwt) {
         return createResult(null, false, {
-          type: 'INVALID_SIGNUP_TOKEN',
-          message: 'Invalid signup token'
+          type: 'STWT_NOT_FOUND',
+          message: 'Could not find the signup token'
         })
+      }
+
+      return createResult(stwt)
+    } catch (e) {
+      this.loggerService.error(e, 'AuthService')
+      return createResult(null, false, 'Could not find the signup token')
+    }
+  }
+
+  async verifyStwt(stwt: string) {
+    const stwtResult = await this.jwtService.verify<{ type: UserType }>(stwt, process.env.STWT_SECRET)
+    if (!stwtResult) {
+      return createResult(null, false, {
+        type: 'INVALID_SIGNUP_TOKEN',
+        message: 'Invalid signup token'
+      })
+    }
+    return createResult(stwtResult)
+  }
+
+  async isUsableStwt(stwt: string) {
+    try {
+      const stwtResult = await this.verifyStwt(stwt)
+      if (!stwtResult.success) {
+        return stwtResult
       }
 
       const stwtInDb = await this.prismaService.stwt.findUnique({
@@ -116,7 +148,10 @@ export class AuthService {
         })
       }
 
-      return createResult(stwtResult)
+      return createResult({
+        ...stwtResult.data,
+        stwt: stwtInDb
+      })
     } catch (e) {
       this.loggerService.error(e, 'AuthService')
       return createResult(null, false, 'Unexpected error during signup token verification')

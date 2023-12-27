@@ -26,6 +26,7 @@ export type UserCreate = Omit<User,
   type?: UserType,
   verified?: boolean,
   completed?: boolean,
+  country?: string
 }
 
 export type ProfileCreate = Omit<Profile,

@@ -8,9 +8,15 @@ import { RandomService } from "@/common/random/random.service";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../guards/auth.guard";
+import { StwtGuard } from "../guards/stwt.guard";
+import { dateIsExpired } from "@/utils/functions";
 
 
-@UseGuards(AuthGuard, UserGuard)
+@UseGuards(
+  StwtGuard,
+  AuthGuard,
+  UserGuard,
+)
 @Controller('auth/verify')
 export class VerifyController {
 
@@ -75,31 +81,25 @@ export class VerifyController {
     @User() user: UserModel,
     @Body('code') code: string
   ) {
-
     if (!code) {
-      throw createRawHttpError(HttpStatus.BAD_REQUEST, 'Verification code is required')
+      throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, 'Verification code is required')
     }
 
     if (user.verified) {
-      throw createRawHttpError(HttpStatus.BAD_REQUEST, 'User already verified')
+      throw createRawHttpError(HttpStatus.CONFLICT, 'User already verified')
     }
     if (!user.verificationToken) {
-      throw createRawHttpError(HttpStatus.BAD_REQUEST, 'User verification token not found')
-    }
-
-
-    // check if the last verification request was less than 5 minutes ago
-    if (user.lastVerificationRequest) {
-      const now = new Date()
-      const diff = now.getTime() - user.lastVerificationRequest.getTime()
-      if (diff > 5 * 60 * 1000) {
-        throw createRawHttpError(HttpStatus.BAD_REQUEST, 'Verification code expired')
-      }
+      throw createRawHttpError(HttpStatus.NOT_FOUND, 'User verification token not found')
     }
 
     const result = await this.cryptoService.compare(code, user.verificationToken)
     if (!result) {
       throw createRawHttpError(HttpStatus.BAD_REQUEST, 'Invalid verification code')
+    }
+
+    // check if the last verification request was less than 5 minutes ago
+    if (user.lastVerificationRequest && dateIsExpired(user.lastVerificationRequest, 5 * 60 * 1000)) {
+      throw createRawHttpError(HttpStatus.REQUEST_TIMEOUT, 'Verification code expired')
     }
 
     const updateResult = await this.userService.updateById(user.id, {

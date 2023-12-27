@@ -1,3 +1,4 @@
+import { COUNTRIES } from "@/utils/constants";
 import { z } from "zod";
 
 /**
@@ -15,12 +16,17 @@ export const signupSchema = z.object({
       message: 'Password is too weak, it should contain at least 8 characters, one uppercase, one lowercase, one number and one special character (#?!@$%.^&*-)'
     }),
   confirmPassword: z.string(),
-  phone: z.string(), // TODO: add phone validation, enforce international phone numbers only (E.164)
+  phone: z.string(),
+  country: z.string().refine((country) => {
+    return COUNTRIES.some((c) => c.code === country)
+  }, {
+    message: 'Invalid country'
+  })
 })
-.refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"], // path of error
-});
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // path of error
+  });
 
 export const signinSchema = z.object({
   email: z

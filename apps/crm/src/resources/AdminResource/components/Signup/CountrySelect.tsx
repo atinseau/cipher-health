@@ -1,10 +1,64 @@
+import Box from '@mui/material/Box';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import { Control, Controller } from 'react-hook-form';
+import { useState } from 'react';
+
+const CountrySelect = ({ control, getError }: { control: Control<any>, getError: (key: any) => { helperText?: string, error?: boolean } }) => {
+  return (
+    <Controller
+      name="country"
+      control={control}
+      render={({ field: { value, ...rest } }) => {
+        return <Autocomplete
+          {...rest}
+          onChange={(_, data) => rest.onChange(data?.code)}
+          options={countries}
+          autoHighlight
+          fullWidth
+          getOptionLabel={(option) => option.label}
+          renderOption={(props, option) => (
+            <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+              <img
+                loading="lazy"
+                width="20"
+                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                alt=""
+              />
+              {option.label} ({option.code}) +{option.phone}
+            </Box>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              {...getError('country')}
+              margin='none'
+              inputRef={(e) => rest.ref({ ...e, focus: () => e?.focus() })}
+              label="Votre pays"
+              inputProps={{
+                ...params.inputProps,
+                autoComplete: 'new-password', // disable autocomplete and autofill
+              }}
+            />
+          )}
+        />
+
+      }}
+    />
+  );
+}
 
 
-export const API_PREFIX = '/api/v1';
+interface CountryType {
+  code: string;
+  label: string;
+  phone: string;
+  suggested?: boolean;
+}
 
-// used to format phone numbers to E.164 format
 // TODO: export this in utils package
-export const COUNTRIES = [
+export const countries: readonly CountryType[] = [
   { code: 'AD', label: 'Andorra', phone: '376' },
   {
     code: 'AE',
@@ -428,3 +482,5 @@ export const COUNTRIES = [
   { code: 'ZM', label: 'Zambia', phone: '260' },
   { code: 'ZW', label: 'Zimbabwe', phone: '263' },
 ];
+
+export default CountrySelect;

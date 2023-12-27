@@ -13,6 +13,7 @@ import { AccessToken } from '../auth.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 // import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UserType } from '@prisma/client';
+import { dateIsExpired } from '@/utils/functions';
 
 @Controller('auth')
 export class AuthController {
@@ -49,7 +50,7 @@ export class AuthController {
 
     let type: UserType = 'CLIENT'
     if (stwt) {
-      const stwtResult = await this.authService.verifyStwt(stwt)
+      const stwtResult = await this.authService.isUsableStwt(stwt)
       if (!stwtResult.success) {
         throw createHttpError(stwtResult, {
           INVALID_SIGNUP_TOKEN: HttpStatus.UNAUTHORIZED,
@@ -62,12 +63,13 @@ export class AuthController {
       ...omit(output.data, [
         'confirmPassword'
       ]),
-      type,
+      type, // override the type if the stwt is provided
     })
 
     if (!result.success) {
       throw createHttpError(result, {
         DUPLICATE_EMAIL: HttpStatus.CONFLICT,
+        PHONE_FORMAT_ERROR: HttpStatus.UNPROCESSABLE_ENTITY,
       })
     }
 
@@ -86,12 +88,68 @@ export class AuthController {
     }
   }
 
+  // If the user is already created, verified and completed 
+  // the signup info, return an error
+  // in other cases, return the signup process info
   @Get('signup/info')
   async signupProcessInfo(@Query('stwt') stwt: string) {
-    // TODO: check where the signup process is
-    // If the user is already created, verified and completed 
-    // the signup info, return an error
-    // in other cases, return the signup process info
+
+    const stwtResult = await this.authService.findStwtByToken(stwt)
+    if (!stwtResult.success) {
+      throw createHttpError(stwtResult, {
+        STWT_NOT_FOUND: HttpStatus.NOT_FOUND,
+      })
+    }
+
+    // In this case, the signup token have never been used
+    // isn't owned by any user and is not deleted
+    // so it's a valid signup token for a user creation
+    if (!stwtResult.data.expiresAt || !stwtResult.data.consumerId) {
+      return {
+        success: true,
+        data: {
+          status: 'USER_NOT_CREATED'
+        }
+      }
+    }
+
+    // In this case, the signup token have been used
+    // fetch the user that used the signup token
+    const userResult = await this.userService.findById(stwtResult.data.consumerId)
+
+    // usually this should never happen
+    // if a signup token exists, and it's used (expiresAt and consumerId not null)
+    // it should be owned by a user
+    if (!userResult.success) {
+      throw createHttpError(userResult, {
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+      })
+    }
+
+    if (!userResult.data.verified) {
+      return {
+        success: true,
+        data: {
+          status: 'USER_NOT_VERIFIED',
+          // if the user is not verified, we need to check if the last verification request
+          // was less than 5 minutes ago, if so, we return that the code was sent
+          codeSent: !!(
+            userResult.data.lastVerificationRequest
+            && !dateIsExpired(userResult.data.lastVerificationRequest, 5 * 60 * 1000)
+            && userResult.data.verificationToken
+          ),
+        }
+      }
+    }
+
+    if (!userResult.data.completed) {
+      return {
+        success: true,
+        data: {
+          status: 'USER_NOT_COMPLETED',
+        }
+      }
+    }
   }
 
 

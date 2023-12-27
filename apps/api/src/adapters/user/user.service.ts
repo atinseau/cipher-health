@@ -10,6 +10,7 @@ import { merge, omit, omitBy } from "lodash";
 import { profileCreationSchema } from "./profile.schema";
 import { z } from "zod";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
+import { PhoneService } from "@/common/phone/phone.service";
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,7 @@ export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly cryptoService: CryptoService,
+    private readonly phoneService: PhoneService,
     private readonly loggerService: Logger,
     private readonly eventEmitter: EventEmitter2
   ) { }
@@ -42,16 +44,28 @@ export class UserService {
     }
   }
 
-
-  async create(user: UserCreate) {
+  async create(userCreate: UserCreate) {
     try {
+      const {
+        country = 'FR',
+        type = 'CLIENT',
+        ...user
+      } = userCreate
 
-      const type = user?.type || 'CLIENT'
+      const phone = this.phoneService.formatPhone(user.phone, country)
+
+      if (!phone) {
+        return createResult(null, false, {
+          type: 'PHONE_FORMAT_ERROR',
+          message: 'Invalid phone number'
+        })
+      }
 
       const result = await this.prismaService.user.create({
         data: {
           ...user,
           ...this.getInitalValue(type, user),
+          phone,
           type,
           // Password will always be defined here because of the schema
           password: await this.cryptoService.hash(user.password),

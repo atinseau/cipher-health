@@ -4,7 +4,7 @@
   "scripts": {
     "up": "docker-compose -f docker/docker-compose.yml up --build -d",
     "down": "docker-compose -f docker/docker-compose.yml down",
-    "dev": "turbo dev",
+    "dev": "FORCE_COLOR=true turbo dev --filter=!@cipher-health/frontend",
     "build": "turbo build",
     "turbo": "turbo"
   },

@@ -18,6 +18,13 @@ export class AuthGuard implements CanActivate {
 
   async validateRequest(req: Request) {
 
+    // If the user is already authenticated, skip the guard
+    // (this is useful for the stwt feature, simulate a user already logged in)
+    // "req.userJwt" is set by the StwtGuard
+    if (req?.userJwt?.id) {
+      return true
+    }
+
     const accessToken = req.headers.authorization?.split(' ')[1]
     if (!accessToken) {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide an access token by signing in.')
