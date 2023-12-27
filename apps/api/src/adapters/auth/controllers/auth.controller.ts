@@ -40,25 +40,42 @@ export class AuthController {
   @HttpCode(201)
   async signup(
     @Body() body: any,
-    @Param('stwt') stwt?: string // Signup Token With Type (stwt)
+    @Query('stwt') stwt?: string // Signup Token With Type (stwt)
   ) {
-
     const output = signupSchema.safeParse(body)
 
     if (!output.success)
       throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
 
+    let type: UserType = 'CLIENT'
+    if (stwt) {
+      const stwtResult = await this.authService.verifyStwt(stwt)
+      if (!stwtResult.success) {
+        throw createHttpError(stwtResult, {
+          INVALID_SIGNUP_TOKEN: HttpStatus.UNAUTHORIZED,
+        })
+      }
+      type = stwtResult.data.type
+    }
 
     const result = await this.userService.create({
       ...omit(output.data, [
         'confirmPassword'
       ]),
+      type,
     })
 
     if (!result.success) {
       throw createHttpError(result, {
         DUPLICATE_EMAIL: HttpStatus.CONFLICT,
       })
+    }
+
+    // After the user is created, we can safely delete the stwt
+    // because it's no longer needed
+    // it's a soft delete, it will be deleted from the database after 24 hours + 1 hour
+    if (stwt) {
+      await this.authService.deleteStwt(stwt, result.data.id)
     }
 
     return {
@@ -68,6 +85,16 @@ export class AuthController {
       }
     }
   }
+
+  @Get('signup/info')
+  async signupProcessInfo(@Query('stwt') stwt: string) {
+    // TODO: check where the signup process is
+    // If the user is already created, verified and completed 
+    // the signup info, return an error
+    // in other cases, return the signup process info
+  }
+
+
 
   @Post('signin')
   @HttpCode(200)
@@ -147,7 +174,6 @@ export class AuthController {
 
     const jwtResult = await this.jwtService.verify<UserToken>(refreshToken, process.env.REFRESH_TOKEN_SECRET)
     if (!jwtResult) {
-      console.log('case 1')
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 
@@ -166,12 +192,11 @@ export class AuthController {
     }
 
     // Check if the refresh token is valid and not deleted
-
-    console.log(result.data.refreshTokens)
-
     const userRefreshToken = result.data.refreshTokens.find(token => token.token === refreshToken)
+
     if (!userRefreshToken || userRefreshToken.deletedAt) {
-      console.log('case 2')
+      // TODO: there is an issue here
+      console.log(result.data.refreshTokens, userRefreshToken)
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 

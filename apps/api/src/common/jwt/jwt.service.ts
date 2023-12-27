@@ -52,6 +52,21 @@ export class JwtService {
     })
   }
 
+  // Usefull for stored tokens in a database
+  async getExpiryDate(token: string, secret: string) {
+    const refreshTokenVerified = await this.verify(token, secret)
+    if (!refreshTokenVerified) {
+      throw new Error('Invalid refresh token')
+    }
+
+    const expiresAt = new Date()
+
+    // Get the expiration date from "exp" of the token
+    // it will be used later to delete a token that is expired but now soft-deleted
+    expiresAt.setTime((refreshTokenVerified.exp || 0) * 1000)
+
+    return expiresAt
+  }
 
   async addToBlacklist(token: string) {
     if (!token) {

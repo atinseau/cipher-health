@@ -322,8 +322,7 @@ describe('Client class', () => {
       }
     })
 
-    const [data, error] = await client.get({
-      endpoint: 'mocked-url',
+    const [data, error] = await client.get('mocked-url', {
       skipRetry: true,
       // maxRetry: 0 <--- it will do the same thing
     })
@@ -353,8 +352,7 @@ describe('Client class', () => {
       }
     })
 
-    const [data, error] = await client.get({
-      endpoint: 'mocked-url',
+    const [data, error] = await client.get('mocked-url', {
       maxRetry: 10 // override default maxRetry (3)
     })
 
@@ -382,8 +380,7 @@ describe('Client class', () => {
       }
     })
 
-    const [data, error] = await client.get({
-      endpoint: 'mocked-url',
+    const [data, error] = await client.get('mocked-url', {
       skipHooks: ['afterRequest'],
     })
 
@@ -435,15 +432,11 @@ describe('Client class', () => {
 
     let client = new Client()
 
-    const [data1, error1] = await client.get({
-      endpoint: 'mocked-url',
-    })
+    const [data1, error1] = await client.get('mocked-url')
 
     await sleep(1000) // Wait 1 second to simulate a new request
 
-    const [data2, error2] = await client.get({
-      endpoint: 'mocked-url',
-    })
+    const [data2, error2] = await client.get('mocked-url')
 
     expect(error1).toBeNull()
     expect(error2).toBeNull()
@@ -453,15 +446,13 @@ describe('Client class', () => {
 
     initialTime = null // Reset the initial time
 
-    const [data3, error3] = await client.get({
-      endpoint: 'mocked-url',
+    const [data3, error3] = await client.get('mocked-url', {
       ttl: 2000
     })
 
     await sleep(1000) // Wait 1 second to simulate a new request
 
-    const [data4, error4] = await client.get({
-      endpoint: 'mocked-url',
+    const [data4, error4] = await client.get('mocked-url', {
       ttl: 2000
     })
 

@@ -6,18 +6,18 @@ const client = authentificator.getClient()
 
 export async function getAdminOne(params: GetOneParams): Promise<GetOneResult> {
 
-  const [res, error] = await client.get<{ data: UserModel }>({
-    endpoint: '/admin/' + params.id,
-  })
+  const [res, error] = await client.get<{ data: UserModel }>('/admin/' + params.id)
 
-  console.log(error)
-
+  if (error) {
+    throw error
+  }
+  
   return {
     data: {
-      id: "53c2b6c9-be05-4693-91ab-bad8939cfd82",
-      fullName: 'Admin Admin',
-      email: 'arthurtweak@gmail.com',
-      permissions: []
+      id: res.data.id,
+      fullName: `${res.data.profile?.firstName} ${res.data.profile?.lastName}`,
+      email: res.data.email,
+      permissions: res.data.admin?.permissions || [],
     }
   }
 

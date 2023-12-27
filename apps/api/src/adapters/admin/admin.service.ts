@@ -27,9 +27,10 @@ export class AdminService implements OnApplicationBootstrap {
         user: {
           email: process.env.ADMIN_EMAIL,
           password: process.env.ADMIN_PASSWORD,
-          verified: true,
           phone: '+33000000000',
           type: 'ADMIN',
+          verified: true, // Initial admin is always verified
+          completed: true, // Inital admin is always completed
         },
         // This is a completed fake profile
         profile: {
@@ -44,6 +45,9 @@ export class AdminService implements OnApplicationBootstrap {
           country: 'FR',
           gender: 'MALE',
           zipCode: '00000',
+        },
+        admin: {
+          permissions: ['*']
         }
       })
       if (!result.success) {
@@ -63,7 +67,14 @@ export class AdminService implements OnApplicationBootstrap {
    * He can't also be created without the "profile" relation that contains all the
    * user information (lastname, firstname, etc...)
    */
-  async createAdmin(userCreation: { user: UserCreate, profile: ProfileCreate, admin?: Partial<AdminCreate> }) {
+  async createAdmin(userCreation: {
+    user: UserCreate,
+    profile: ProfileCreate,
+    admin?: Partial<AdminCreate>
+  }) {
+
+    // TODO: use an existing user if userCreation.user is undefined
+    //       use and existing user instead in the userCreation object
     const result = await this.userService.create(userCreation.user)
     if (!result.success) {
       return result

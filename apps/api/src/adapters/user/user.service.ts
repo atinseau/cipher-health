@@ -28,13 +28,18 @@ export class UserService {
    * 
    * if the user is not an admin, he must be verified by email in any case
    */
-  private getInitalStatus(type: UserType, verified?: boolean): Partial<User> {
+  private getInitalValue(type: UserType, user: UserCreate): Partial<User> {
     if (type === 'ADMIN') {
       return {
-        verified: verified || false,
+        verified: user?.verified || false,
+        completed: user?.completed || false,
       }
     }
-    return {}
+
+    return {
+      verified: false,
+      completed: false,
+    }
   }
 
 
@@ -46,7 +51,7 @@ export class UserService {
       const result = await this.prismaService.user.create({
         data: {
           ...user,
-          ...this.getInitalStatus(type, user.verified),
+          ...this.getInitalValue(type, user),
           type,
           // Password will always be defined here because of the schema
           password: await this.cryptoService.hash(user.password),

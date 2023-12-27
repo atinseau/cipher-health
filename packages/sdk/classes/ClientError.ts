@@ -2,23 +2,22 @@
 
 type ClientErrorOptions = {
   status: number
+  error?: Error
   data: any
 }
 
 export class ClientError extends Error {
 
   public status: number
+  public data: any
 
   constructor(options: ClientErrorOptions) {
-    const error = options?.data?.error || options?.data?.errors || options?.data
+    const error = options?.error?.message || options?.data?.error || options?.data?.errors || options?.data || 'Unknown error'
     let message = error
 
-    // MALFORMED_REQUEST, ZOD_ERROR
-    if (Array.isArray(error) && options.status === 422) {
-      message = error[0].message
-    }
-    super(message)
+    super(typeof message !== 'string' ? JSON.stringify(message) : message)
 
     this.status = options.status
+    this.data = error
   }
 }

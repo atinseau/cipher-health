@@ -163,4 +163,28 @@ model Admin {
   // the user who owns this admin profile
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
+
+  creator   Admin?  @relation("createdAdmins", fields: [creatorId], references: [id])
+  creatorId String?
+
+  // the list of admins created by this admin
+  admins Admin[] @relation("createdAdmins")
+}
+
+// Signup Token With Type
+// This is a token that is sent to the user's email
+// when someone invites him to join the plateform
+// the token only contains the type of the user (worker or admin, never client)
+// it only can be used once, when the user uses it, it will be deleted (soft delete)
+// and when it's expired, a cron job will delete it
+model Stwt {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  expiresAt DateTime?
+
+  token String @unique
+
+  consumerId String?
 }

@@ -24,10 +24,14 @@ export const authProvider: AuthProvider = {
   getPermissions: async () => {
     console.log('getPermissions')
     try {
+      if (!await authentificator.isConnected()) {
+        return Promise.resolve([]);
+      }
+
       const me = await authentificator.me()
       return Promise.resolve(me.admin?.permissions || [])
     } catch (e) {
-      return Promise.reject();
+      return Promise.resolve([]);
     }
   },
   checkError: () => {

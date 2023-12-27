@@ -1,10 +1,11 @@
 import { PrismaService } from "@/common/database/prisma.service";
 import { JwtService } from "@/common/jwt/jwt.service";
 import { Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { User, UserType } from "@prisma/client";
 import { v4 as uuid } from 'uuid'
 import { UserService } from "../user/user.service";
 import { createResult } from "@/utils/errors";
+import { Logger } from "@/common/logger/logger.service";
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
+    private readonly loggerService: Logger,
   ) { }
 
   async createTokens(user: User) {
@@ -30,16 +32,7 @@ export class AuthService {
     })
 
     try {
-      const refreshTokenVerified = await this.jwtService.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-      if (!refreshTokenVerified) {
-        throw new Error('Invalid refresh token')
-      }
-
-      const expiresAt = new Date()
-
-      // Get the expiration date from "exp" of the refresh token
-      // it will be used later to delete a refresh token that is expired but now soft-deleted
-      expiresAt.setTime((refreshTokenVerified.exp || 0) * 1000)
+      const expiresAt = await this.jwtService.getExpiryDate(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
       await this.prismaService.refreshToken.create({
         data: {
@@ -49,7 +42,7 @@ export class AuthService {
         }
       })
     } catch (e) {
-      console.error(e)
+      this.loggerService.error(e, 'AuthService')
     }
 
     return {
@@ -68,9 +61,81 @@ export class AuthService {
     const isBanned = await this.jwtService.addToBlacklist(accessToken)
 
     if (!isCleaned || !isBanned) {
-      return createResult(null, false,  'Could not logout for unknown reasons')
+      return createResult(null, false, 'Could not logout for unknown reasons')
     }
     return createResult(true)
   }
 
+  // Stwt = Signup Token With Type
+  async createStwt(type: UserType) {
+    try {
+      const token = await this.jwtService.sign({
+        type,
+        cid: uuid() // Correlational ID
+      }, process.env.STWT_SECRET, {
+        expiresIn: process.env.STWT_EXPIRY || '1d'
+      })
+
+      const expiresAt = await this.jwtService.getExpiryDate(token, process.env.STWT_SECRET)
+      const stwt = await this.prismaService.stwt.create({
+        data: {
+          token,
+          expiresAt
+        }
+      })
+      return createResult(stwt.token)
+    } catch (e) {
+      this.loggerService.error(e, 'AuthService')
+      return createResult(null, false, 'Could not create the signup token')
+    }
+  }
+
+  async verifyStwt(stwt: string) {
+    try {
+      const stwtResult = await this.jwtService.verify<{ type: UserType }>(stwt, process.env.STWT_SECRET)
+      if (!stwtResult) {
+        return createResult(null, false, {
+          type: 'INVALID_SIGNUP_TOKEN',
+          message: 'Invalid signup token'
+        })
+      }
+
+      const stwtInDb = await this.prismaService.stwt.findUnique({
+        where: {
+          token: stwt,
+          expiresAt: {
+            gt: new Date()
+          }
+        }
+      })
+
+      if (!stwtInDb || stwtInDb.deletedAt) {
+        return createResult(null, false, {
+          type: 'INVALID_SIGNUP_TOKEN',
+          message: 'Invalid signup token'
+        })
+      }
+
+      return createResult(stwtResult)
+    } catch (e) {
+      this.loggerService.error(e, 'AuthService')
+      return createResult(null, false, 'Unexpected error during signup token verification')
+    }
+  }
+
+  async deleteStwt(stwt: string, consumerId: string) {
+    try {
+      await this.prismaService.stwt.update({
+        where: {
+          token: stwt
+        },
+        data: {
+          deletedAt: new Date(),
+          consumerId
+        }
+      })
+    } catch (e) {
+      this.loggerService.error(e, 'AuthService')
+    }
+  }
 }

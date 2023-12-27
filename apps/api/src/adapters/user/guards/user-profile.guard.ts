@@ -35,7 +35,6 @@ export class UserProfileGuard implements CanActivate {
     if (userProfile.success) {
       user.profile = userProfile.data
     }
-
     return true
   }
 }

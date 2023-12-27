@@ -38,6 +38,7 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "nodemailer": "^6.9.7",
+    "react": "^18.2.0",
     "redis": "^4.6.11",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
@@ -82,7 +83,7 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     },
-    "testRegex": ".spec.ts$",
+    "testRegex": ".spec.ts(x?)$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

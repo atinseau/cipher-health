@@ -60,13 +60,17 @@ export class Authentificator {
    */
   private async refresh() {
 
+    if (!this.isSoftConnected()) {
+      throw new Error('Cannot refresh token, not connected')
+    }
+
     if (this.refreshMutex.isLocked()) {
       return this.refreshMutex.waitForUnlock()
     }
 
     const release = await this.refreshMutex.acquire()
-    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>({
-      endpoint: '/auth/refresh',
+
+    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/refresh', {
       skipHooks: ['afterRequest'],
       body: {
         refreshToken: localStorage.getItem('refreshToken'),
@@ -92,10 +96,9 @@ export class Authentificator {
       return
     }
 
-    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>({
-      endpoint: '/auth/signin',
+    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/signin', {
       skipHooks: ['afterRequest'],
-      params: {
+      query: {
         type: this.options.mode || 'CLIENT'
       },
       body: {
@@ -121,9 +124,10 @@ export class Authentificator {
 
     // Throw nothing if the user is not connected
     // just continue the logout process
-    await this.client.get({
-      endpoint: '/auth/signout'
-    })
+    await this.client.get('/auth/signout')
+
+    console.log(localStorage.getItem('accessToken'))
+    console.log(localStorage.getItem('refreshToken'))
 
     // Remove tokens from local storage in any case
     // headers will be resetted after the request
@@ -146,6 +150,7 @@ export class Authentificator {
     try {
       await this.me()
     } catch (e) {
+      console.error('isConnected', e)
       return false
     }
 
@@ -163,8 +168,7 @@ export class Authentificator {
       // TODO: implement worker mode
     }
 
-    const [res, error] = await this.client.get<{ data: UserModel }>({
-      endpoint: endpoint,
+    const [res, error] = await this.client.get<{ data: UserModel }>(endpoint, {
       ttl: 5000
     })
     if (error) {

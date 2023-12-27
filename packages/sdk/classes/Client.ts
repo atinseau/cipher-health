@@ -3,7 +3,7 @@ import { ClientError } from './ClientError'
 
 import { Mutex } from 'async-mutex'
 
-type Params = Record<string, string | number>
+type Query = Record<string, string | number>
 
 type RequestOptions = {
   ttl?: number // time to live of the req cache
@@ -13,8 +13,7 @@ type RequestOptions = {
 }
 
 type RequestOrder<T extends 'GET' | 'POST'> = {
-  endpoint: string
-  params?: Params
+  query?: Query
 }
   & RequestOptions
   & (
@@ -46,7 +45,7 @@ type RequestContext = Record<string, {
   output: any
 }>
 
-type ClientOptions = {
+export type ClientOptions = {
   threadSafe?: boolean
   maxRetry?: number
 }
@@ -71,22 +70,22 @@ export class Client {
     return endpoint[0] === '/' ? endpoint : '/' + endpoint
   }
 
-  private createUrl(endpoint: string, params?: Params) {
+  private createUrl(endpoint: string, query?: Query) {
     const url = new URL(HOST + this.formatEndpoint(endpoint))
-    const formattedParams = Object.keys(params || {}).reduce((acc, key) => {
-      if (typeof params[key] === 'number') {
+    const formattedQuery = Object.keys(query || {}).reduce((acc, key) => {
+      if (typeof query[key] === 'number') {
         return {
           ...acc,
-          [key]: params[key].toString()
+          [key]: query[key].toString()
         }
       }
       return {
         ...acc,
-        [key]: params[key]
+        [key]: query[key]
       }
     }, {})
 
-    url.search = new URLSearchParams(formattedParams).toString()
+    url.search = new URLSearchParams(formattedQuery).toString()
     return url
   }
 
@@ -100,9 +99,10 @@ export class Client {
       if (!res.ok) {
         throw new Error()
       }
-    } catch (_) {
+    } catch (e) {
       error = new ClientError({
         data,
+        error: e,
         status: res.status,
       })
       data = null
@@ -122,7 +122,7 @@ export class Client {
   private async request<T>(
     url: string,
     init: RequestInit & { options: RequestOptions }
-  ): Promise<[T, ClientError | Error | null]> {
+  ): Promise<[T, ClientError | null]> {
 
     const config = init.options;
 
@@ -235,25 +235,19 @@ export class Client {
     }
   }
 
-  async get<T extends Record<string, any> | null>(order: RequestOrder<'GET'> | string) {
-
-    let preparedOrder: RequestOrder<'GET'> = typeof order === 'string'
-      ? { endpoint: order }
-      : order
-
-    const { endpoint, params } = preparedOrder
-    const url = this.createUrl(endpoint, params)
-
+  async get<T extends Record<string, any> | null>(endpoint: string, order: RequestOrder<'GET'> = {}) {
+    const { query } = order
+    const url = this.createUrl(endpoint, query)
     const request = await this.request<T>(url.toString(), {
       method: 'GET',
-      options: preparedOrder,
+      options: order,
     })
     return request
   }
 
-  async post<T extends Record<string, any>>(order: RequestOrder<'POST'>) {
-    const { endpoint, params, body } = order
-    const url = this.createUrl(endpoint, params)
+  async post<T extends Record<string, any>>(endpoint: string, order: RequestOrder<'POST'> = {}) {
+    const { query, body } = order
+    const url = this.createUrl(endpoint, query)
 
     const request = await this.request<T>(url.toString(), {
       method: 'POST',
