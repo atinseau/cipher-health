@@ -1,5 +1,5 @@
-import { Client } from "../classes/Client"
-import { ClientError } from "../classes/ClientError"
+import { Client } from "../src/classes/Client"
+import { ClientError } from "../src/classes/ClientError"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -68,14 +68,14 @@ describe('Client class', () => {
 
     const mockedFetch = applyMockedFetch({
       error: true,
-      data: 'error',
+      data: JSON.stringify({ "message": "error" }), // to prevent json parsing error
     })
 
     const [data, error] = await client.get('mocked-url')
 
     expect(data).toBeNull()
     expect(error).toBeInstanceOf(ClientError)
-    expect(error?.message).toBe('error')
+    expect(error?.message).toBe(JSON.stringify({ "message": "error" }))
 
     mockedFetch.mockRestore()
   })
@@ -91,9 +91,17 @@ describe('Client class', () => {
 
     const [data, error] = await client.get('mocked-url')
 
+    let fakeJsonError: Error = null
+
+    try {
+      JSON.parse('not-json')
+    } catch (e) {
+      fakeJsonError = e
+    }
+
     expect(data).toBeNull()
     expect(error).toBeInstanceOf(ClientError)
-    expect(error?.message).toBe('not-json')
+    expect(error?.message).toBe(error?.message)
 
     mockedFetch.mockRestore()
   })

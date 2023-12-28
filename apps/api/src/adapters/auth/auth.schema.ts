@@ -1,4 +1,4 @@
-import { COUNTRIES } from "@/utils/constants";
+import { COUNTRIES } from "@cipher-health/utils";
 import { z } from "zod";
 
 /**

@@ -1,4 +1,5 @@
-import { Paper, styled } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import styled from "@mui/material/styles/styled";
 import Box from "@mui/material/Box";
 
 type SignupContainerProps = {
@@ -13,7 +14,7 @@ const Root = styled(Box)(({ theme }) => ({
   backgroundImage: "radial-gradient(circle at 50% 14em, #313264 0%, #00023b 60%, #00023b 100%)",
 }))
 
-const Container = styled(Paper)(({ theme }) => ({
+export const Container = styled(Paper)(({ theme }) => ({
   marginTop: '6rem',
   padding: '16px',
   minHeight: 200,
@@ -25,8 +26,6 @@ const Container = styled(Paper)(({ theme }) => ({
 
 export default function SignupContainer({ children, isBooted }: SignupContainerProps) {
   return <Root>
-    {isBooted && <Container>
-      {children}
-    </Container>}
+    {isBooted && children}
   </Root>
 }

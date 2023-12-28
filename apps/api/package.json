@@ -8,11 +8,14 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "clean": "rm -rf dist",
+    "fclean": "rm -rf dist node_modules .turbo",
     "postinstall": "prisma generate",
     "build": "nest build",
     "start": "NODE_ENV=production node dist/main",
     "dev": "NODE_ENV=development nest start --watch",
     "dev:debug": "nest start --debug --watch",
+    "check-types": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -20,6 +23,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@cipher-health/utils": "workspace:*",
     "@nestjs/bull": "^10.0.1",
     "@nestjs/common": "^10.2.10",
     "@nestjs/config": "^3.1.1",

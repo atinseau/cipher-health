@@ -4,14 +4,20 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview",
-    "type-check": "tsc --noEmit"
+    "start": "vite preview",
+    "analyze": "vite-bundle-visualizer",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "fclean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
     "@cipher-health/sdk": "workspace:*",
+    "@cipher-health/utils": "workspace:*",
     "@hookform/resolvers": "^3.3.3",
     "@mui/icons-material": "^5.15.2",
     "@mui/material": "^5.15.1",
+    "@mui/x-date-pickers": "^6.18.6",
+    "dayjs": "^1.11.10",
     "react": "^18.2.0",
     "react-admin": "^4.16.0",
     "react-dom": "^18.2.0",
@@ -25,7 +31,9 @@
     "@types/react": "^18.0.22",
     "@types/react-dom": "^18.0.7",
     "@vitejs/plugin-react": "^4.0.1",
+    "@vitejs/plugin-react-swc": "^3.5.0",
     "typescript": "^5.1.6",
-    "vite": "^4.3.9"
+    "vite": "^4.3.9",
+    "vite-bundle-visualizer": "^1.0.0"
   }
 }

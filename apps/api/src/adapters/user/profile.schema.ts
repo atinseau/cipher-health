@@ -1,4 +1,4 @@
-import { getMinimalMajorBirthDate } from "@/utils/functions";
+import { getMinimalMajorBirthDate } from "@cipher-health/utils";
 import { z } from "zod";
 
 export const profileCreationSchema = z.object({

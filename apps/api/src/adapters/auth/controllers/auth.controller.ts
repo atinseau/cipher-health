@@ -13,7 +13,7 @@ import { AccessToken } from '../auth.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 // import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UserType } from '@prisma/client';
-import { dateIsExpired } from '@/utils/functions';
+import { dateIsExpired } from '@cipher-health/utils';
 
 @Controller('auth')
 export class AuthController {
@@ -171,6 +171,11 @@ export class AuthController {
       throw createHttpError(result, {
         USER_NOT_FOUND: HttpStatus.NOT_FOUND,
       })
+    }
+
+    // special case for admin accounts
+    if (type === 'ADMIN' && !result.data.verified && !result.data.completed) {
+      throw createRawHttpError(HttpStatus.FORBIDDEN, 'Admin account must be verified and completed to sign in.')
     }
 
     if (!result.data.password) {

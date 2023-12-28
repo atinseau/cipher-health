@@ -6,6 +6,7 @@ const client = authentificator.getClient()
 
 export async function getAdminList(params: GetListParams): Promise<GetListResult> {
   
+  // @ts-ignore
   const [res, error] = await client.get<{ data: UserModel[] }>({
     endpoint: '/admin/all',
     params: {

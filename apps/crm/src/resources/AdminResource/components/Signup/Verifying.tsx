@@ -2,11 +2,12 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import Box from "@mui/material/Box";
-import { styled } from "@mui/material";
+import styled from "@mui/material/styles/styled";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useClient } from "@cipher-health/sdk/react";
 import { useNotify } from "react-admin";
 import { codeSent, expiredCodeError } from "./errors";
+import { Container } from "./SignupContainer";
 
 const Input = styled('input')(({ theme }) => ({
   width: "40px",
@@ -118,44 +119,46 @@ export default function Verifying({ stwt, checkProgress }: {
     return code.length === 6 && code.every((char) => char !== undefined && numRegex.test(char))
   }, [code])
 
-  return <Box component="form" sx={{ pt: "10px" }}>
+  return <Container>
+    <Box component="form" sx={{ pt: "10px" }}>
 
-    <Box sx={{ display: "flex", flexDirection: 'column', alignItems: 'center' }}>
-      <LockPersonIcon fontSize={"large"} sx={{ mb: "10px" }} />
-      <Typography variant="h6">Confirmer votre compte</Typography>
-      <Typography variant="body2" color="GrayText">
-        Nous allons vous envoyer un sms au numéro de téléphone que vous avez renseigné.
-        Merci de bien vouloir renseigner le code que vous allez recevoir.
-      </Typography>
+      <Box sx={{ display: "flex", flexDirection: 'column', alignItems: 'center' }}>
+        <LockPersonIcon fontSize={"large"} sx={{ mb: "10px" }} />
+        <Typography variant="h6">Confirmer votre compte</Typography>
+        <Typography variant="body2" color="GrayText">
+          Nous allons vous envoyer un sms au numéro de téléphone que vous avez renseigné.
+          Merci de bien vouloir renseigner le code que vous allez recevoir.
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: "flex", gap: "5px", mt: "20px", justifyContent: "center" }}>
+        {Array.from({ length: 6 }).map((_, i) => (<Input
+          key={i}
+          maxLength={1}
+          onPaste={handlePaste}
+          onKeyDown={(e) => {
+            if (e.key === 'Backspace' && i > 0 && e.currentTarget.value.length === 0) {
+              inputRefs.current[i - 1].focus()
+            }
+          }}
+          ref={(ref) => inputRefs.current[i] = ref!}
+          onChange={(e) => handleInputChange(e, i)}
+        />))}
+      </Box>
+
+
+      <Box sx={{ mt: "20px" }}>
+        <Typography variant="body2" color="GrayText">
+          Votre code est valide pendant 5 minutes.
+        </Typography>
+        <Typography variant="body2" color="GrayText">
+          Code non reçu ? <a href="#" onClick={() => verify()}>Renvoyer</a>
+        </Typography>
+      </Box>
+
+      <Button disabled={!canSubmit} sx={{ mt: "25px", width: "100%" }} variant="contained" onClick={handleSubmit}>
+        Confirmer
+      </Button>
     </Box>
-
-    <Box sx={{ display: "flex", gap: "5px", mt: "20px", justifyContent: "center" }}>
-      {Array.from({ length: 6 }).map((_, i) => (<Input
-        key={i}
-        maxLength={1}
-        onPaste={handlePaste}
-        onKeyDown={(e) => {
-          if (e.key === 'Backspace' && i > 0 && e.currentTarget.value.length === 0) {
-            inputRefs.current[i - 1].focus()
-          }
-        }}
-        ref={(ref) => inputRefs.current[i] = ref!}
-        onChange={(e) => handleInputChange(e, i)}
-      />))}
-    </Box>
-
-
-    <Box sx={{ mt: "20px" }}>
-      <Typography variant="body2" color="GrayText">
-        Votre code est valide pendant 5 minutes.
-      </Typography>
-      <Typography variant="body2" color="GrayText">
-        Code non reçu ? <a href="#" onClick={() => verify()}>Renvoyer</a>
-      </Typography>
-    </Box>
-
-    <Button disabled={!canSubmit} sx={{ mt: "25px", width: "100%" }} variant="contained" onClick={handleSubmit}>
-      Confirmer
-    </Button>
-  </Box>
+  </Container>
 }

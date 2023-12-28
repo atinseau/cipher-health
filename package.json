@@ -5,11 +5,16 @@
     "up": "docker-compose -f docker/docker-compose.yml up --build -d",
     "down": "docker-compose -f docker/docker-compose.yml down",
     "dev": "FORCE_COLOR=true turbo dev --filter=!@cipher-health/frontend",
-    "build": "turbo build",
-    "turbo": "turbo"
+    "clean": "FORCE_COLOR=true turbo clean --filter=!@cipher-health/frontend",
+    "fclean": "FORCE_COLOR=true turbo fclean --filter=!@cipher-health/frontend",
+    "build": "FORCE_COLOR=true turbo build --filter=!@cipher-health/frontend",
+    "test": "FORCE_COLOR=true turbo test --filter=!@cipher-health/frontend",
+    "check-types": "FORCE_COLOR=true turbo check-types --filter=!@cipher-health/frontend",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@turbo/gen": "^1.10.16",
-    "turbo": "^1.10.16"
+    "turbo": "^1.10.16",
+    "husky": "^8.0.0"
   }
 }

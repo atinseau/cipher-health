@@ -18,7 +18,9 @@ import { useNavigate } from "react-router-dom";
 
 import { useNotify } from "react-admin";
 import { invalidLinkError } from "./errors";
-import CountrySelect, { countries } from "./CountrySelect";
+import CountrySelect from "./CountrySelect";
+import { Container } from "./SignupContainer";
+import { COUNTRIES } from "@cipher-health/utils";
 
 const defaultValues = {
   "email": "arthurtinseau@live.fr",
@@ -37,7 +39,7 @@ const signupSchema = z.object({
   confirmPassword: z.string().min(1),
   phone: z.string().min(1), // TODO: add phone validation, enforce international phone numbers only (E.164)
   country: z.string().refine((country) => {
-    return countries.some((c) => c.code === country)
+    return COUNTRIES.some((c) => c.code === country)
   }, {
     message: 'Invalid country'
   })
@@ -126,31 +128,33 @@ export default function Registration({ stwt, checkProgress }: {
     }
   }, [formState, errors])
 
-  return <form onSubmit={handleSubmit(onSubmit)}>
-    <Box mb={"30px"}>
-      <Typography variant="h6">Bienvenue !</Typography>
-      <Typography variant="body2" color="GrayText">Pour créer votre compte, veuillez renseigner les champs suivant.</Typography>
-    </Box>
+  return <Container>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Box mb={"30px"}>
+        <Typography variant="h6">Bienvenue !</Typography>
+        <Typography variant="body2" color="GrayText">Pour créer votre compte, veuillez renseigner les champs suivant.</Typography>
+      </Box>
 
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Typography mb={"5px"} variant="body1" color="GrayText">Informations</Typography>
-        <TextField sx={{ mb: "10px" }} margin="none" label="Votre email" {...register('email')} {...getError('email')} />
-        <Box sx={{ display: 'flex', gap: "6px" }}>
-          <CountrySelect control={control} getError={getError} />
-          <TextField fullWidth margin="none" label="Votre téléphone" {...register('phone')} {...getError('phone')} />
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography mb={"5px"} variant="body1" color="GrayText">Informations</Typography>
+          <TextField sx={{ mb: "10px" }} margin="none" label="Votre email" {...register('email')} {...getError('email')} />
+          <Box sx={{ display: 'flex', gap: "6px" }}>
+            <CountrySelect control={control} getError={getError} />
+            <TextField fullWidth margin="none" label="Votre téléphone" {...register('phone')} {...getError('phone')} />
+          </Box>
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography mb={"5px"} variant="body1" color="GrayText">Sécurité</Typography>
+          <TextField sx={{ mb: "10px" }} margin="none" label="Votre mdp" id="password" type="password" {...register('password')} {...getError('password')} />
+          <TextField margin="none" label="Confirmer mdp" id="phone" type="password" {...register('confirmPassword')} {...getError('confirmPassword')} />
         </Box>
       </Box>
 
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Typography mb={"5px"} variant="body1" color="GrayText">Sécurité</Typography>
-        <TextField sx={{ mb: "10px" }} margin="none" label="Votre mdp" id="password" type="password" {...register('password')} {...getError('password')} />
-        <TextField margin="none" label="Confirmer mdp" id="phone" type="password" {...register('confirmPassword')} {...getError('confirmPassword')} />
-      </Box>
-    </Box>
-
-    <Button type="submit" sx={{ mt: "40px", width: "100%" }} variant="contained">
-      {isSubmitting ? <CircularProgress size="24px" sx={{ color: "black" }} /> : 'Créer mon compte'}
-    </Button>
-  </form>
+      <Button type="submit" sx={{ mt: "40px", width: "100%" }} variant="contained">
+        {isSubmitting ? <CircularProgress size="24px" sx={{ color: "black" }} /> : 'Créer mon compte'}
+      </Button>
+    </form>
+  </Container>
 }
