@@ -3,10 +3,10 @@ import Registration from "./Registration";
 import SignupContainer from "./SignupContainer";
 import Verifying from "./Verifying";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { invalidLinkError } from "./errors";
 import { useNotify } from "react-admin";
 import { useClient } from "@cipher-health/sdk/react";
 import Profile from "./Profile";
+import { invalidLinkError } from "../../../../lib/errors";
 
 const steps = [
   Registration,
@@ -28,11 +28,6 @@ export default function AdminSignup() {
   const [isBooting, setIsBooting] = useState(true)
 
   const Step = steps[step]
-  const next = useCallback(() => {
-    if (step < steps.length - 1) {
-      setStep(step + 1)
-    }
-  }, [step])
 
   useEffect(() => {
     if (!stwtRef.current) {
@@ -54,7 +49,9 @@ export default function AdminSignup() {
     setIsBooting(false)
 
     if (error) {
-      notify(error.message)
+      notify(error.message, {
+        type: 'error'
+      })
       navigate('/login')
       return
     }

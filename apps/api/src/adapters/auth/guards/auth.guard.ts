@@ -1,7 +1,10 @@
 import { JwtService } from "@/common/jwt/jwt.service";
-import { createRawHttpError } from "@/utils/errors";
+import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { CanActivate, ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 import { Request } from "express";
+import { EnableStwtAuth } from "../auth.decorator";
+import { AuthService } from "../auth.service";
 
 
 @Injectable()
@@ -9,19 +12,57 @@ export class AuthGuard implements CanActivate {
 
   constructor(
     private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
+    private reflector: Reflector
   ) { }
 
   canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest<Request>();
-    return this.validateRequest(request);
+    return this.validateRequest(context);
   }
 
-  async validateRequest(req: Request) {
+  async validateRequest(context: ExecutionContext) {
+    const req = context.switchToHttp().getRequest<Request>();
+    const handler = context.getHandler()
+    const classHandler = context.getClass()
 
-    // If the user is already authenticated, skip the guard
-    // (this is useful for the stwt feature, simulate a user already logged in)
-    // "req.userJwt" is set by the StwtGuard
-    if (req?.userJwt?.id) {
+    const stwtAuthIsEnabled = !!(this.reflector.get(EnableStwtAuth, handler) || this.reflector.get(EnableStwtAuth, classHandler))
+    const { stwt } = req.query as { stwt: string | null }
+
+    // If the method or the controller implements the EnableStwtAuth decorator,
+    // check if query param "stwt" is present and valid.
+    // If it is, simulate a logged user for the next guards (like a JWT in headers)
+    if (stwtAuthIsEnabled && stwt) {
+      const stwtResult = await this.authService.verifyStwt(stwt)
+      if (!stwtResult.success) {
+        // TODO: impl hard delete for stwt and remove the unfinished user if it exists
+        throw createHttpError(stwtResult, {
+          INVALID_SIGNUP_TOKEN: HttpStatus.UNAUTHORIZED,
+        })
+      }
+
+      const tokenResult = await this.authService.findStwtByToken(stwt)
+
+      // Very weird case, the token is valid but not found in the database
+      // interseting to know why
+      if (!tokenResult.success) {
+        throw createHttpError(tokenResult, {
+          STWT_NOT_FOUND: HttpStatus.NOT_FOUND
+        })
+      }
+
+      // Simulate a logged user for the next guards
+      // BECAREFUL: consumerId can be null
+      // TODO: add a check for this case
+      req.userJwt = {
+        id: tokenResult.data.consumerId
+      }
+
+      // Some STWTs have data attached to them
+      // ex: permissions for admins
+      if (stwtResult.data?.data) {
+        req.stwt = stwtResult.data
+      }
+
       return true
     }
 

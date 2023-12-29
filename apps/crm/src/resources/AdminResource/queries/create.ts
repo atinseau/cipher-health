@@ -1,9 +1,33 @@
 import { CreateParams, CreateResult } from "react-admin";
+import { authentificator } from "../../../auth";
 
-// @ts-ignore
-export async function adminCreate(resource: string, params: CreateParams): Promise<CreateResult> {
+const client = authentificator.getClient()
 
-  console.log(resource, params)
+export async function adminCreate(params: CreateParams): Promise<CreateResult> {
 
-  
+  const { data } = params
+
+  const {
+    selectedPermissions = [],
+    allPermissions = false
+  } = data
+
+  const [_, error] = await client.post('/admin/invite', {
+    body: {
+      email: data.email,
+      permissions: allPermissions
+        ? ['*']
+        : selectedPermissions
+    }
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return {
+    data: {
+      id: true // workaround for react-admin
+    }
+  }
 }

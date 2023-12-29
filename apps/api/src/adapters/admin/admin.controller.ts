@@ -11,12 +11,12 @@ import { AdminService } from "./admin.service";
 import { ListQuery, IListQuery } from "@/utils/decorators/searchQuery";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { RequiredPermissions } from "./admin.decorator";
-import { AdminPermissions } from "./permissions";
 import { inviteAdminSchema } from "./admin.schema";
 import { AuthService } from "../auth/auth.service";
 import { MailService } from "@/common/mail/mail.service";
 import { Logger } from "@/common/logger/logger.service";
 import { InviteAdminEmail } from "@/common/mail/templates";
+import { AdminPermissions } from "./permissions";
 
 @UseGuards(
   AuthGuard,
@@ -60,7 +60,7 @@ export class AdminController {
 
   @Get('permissions')
   @RequiredPermissions([
-    AdminPermissions.GET_PERMISSIONS
+    'GET_PERMISSIONS'
   ])
   async getPermissions() {
     return {
@@ -85,7 +85,7 @@ export class AdminController {
 
   @Post('invite')
   @RequiredPermissions([
-    AdminPermissions.INVITE
+    'INVITE',
   ])
   async inviteAdmin(@User() user: UserModel, @Body() body: any) {
 
@@ -94,12 +94,20 @@ export class AdminController {
       throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, payload.error.issues)
     }
 
+    // Verify that user as the right to give thoses permissions to the new admin
+    // TODO: do that
+
     const result = await this.userService.findByEmail(payload.data.email)
     if (result.success) {
       throw createRawHttpError(HttpStatus.CONFLICT, 'This email is already registered')
     }
 
-    const stwtResult = await this.authService.createStwt('ADMIN')
+    // Add the permissions to the payload for the futur when
+    // the admin will signup with the invitation link, we will 
+    // attach the permissions to his account.
+    const stwtResult = await this.authService.createStwt('ADMIN', {
+      permissions: payload.data.permissions
+    })
     if (!stwtResult.success) {
       throw createHttpError(stwtResult)
     }
@@ -121,6 +129,5 @@ export class AdminController {
       success: true,
       data: 'The invitation has been sent successfully.'
     }
-
   }
 }

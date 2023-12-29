@@ -17,11 +17,13 @@ interface RadioGroupProps extends FormControlProps {
     label: string
   }[]
   radioGroupProps?: RadioGroupPropsMui
+  error?: boolean
+  helperText?: string
 }
 
-export default function RadioGroup({ label, radioGroupProps, id, name, defaultValue, options, ...rest }: RadioGroupProps) {
+export default function RadioGroup({ label, error, helperText, radioGroupProps, id, name, defaultValue, options, ...rest }: RadioGroupProps) {
   return <FormControl {...rest}>
-    <FormLabel id={id}>{label}</FormLabel>
+    <FormLabel error={error} id={id}>{label + (helperText ? " " + helperText: "")}</FormLabel>
     <RadioGroupMui
       {...radioGroupProps}
       name={name}

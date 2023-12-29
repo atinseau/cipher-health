@@ -11,7 +11,7 @@ export const unknownError = <Alert variant="filled" severity="error">
 </Alert>
 
 export const expiredCodeError = <Alert variant="filled" severity="error">
-  <Typography variant="body2">Le code a expiré, veuillez réessayer.</Typography>
+  <Typography variant="body2">Le code a expiré ou est invalide, veuillez réessayer.</Typography>
 </Alert>
 
 export const codeSent = <Alert variant="filled" severity="success">

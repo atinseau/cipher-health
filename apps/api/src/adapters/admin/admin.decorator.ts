@@ -1,6 +1,5 @@
 import { Reflector } from "@nestjs/core";
-import { AdminPermissions } from "./permissions";
-
+import type { AdminPermission } from "./permissions";
 
 /**
  * This decorator is used to mark a route that requires the 
@@ -14,4 +13,4 @@ export const RequiredAdmin = Reflector.createDecorator()
  * This decorator is used to mark a route that requires the
  * admin profile should have all the required permissions.
  */
-export const RequiredPermissions = Reflector.createDecorator<AdminPermissions[]>()
+export const RequiredPermissions = Reflector.createDecorator<AdminPermission[]>()

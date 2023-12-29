@@ -17,10 +17,10 @@ import { useClient } from "@cipher-health/sdk/react";
 import { useNavigate } from "react-router-dom";
 
 import { useNotify } from "react-admin";
-import { invalidLinkError } from "./errors";
 import CountrySelect from "./CountrySelect";
 import { Container } from "./SignupContainer";
 import { COUNTRIES } from "@cipher-health/utils";
+import { invalidLinkError } from "../../../../lib/errors";
 
 const defaultValues = {
   "email": "arthurtinseau@live.fr",
@@ -138,17 +138,17 @@ export default function Registration({ stwt, checkProgress }: {
       <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <Typography mb={"5px"} variant="body1" color="GrayText">Informations</Typography>
-          <TextField sx={{ mb: "10px" }} margin="none" label="Votre email" {...register('email')} {...getError('email')} />
+          <TextField required sx={{ mb: "10px" }} margin="none" label="Votre email" {...register('email')} {...getError('email')} />
           <Box sx={{ display: 'flex', gap: "6px" }}>
             <CountrySelect control={control} getError={getError} />
-            <TextField fullWidth margin="none" label="Votre téléphone" {...register('phone')} {...getError('phone')} />
+            <TextField required fullWidth margin="none" label="Votre téléphone" {...register('phone')} {...getError('phone')} />
           </Box>
         </Box>
 
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <Typography mb={"5px"} variant="body1" color="GrayText">Sécurité</Typography>
-          <TextField sx={{ mb: "10px" }} margin="none" label="Votre mdp" id="password" type="password" {...register('password')} {...getError('password')} />
-          <TextField margin="none" label="Confirmer mdp" id="phone" type="password" {...register('confirmPassword')} {...getError('confirmPassword')} />
+          <TextField required sx={{ mb: "10px" }} margin="none" label="Votre mdp" id="password" type="password" {...register('password')} {...getError('password')} />
+          <TextField required margin="none" label="Confirmer mdp" id="phone" type="password" {...register('confirmPassword')} {...getError('confirmPassword')} />
         </Box>
       </Box>
 

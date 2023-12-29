@@ -31,7 +31,7 @@ async function getOne(resource: string, params: GetOneParams): Promise<GetOneRes
 async function create(resource: string, params: CreateParams): Promise<CreateResult> {
   switch (resource) {
     case 'admin':
-      return adminCreate(resource, params)
+      return adminCreate(params)
     default:
       return {
         data: {

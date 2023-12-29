@@ -5,11 +5,9 @@ import { UserModel } from "@cipher-health/sdk"
 const client = authentificator.getClient()
 
 export async function getAdminList(params: GetListParams): Promise<GetListResult> {
-  
-  // @ts-ignore
-  const [res, error] = await client.get<{ data: UserModel[] }>({
-    endpoint: '/admin/all',
-    params: {
+
+  const [res, error] = await client.get<{ data: UserModel[] }>('/admin/all', {
+    query: {
       page: params.pagination.page,
       perPage: params.pagination.perPage,
       sort: params.sort.field,
@@ -26,7 +24,7 @@ export async function getAdminList(params: GetListParams): Promise<GetListResult
   }
 
   const { data } = res
-  
+
   return {
     data: data.map((user) => ({
       id: user.id,

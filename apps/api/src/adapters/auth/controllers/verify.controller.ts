@@ -8,15 +8,15 @@ import { RandomService } from "@/common/random/random.service";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../guards/auth.guard";
-import { StwtGuard } from "../guards/stwt.guard";
 import { dateIsExpired } from "@cipher-health/utils";
+import { EnableStwtAuth } from "../auth.decorator";
 
 
 @UseGuards(
-  StwtGuard,
   AuthGuard,
   UserGuard,
 )
+@EnableStwtAuth()
 @Controller('auth/verify')
 export class VerifyController {
 

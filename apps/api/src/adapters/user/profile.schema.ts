@@ -2,16 +2,15 @@ import { getMinimalMajorBirthDate } from "@cipher-health/utils";
 import { z } from "zod";
 
 export const profileCreationSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  address: z.string(),
-  addressDetails: z.string().optional(),
-  city: z.string(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  address: z.string().min(1),
+  addressDetails: z.string().min(1).optional(),
+  city: z.string().min(1),
   zipCode: z.string().regex(/^\d{5}$/),
-  country: z.string().length(2), // FR, US, etc.
+  country: z.string().length(2), // TODO: use the dataset from @utils
   birthDate: z.coerce.date().max(getMinimalMajorBirthDate()),
-  // TODO: add dyanmic logic to require birthPlace on "CLIENT" type of user
-  // birthPlace: z.string(), 
-  birthName: z.string().optional(),
+  birthPlace: z.string().min(1).optional(),
+  birthName: z.string().min(1).optional(),
   gender: z.enum(['MALE', 'FEMALE'])
 })

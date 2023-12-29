@@ -1,8 +1,6 @@
-// import { UserType } from "@prisma/client"
+import { UserType } from "@prisma/client"
 
-
-
-// export type Stwt = {
-//   type: UserType,
-//   email: string
-// }
+export type IStwt = {
+  type: UserType,
+  data?: any
+}

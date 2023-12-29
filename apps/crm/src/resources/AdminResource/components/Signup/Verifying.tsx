@@ -6,8 +6,8 @@ import styled from "@mui/material/styles/styled";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useClient } from "@cipher-health/sdk/react";
 import { useNotify } from "react-admin";
-import { codeSent, expiredCodeError } from "./errors";
 import { Container } from "./SignupContainer";
+import { codeSent, expiredCodeError } from "../../../../lib/errors";
 
 const Input = styled('input')(({ theme }) => ({
   width: "40px",
@@ -32,6 +32,7 @@ export default function Verifying({ stwt, checkProgress }: {
   const inputRefs = useRef<HTMLInputElement[]>([])
 
   const [code, setCode] = useState<string[]>([])
+  const [isMounted, setIsMounted] = useState(false)
 
   async function verify() {
     // check if a verification code has been sent
@@ -52,8 +53,13 @@ export default function Verifying({ stwt, checkProgress }: {
   }
 
   useEffect(() => {
+    // To prevent the code from being sent twice (StrictMode)
+    if (!isMounted) {
+      setIsMounted(true)
+      return
+    }
     verify()
-  }, [])
+  }, [isMounted])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, i: number) => {
     if (!numRegex.test(e.target.value)) {

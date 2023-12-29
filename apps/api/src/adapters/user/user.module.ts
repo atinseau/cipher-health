@@ -6,11 +6,15 @@ import { UserEncryptionController } from './controllers/user-encryption.controll
 import { JwtService } from '@/common/jwt/jwt.service';
 import { UserTasks } from './user.tasks';
 import { UserEvents } from './user.events';
+import { AuthService } from '../auth/auth.service';
+import { AdminService } from '../admin/admin.service';
 
 @Global()
 @Module({
   providers: [
+    AuthService, // For AuthGuard
     UserEvents,
+    AdminService,
     UserService,
     UserTasks,
     JwtService,
@@ -22,4 +26,4 @@ import { UserEvents } from './user.events';
     UserEncryptionController
   ]
 })
-export class UserModule {}
+export class UserModule { }

@@ -7,6 +7,7 @@ import { UserService } from "../user/user.service";
 import { createResult } from "@/utils/errors";
 import { Logger } from "@/common/logger/logger.service";
 import { CryptoService } from "@/common/crypto/crypto.service";
+import { IStwt } from "./auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -69,11 +70,12 @@ export class AuthService {
   }
 
   // Stwt = Signup Token With Type
-  async createStwt(type: UserType) {
+  async createStwt(type: UserType, data?: any) {
     try {
       const token = await this.jwtService.sign({
         type,
-        cid: uuid() // Correlational ID
+        cid: uuid(), // Correlational ID
+        ...data ? { data } : {} // Add data if provided
       }, process.env.STWT_SECRET, {
         expiresIn: process.env.STWT_EXPIRY || '1d'
       })
@@ -115,7 +117,7 @@ export class AuthService {
   }
 
   async verifyStwt(stwt: string) {
-    const stwtResult = await this.jwtService.verify<{ type: UserType }>(stwt, process.env.STWT_SECRET)
+    const stwtResult = await this.jwtService.verify<IStwt>(stwt, process.env.STWT_SECRET)
     if (!stwtResult) {
       return createResult(null, false, {
         type: 'INVALID_SIGNUP_TOKEN',
@@ -158,7 +160,7 @@ export class AuthService {
     }
   }
 
-  async deleteStwt(stwt: string, consumerId: string) {
+  async softDeleteStwt(stwt: string, consumerId: string) {
     try {
       await this.prismaService.stwt.update({
         where: {

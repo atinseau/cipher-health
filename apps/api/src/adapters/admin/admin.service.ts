@@ -5,6 +5,7 @@ import { UserService } from "../user/user.service";
 import { ProfileCreate, UserCreate, UserModel } from "../user/user.dto";
 import { createResult } from "@/utils/errors";
 import { AdminCreate } from "./admin.dto";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class AdminService implements OnApplicationBootstrap {
@@ -27,7 +28,7 @@ export class AdminService implements OnApplicationBootstrap {
         user: {
           email: process.env.ADMIN_EMAIL,
           password: process.env.ADMIN_PASSWORD,
-          phone: '+33000000000',
+          phone: '06-06-06-06-06', // fake valid phone number
           type: 'ADMIN',
           verified: true, // Initial admin is always verified
           completed: true, // Inital admin is always completed
@@ -68,22 +69,30 @@ export class AdminService implements OnApplicationBootstrap {
    * user information (lastname, firstname, etc...)
    */
   async createAdmin(userCreation: {
-    user: UserCreate,
+    user: UserCreate | User,
     profile: ProfileCreate,
     admin?: Partial<AdminCreate>
   }) {
+    // TODO: add try catch here
 
-    // TODO: use an existing user if userCreation.user is undefined
-    //       use and existing user instead in the userCreation object
-    const result = await this.userService.create(userCreation.user)
-    if (!result.success) {
-      return result
+    let user: User
+
+    // If the "userCreation.user" contains an id, it means that the user already exists
+    // and we just need to attach the admin profile to it
+    if ('id' in userCreation.user) {
+      user = userCreation.user
+    } else {
+      const result = await this.userService.create(userCreation.user)
+      if (!result.success) {
+        return result
+      }
+      user = result.data
     }
 
-    const profile = this.userService.createProfile(result.data as UserModel, userCreation.profile)
+    const profile = this.userService.createProfile(user, userCreation.profile)
     const admin = this.prismaService.admin.create({
       data: {
-        userId: result.data.id,
+        userId: user.id,
         permissions: userCreation.admin?.permissions || [],
       }
     })
@@ -94,7 +103,7 @@ export class AdminService implements OnApplicationBootstrap {
       return createResult(null, false, 'Cannot create admin')
     }
 
-    const userModel = result.data as UserModel
+    const userModel = user as UserModel
 
     userModel.profile = profileResult.data
     userModel.admin = adminResult

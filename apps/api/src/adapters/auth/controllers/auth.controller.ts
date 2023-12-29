@@ -52,6 +52,7 @@ export class AuthController {
     if (stwt) {
       const stwtResult = await this.authService.isUsableStwt(stwt)
       if (!stwtResult.success) {
+        // TODO: impl hard delete for stwt and remove the unfinished user if it exists
         throw createHttpError(stwtResult, {
           INVALID_SIGNUP_TOKEN: HttpStatus.UNAUTHORIZED,
         })
@@ -77,7 +78,7 @@ export class AuthController {
     // because it's no longer needed
     // it's a soft delete, it will be deleted from the database after 24 hours + 1 hour
     if (stwt) {
-      await this.authService.deleteStwt(stwt, result.data.id)
+      await this.authService.softDeleteStwt(stwt, result.data.id)
     }
 
     return {
@@ -101,6 +102,13 @@ export class AuthController {
       })
     }
 
+    // In this case "signup/info" route is called without any guard
+    // so because the expiration check is done in "AuthGuard" we need to manually check it here
+    // with the "expiresAt" field in the associated entry in db (token = stwt, model = Stwt)
+    if (stwtResult.data.expiresAt && dateIsExpired(stwtResult.data.expiresAt)) {
+      // TODO: impl hard delete for stwt and remove the unfinished user if it exists
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Signup token expired.')
+    }
     // In this case, the signup token have never been used
     // isn't owned by any user and is not deleted
     // so it's a valid signup token for a user creation

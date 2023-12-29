@@ -9,11 +9,12 @@ const CountrySelect = ({ control, getError }: { control: Control<any>, getError:
     <Controller
       name="country"
       control={control}
-      render={({ field: { value, ...rest } }) => {
+      render={({ field: { value, ref, ...rest }, formState }) => {
         return <Autocomplete
           {...rest}
           onChange={(_, data) => rest.onChange(data?.code)}
           options={COUNTRIES}
+          defaultValue={COUNTRIES.find((c) => c.code === formState?.defaultValues?.country)}
           autoHighlight
           fullWidth
           getOptionLabel={(option) => option.label}
@@ -34,7 +35,9 @@ const CountrySelect = ({ control, getError }: { control: Control<any>, getError:
               {...params}
               {...getError('country')}
               margin='none'
-              inputRef={(e) => rest.ref({ ...e, focus: () => e?.focus() })}
+              required
+              name='country'
+              inputRef={(e) => ref({ ...e, focus: () => e?.focus() })}
               label="Votre pays"
               inputProps={{
                 ...params.inputProps,

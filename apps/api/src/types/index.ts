@@ -1,5 +1,6 @@
 import { UserModel } from "../adapters/user/user.dto"
 import { JwtPayload } from "jsonwebtoken"
+import { IStwt } from "../adapters/auth/auth.dto"
 
 declare global {
 
@@ -31,6 +32,7 @@ declare global {
       userJwt?: JwtPayload
       user?: UserModel
       accessToken: string
+      stwt?: IStwt
     }
   }
 }

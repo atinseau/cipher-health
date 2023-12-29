@@ -4,7 +4,7 @@ import { createRawHttpError } from "@/utils/errors";
 import { PrismaService } from "@/common/database/prisma.service";
 import { Reflector } from "@nestjs/core";
 import { RequiredPermissions, RequiredAdmin } from "../admin.decorator";
-import { AdminPermissions } from "../permissions";
+import { AdminPermission, AdminPermissions } from "../permissions";
 
 
 @Injectable()
@@ -42,16 +42,22 @@ export class AdminGuard implements CanActivate {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'There is no administrator associated with this user.')
     }
 
-
-    const permissions = admin?.permissions || []
-    const hasAllPermissions = permissions.some((permissions) => permissions === AdminPermissions.ALL)
-    const hasRequiredPermissions = permissions.every((permissions) => requiredPermissions?.includes(permissions as AdminPermissions))
-
     // If the method implements the RequiredPermissions decorator,
     // check if the user has all the required permissions.
     // or if the user has the AdminPermissions.ALL permission.
-    if (requiredPermissions !== undefined && !(hasAllPermissions || hasRequiredPermissions)) {
-      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'This administrator does not have the required permissions.')
+    if (requiredPermissions !== undefined) {
+
+      const permissions = (admin?.permissions || []) as AdminPermission[]
+      const hasAllPermissions = permissions.some((permission) => permission === AdminPermissions.ALL.name)
+      const hasRequiredPermissions = permissions.every((permission) => requiredPermissions?.includes(permission))
+
+      if (!(hasAllPermissions || hasRequiredPermissions)) {
+        throw createRawHttpError(HttpStatus.FORBIDDEN, {
+          message: 'This administrator does not have the required permissions.',
+          requiredPermissions,
+          userPermissions: permissions
+        })
+      }
     }
 
     user.admin = admin
