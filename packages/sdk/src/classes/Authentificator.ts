@@ -1,11 +1,10 @@
 import { Mutex } from "async-mutex";
-import { Client } from "./Client"
-
+import { Client, ClientOptions } from "./Client"
 import { UserType, UserModel } from '@cipher-health/api'
-
 
 type AuthentificatorOptions = {
   mode: UserType
+  clientOptions?: Omit<ClientOptions, 'threadSafe'>
 }
 
 export class Authentificator {
@@ -18,6 +17,7 @@ export class Authentificator {
   constructor(options?: AuthentificatorOptions) {
     this.options = options || { mode: 'CLIENT' };
     this.client = new Client({
+      ...this.options.clientOptions,
       threadSafe: true,
     });
 
@@ -32,19 +32,13 @@ export class Authentificator {
       }
     })
 
-    // not implemented yet
-    // this.client.addHook('beforeRequest', async () => {
-    // ...
-    // })
-
     this.applyHeaders()
   }
 
   private applyHeaders() {
-    const accessToken = localStorage.getItem('accessToken')
-    if (accessToken) {
+    if (this.accessToken) {
       this.client.addHeaders({
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${this.accessToken}`
       })
     }
   }
@@ -58,8 +52,7 @@ export class Authentificator {
    * that means that if multiple requests are made at the same time
    * only one will refresh the token, the others will wait for the first one to finish
    */
-  private async refresh() {
-
+  private async refresh() {    
     if (!this.isSoftConnected()) {
       throw new Error('Cannot refresh token, not connected')
     }
@@ -70,11 +63,11 @@ export class Authentificator {
 
     const release = await this.refreshMutex.acquire()
 
-    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/refresh', {
+    let [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/refresh', {
       skipHooks: ['afterRequest'],
       body: {
-        refreshToken: localStorage.getItem('refreshToken'),
-        accessToken: localStorage.getItem('accessToken')
+        refreshToken: this.refreshToken,
+        accessToken: this.accessToken
       }
     })
 
@@ -90,7 +83,6 @@ export class Authentificator {
   }
 
   async login({ email, password }: { email: string, password: string }) {
-
     // if already connected, do nothing
     if (await this.isConnected()) {
       return
@@ -126,9 +118,6 @@ export class Authentificator {
     // just continue the logout process
     await this.client.get('/auth/signout')
 
-    console.log(localStorage.getItem('accessToken'))
-    console.log(localStorage.getItem('refreshToken'))
-
     // Remove tokens from local storage in any case
     // headers will be resetted after the request
     localStorage.removeItem('accessToken')
@@ -138,7 +127,7 @@ export class Authentificator {
   }
 
   private isSoftConnected() {
-    return !!localStorage.getItem('accessToken') && !!localStorage.getItem('refreshToken')
+    return !!this.accessToken && !!this.refreshToken
   }
 
   async isConnected() {
@@ -184,5 +173,14 @@ export class Authentificator {
    */
   getClient() {
     return this.client
+  }
+
+
+  private get accessToken() {
+    return localStorage.getItem('accessToken')
+  }
+
+  private get refreshToken() {
+    return localStorage.getItem('refreshToken')
   }
 }

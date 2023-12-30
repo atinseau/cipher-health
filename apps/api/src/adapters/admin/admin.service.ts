@@ -6,6 +6,7 @@ import { ProfileCreate, UserCreate, UserModel } from "../user/user.dto";
 import { createResult } from "@/utils/errors";
 import { AdminCreate } from "./admin.dto";
 import { User } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class AdminService implements OnApplicationBootstrap {
@@ -59,6 +60,26 @@ export class AdminService implements OnApplicationBootstrap {
     }
   }
 
+  private async createStandaloneAdmin(userId: string, adminCreation?: Partial<AdminCreate>) {
+    try {
+      const admin = await this.prismaService.admin.create({
+        data: {
+          userId,
+          permissions: adminCreation?.permissions || [],
+        }
+      })
+      return createResult(admin)
+    } catch (e) {
+      this.loggerService.error(e, 'AdminService')
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2003') {
+        return createResult(null, false, {
+          type: 'USER_NOT_FOUND',
+          message: 'User not found'
+        })
+      }
+      return createResult(null, false, e.message as string)
+    }
+  }
 
   /**
    * Always attach the admin profile to the user object
@@ -89,24 +110,35 @@ export class AdminService implements OnApplicationBootstrap {
       user = result.data
     }
 
-    const profile = this.userService.createProfile(user, userCreation.profile)
-    const admin = this.prismaService.admin.create({
-      data: {
-        userId: user.id,
-        permissions: userCreation.admin?.permissions || [],
-      }
-    })
+    const profile = this.userService.createProfile(user.id, userCreation.profile)
+    const admin = this.createStandaloneAdmin(user.id, userCreation.admin)
 
     const [profileResult, adminResult] = await Promise.all([profile, admin])
 
-    if (!adminResult || !profileResult.success) {
-      return createResult(null, false, 'Cannot create admin')
+    if (!adminResult.success) {
+      return adminResult
+    }
+
+    if (!profileResult.success) {
+      return profileResult
     }
 
     const userModel = user as UserModel
 
     userModel.profile = profileResult.data
-    userModel.admin = adminResult
+    userModel.admin = adminResult.data
+
+    // Set user as completed when profile and admin are created for this user
+    if (!userModel.completed) {
+      await this.prismaService.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          completed: true
+        }
+      })
+    }
 
     return createResult(userModel)
   }

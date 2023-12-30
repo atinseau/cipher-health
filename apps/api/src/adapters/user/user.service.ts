@@ -167,15 +167,14 @@ export class UserService {
     }
   }
 
-  async createProfile(user: User, payload: z.infer<typeof profileCreationSchema>) {
+  async createProfile(userId: string, payload: z.infer<typeof profileCreationSchema>) {
     try {
       const result = await this.prismaService.profile.create({
         data: {
           ...payload,
-          userId: user.id
+          userId
         }
       })
-
       return createResult(result)
     } catch (e) {
       this.loggerService.error(e, 'UserService')

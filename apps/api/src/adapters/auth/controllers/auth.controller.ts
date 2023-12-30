@@ -267,7 +267,7 @@ export class AuthController {
 
     if (!userRefreshToken || userRefreshToken.deletedAt) {
       // TODO: there is an issue here
-      console.log(result.data.refreshTokens, userRefreshToken)
+      console.log(result.data.refreshTokens, userRefreshToken, refreshToken)
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token, cannot renew access token.')
     }
 

@@ -1,51 +1,20 @@
 import { Client } from "../src/classes/Client"
 import { ClientError } from "../src/classes/ClientError"
+import applyMockedFetch from "./mock/fetch"
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-function applyMockedFetch(options?: { error?: boolean, data?: any, status?: number }) {
-
-  const fetchContext = {
-    count: 0
-  }
-
-  const customFetch = () => {
-    fetchContext.count += 1
-    const data = typeof options?.data === 'function' ? options?.data() : options?.data
-    let text = data || 'ok'
-    return Promise.resolve({
-      ok: !options?.error,
-      status: options?.error ? (options?.status || 500) : 200,
-      json: () => {
-        try {
-          return Promise.resolve(JSON.parse(text))
-        } catch (_) {
-          return Promise.reject(text)
-        }
-      },
-      text: () => Promise.resolve(text)
-    })
-  }
-
-  const mockedFetch = jest.fn(customFetch) as jest.Mock<ReturnType<typeof customFetch>> & {
-    fetchContext: {
-      count: number
-    }
-  }
-
-  // @ts-ignore
-  global.fetch = mockedFetch
-
-  mockedFetch.fetchContext = fetchContext
-
-  return mockedFetch
-}
 
 const response = {
   message: 'Hello World!'
 }
 
 describe('Client class', () => {
+
+  // to be sure mockRestore is called
+  beforeEach(() => {
+    global.fetch = undefined
+  })
 
   it('should be able to make a simple request', async () => {
     const mockedFetch = applyMockedFetch({

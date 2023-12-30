@@ -47,6 +47,7 @@ type RequestContext = Record<string, {
 
 export type ClientOptions = {
   threadSafe?: boolean
+  baseUrl?: string
   maxRetry?: number
 }
 
@@ -61,6 +62,7 @@ export class Client {
   constructor(options?: ClientOptions) {
     this.options = {
       threadSafe: false,
+      baseUrl: HOST,
       maxRetry: 3,
       ...options || {}
     }
@@ -71,7 +73,7 @@ export class Client {
   }
 
   private createUrl(endpoint: string, query?: Query) {
-    const url = new URL(HOST + this.formatEndpoint(endpoint))
+    const url = new URL(this.options.baseUrl + this.formatEndpoint(endpoint))
     const formattedQuery = Object.keys(query || {}).reduce((acc, key) => {
       if (typeof query[key] === 'number') {
         return {

@@ -42,6 +42,8 @@ export class UserController {
     @Body() body: any,
     @Stwt() stwt?: IStwt
   ) {
+
+    // TODO: improve this guard by checking "completed" field instead of profile existence
     if (user.profile) {
       throw createRawHttpError(HttpStatus.CONFLICT, 'This user already has a profile.')
     }
@@ -52,19 +54,35 @@ export class UserController {
 
     // Ask profile creation for admin user by stwt method
     if (stwt && stwt.type === 'ADMIN') {
+      const result = await this.adminService.createAdmin({
+        profile: output.data,
+        admin: {
+          // if permissions is provided in stwt data, use it, otherwise use empty array
+          permissions: stwt.data?.permissions || []
+        },
+        user
+      })
 
-      // const result = await this.adminService.createAdmin({
-      //   profile: output.data,
-        
-      // })
+      if (!result.success) {
+        throw createHttpError(result, {
+          USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+          // The next errors should never happen because user is already created
+          // and verified, it's a side effect of "createAdmin" method that can also
+          // create a user if it doesn't exist
+          DUPLICATE_EMAIL: HttpStatus.INTERNAL_SERVER_ERROR,
+          PHONE_FORMAT_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
+        })
+      }
 
       // CREATE ADMIN PROFILE HERE
-
-      return
+      return {
+        success: true,
+        data: result.data
+      }
     }
 
     // Other type of user
-    const result = await this.userService.createProfile(user, output.data)
+    const result = await this.userService.createProfile(user.id, output.data)
     if (!result.success) {
       throw createHttpError(result, {
         USER_NOT_FOUND: HttpStatus.NOT_FOUND,

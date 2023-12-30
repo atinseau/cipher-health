@@ -1,4 +1,4 @@
-import { APP_GUARD, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { API_PREFIX } from '@/utils/constants';
@@ -10,7 +10,7 @@ import { ClientModule } from './adapters/client/client.module';
 import { RedisModule } from './common/redis/redis.module';
 import { PhoneModule } from './common/phone/phone.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import helmet from 'helmet';
 import { ThrottlerExceptionFilter } from './common/throttler/throttler-exception.filter';
@@ -55,7 +55,6 @@ async function bootstrap() {
   app.setGlobalPrefix(API_PREFIX);
   app.use(helmet());
   app.enableCors();
-
   app.useGlobalFilters(new ThrottlerExceptionFilter())
 
   await app.listen(process.env.PORT || 3000);
