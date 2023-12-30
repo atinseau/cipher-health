@@ -52,7 +52,10 @@ export class Authentificator {
    * that means that if multiple requests are made at the same time
    * only one will refresh the token, the others will wait for the first one to finish
    */
-  private async refresh() {    
+  private async refresh() {
+
+    console.log('refresh')
+
     if (!this.isSoftConnected()) {
       throw new Error('Cannot refresh token, not connected')
     }
@@ -83,6 +86,8 @@ export class Authentificator {
   }
 
   async login({ email, password }: { email: string, password: string }) {
+    console.log('login')
+    
     // if already connected, do nothing
     if (await this.isConnected()) {
       return
@@ -108,6 +113,7 @@ export class Authentificator {
   }
 
   async logout() {
+    console.log('logout')
 
     // If there is no token, do nothing
     if (!this.isSoftConnected()) {
@@ -131,6 +137,9 @@ export class Authentificator {
   }
 
   async isConnected() {
+
+    console.log('isConnected')
+
     if (!this.isSoftConnected()) {
       return false
     }
@@ -147,6 +156,9 @@ export class Authentificator {
   }
 
   async me() {
+
+    console.log('me')
+
     let endpoint = '/user/me'
 
     if (this.options.mode === 'ADMIN') {

@@ -3,7 +3,7 @@ import { authentificator } from "../auth";
 
 export const authProvider: AuthProvider = {
   login: async ({ username, password }) => {
-    console.log('login')
+    // console.log('login')
     try {
       await authentificator.login({
         email: username,
@@ -15,14 +15,14 @@ export const authProvider: AuthProvider = {
     }
   },
   checkAuth: async () => {
-    console.log('checkAuth')
+    // console.log('checkAuth')
     const isConnected = await authentificator.isConnected()
     return isConnected
       ? Promise.resolve()
       : Promise.reject();
   },
   getPermissions: async () => {
-    console.log('getPermissions')
+    // console.log('getPermissions')
     try {
       if (!await authentificator.isConnected()) {
         return Promise.resolve([]);
@@ -36,11 +36,11 @@ export const authProvider: AuthProvider = {
   },
   checkError: () => {
     // not implemented yet
-    console.log('checkError')
+    // console.log('checkError')
     return Promise.resolve();
   },
   getIdentity: async () => {
-    console.log('getIdentity')
+    // console.log('getIdentity')
     try {
       const me = await authentificator.me()
 
@@ -58,7 +58,7 @@ export const authProvider: AuthProvider = {
     }
   },
   logout: async () => {
-    console.log('logout')
+    // console.log('logout')
     try {
       await authentificator.logout()
       return Promise.resolve();

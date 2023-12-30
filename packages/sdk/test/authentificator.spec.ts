@@ -51,7 +51,7 @@ const logoutRoute: Route = {
 const refreshRoute: Route = {
   endpoint: '/api/v1/auth/refresh',
   method: 'POST',
-  fetchResult: (init) => {
+  fetchResult: () => {
     refreshToken = (parseInt(refreshToken) + 1).toString()
     accessToken = (parseInt(accessToken) + 1).toString()
     return createFetchResult({
