@@ -1,3 +1,4 @@
+import { NextUIProvider } from '@/contexts/NextUIProvider/NextUIProvider'
 import '@/styles/globals.css'
 
 export const metadata = {
@@ -13,7 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <NextUIProvider>
+          {children}
+        </NextUIProvider>
       </body>
     </html>
   )

@@ -1,20 +1,25 @@
-import type { Config } from 'tailwindcss'
+// tailwind.config.js
+import { nextui } from "@nextui-org/react";
 
-const config: Config = {
+// Due to the monorepo structure, we need to get the absolute path of the nextui package
+// to make sure Tailwind can find the files to compile
+const nextuiPath = require
+  .resolve("@nextui-org/theme")
+  .replace('/dist/index.js', '')
+
+/**
+ * @type {import('tailwindcss').Config}
+ */
+const config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/**/*.{js,ts,jsx,tsx}",
+    nextuiPath + "/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
-    },
+    extend: {},
   },
-  plugins: [],
+  darkMode: "class",
+  plugins: [nextui()]
 }
-export default config
+
+export default config;
