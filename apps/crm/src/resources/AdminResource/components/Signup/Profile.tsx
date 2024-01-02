@@ -17,6 +17,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { type Dayjs } from "dayjs";
 import CountrySelect from "./CountrySelect";
 import { useClient } from "@cipher-health/sdk/react";
+import { useNotify, useRedirect } from "react-admin";
 
 type StepProps = {
   updateMergedData: (data: any) => void
@@ -214,6 +215,9 @@ export default function Profile({ stwt }: { stwt: string }) {
   const [step, setStep] = useState(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const notify = useNotify()
+  const redirect = useRedirect()
+
   // We need to initialize the mergedData with the defaultValues of each steps
   // Very useful on dev mode when we want to go to the last step without filling the form
   const [mergedData, setMergedData] = useState<Record<string, any>>(steps.reduce((acc, s) => ({
@@ -228,8 +232,9 @@ export default function Profile({ stwt }: { stwt: string }) {
 
   // Guard
   const disableNextStep = useRef(false)
-  const disableSubmission = useRef(false)
   const userInteracted = useRef(false)
+  const disableSubmission = useRef(true)
+
 
   const computedDefaultValues = useMemo(() => {
     return mergedData[currentStep.id] || currentStep?.defaultValues || {}
@@ -271,7 +276,19 @@ export default function Profile({ stwt }: { stwt: string }) {
       setStep(0) // workaround to force the user to go back to the first step
       return
     }
+
+    notify('Votre profile a bien été créé, vous pouvez maintenant vous connectez !', {
+      type: 'success'
+    })
+    redirect('/login')
   }
+
+  // During development, we want to prevent keeping the "disableSubmission" boolean to false
+  // after each hot module replacement
+  useEffect(() => {
+    disableSubmission.current = true
+  }, [])
+
 
   useEffect(() => {
     // To prevent auto submission on first render
@@ -291,6 +308,8 @@ export default function Profile({ stwt }: { stwt: string }) {
       return
     }
 
+    // After "mergedData" is updated and the previous "if" passed, we can set "disableSubmission" to false
+    // because if the user click on the next button, we want to submit the form
     disableSubmission.current = false
 
     // - if the current step is filled on this render, go to the next step

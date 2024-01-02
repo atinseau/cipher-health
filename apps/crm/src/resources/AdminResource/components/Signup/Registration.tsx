@@ -106,7 +106,9 @@ export default function Registration({ stwt, checkProgress }: {
       return
     } else if (error) {
       console.error(error)
-      notify(invalidLinkError)
+      notify(error.message, {
+        type: 'error'
+      })
       return
     }
     checkProgress()

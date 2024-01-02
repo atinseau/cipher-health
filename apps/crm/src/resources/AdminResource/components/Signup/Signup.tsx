@@ -49,7 +49,8 @@ export default function AdminSignup() {
     setIsBooting(false)
 
     if (error) {
-      notify(error.message, {
+      console.error(error)
+      notify("Le lien est expiré ou invalide, merci de contacter l'administrateur qui vous a invité", {
         type: 'error'
       })
       navigate('/login')

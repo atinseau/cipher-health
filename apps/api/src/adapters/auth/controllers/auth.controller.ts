@@ -52,7 +52,7 @@ export class AuthController {
     if (stwt) {
       const stwtResult = await this.authService.isUsableStwt(stwt)
       if (!stwtResult.success) {
-        // TODO: impl hard delete for stwt and remove the unfinished user if it exists
+        await this.authService.cleanupStwtFailProcess(stwt)
         throw createHttpError(stwtResult, {
           INVALID_SIGNUP_TOKEN: HttpStatus.UNAUTHORIZED,
         })
@@ -70,6 +70,7 @@ export class AuthController {
     if (!result.success) {
       throw createHttpError(result, {
         DUPLICATE_EMAIL: HttpStatus.CONFLICT,
+        DUPLICATE_PHONE: HttpStatus.CONFLICT,
         PHONE_FORMAT_ERROR: HttpStatus.UNPROCESSABLE_ENTITY,
       })
     }
@@ -106,7 +107,7 @@ export class AuthController {
     // so because the expiration check is done in "AuthGuard" we need to manually check it here
     // with the "expiresAt" field in the associated entry in db (token = stwt, model = Stwt)
     if (stwtResult.data.expiresAt && dateIsExpired(stwtResult.data.expiresAt)) {
-      // TODO: impl hard delete for stwt and remove the unfinished user if it exists
+      await this.authService.cleanupStwtFailProcess(stwt)
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Signup token expired.')
     }
     // In this case, the signup token have never been used
@@ -161,7 +162,6 @@ export class AuthController {
   }
 
 
-
   @Post('signin')
   @HttpCode(200)
   async signin(
@@ -182,6 +182,7 @@ export class AuthController {
     }
 
     // special case for admin accounts
+    // normally, verified should be true if completed is true (correled)
     if (type === 'ADMIN' && !result.data.verified && !result.data.completed) {
       throw createRawHttpError(HttpStatus.FORBIDDEN, 'Admin account must be verified and completed to sign in.')
     }

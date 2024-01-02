@@ -49,7 +49,7 @@ export class AdminGuard implements CanActivate {
 
       const permissions = (admin?.permissions || []) as AdminPermission[]
       const hasAllPermissions = permissions.some((permission) => permission === AdminPermissions.ALL.name)
-      const hasRequiredPermissions = permissions.every((permission) => requiredPermissions?.includes(permission))
+      const hasRequiredPermissions = permissions.length > 0 && permissions.every((permission) => requiredPermissions?.includes(permission))
 
       if (!(hasAllPermissions || hasRequiredPermissions)) {
         throw createRawHttpError(HttpStatus.FORBIDDEN, {

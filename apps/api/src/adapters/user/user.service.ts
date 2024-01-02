@@ -78,6 +78,16 @@ export class UserService {
     } catch (e) {
 
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+
+        const target = e?.meta?.target as string[] | undefined
+
+        if (target?.includes('phone')) {
+          return createResult(null, false, {
+            type: 'DUPLICATE_PHONE',
+            message: 'Phone number already exists'
+          })
+        }
+        
         return createResult(null, false, {
           type: 'DUPLICATE_EMAIL',
           message: 'Email already exists'

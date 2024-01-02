@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
     if (stwtAuthIsEnabled && stwt) {
       const stwtResult = await this.authService.verifyStwt(stwt)
       if (!stwtResult.success) {
-        // TODO: impl hard delete for stwt and remove the unfinished user if it exists
+        await this.authService.cleanupStwtFailProcess(stwt)
         throw createHttpError(stwtResult, {
           INVALID_SIGNUP_TOKEN: HttpStatus.UNAUTHORIZED,
         })

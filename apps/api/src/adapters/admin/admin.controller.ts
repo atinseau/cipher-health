@@ -58,10 +58,11 @@ export class AdminController {
     }
   }
 
+  /**
+   * To get all the permissions available for an admin, the user must have the ALL permission.
+   */
   @Get('permissions')
-  @RequiredPermissions([
-    'GET_PERMISSIONS'
-  ])
+  @RequiredPermissions(['ALL'])
   async getPermissions() {
     return {
       success: true,
@@ -83,10 +84,12 @@ export class AdminController {
     }
   }
 
+  /**
+   * Creation of a new admin account could only be done by an SUPER admin.
+   * that's mean that the user must have the ALL permission.
+   */
   @Post('invite')
-  @RequiredPermissions([
-    'INVITE',
-  ])
+  @RequiredPermissions(['ALL'])
   async inviteAdmin(@User() user: UserModel, @Body() body: any) {
 
     const payload = inviteAdminSchema.safeParse(body)
@@ -106,7 +109,8 @@ export class AdminController {
     // the admin will signup with the invitation link, we will 
     // attach the permissions to his account.
     const stwtResult = await this.authService.createStwt('ADMIN', {
-      permissions: payload.data.permissions
+      permissions: payload.data.permissions,
+      creatorId: user.id
     })
     if (!stwtResult.success) {
       throw createHttpError(stwtResult)

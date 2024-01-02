@@ -6,11 +6,14 @@ import {
   CreateButton,
   ExportButton,
   ShowButton,
+  usePermissions,
 } from 'react-admin';
 
 const ListActions = () => {
+  const { permissions, isLoading } = usePermissions<string[] | undefined>()
+
   return <TopToolbar>
-    <CreateButton />
+    {!isLoading && permissions && permissions.includes('*') && <CreateButton />}
     <ExportButton />
   </TopToolbar>
 }

@@ -13,7 +13,7 @@ export default function AdminShow() {
     <SimpleShowLayout>
       <TextField source="id" />
       <TextField source="fullName" label="Nom complet" />
-      {admin && admin.profile.permissions.length > 0 && <ChipField source="permissions" label="Permissions" />}
+      {/* {admin && admin.profile.permissions.length > 0 && <ChipField source="permissions" label="Permissions" />} */}
     </SimpleShowLayout>
   </Show>
 }

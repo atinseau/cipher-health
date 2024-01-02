@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Create, SimpleForm, TextInput, useNotify, useRedirect } from "react-admin";
+import { Create, SimpleForm, TextInput, useNotify, usePermissions, useRedirect } from "react-admin";
 import { authentificator } from "../../../auth";
 import { useCallback, useEffect, useState } from "react";
 import { BooleanInput } from 'react-admin';
@@ -52,7 +52,7 @@ const PermissionInput = ({ permissions }) => {
     <Typography variant="h6">Permissions</Typography>
     <Typography variant="body2" color="GrayText">
       Les permissions permettent de définir les actions que l{"'"}utilisateur peut faire sur l{"'"}application.
-      Vous pouvez en cocher plusieurs. Si vous ne cochez aucune permission, l{"'"}utilisateur ne pourra rien faire. (il ne pourra même pas se connecter, elles pourront etre modifié plus tard).
+      Vous pouvez en cocher plusieurs. Si vous ne cochez aucune permission, l{"'"}utilisateur ne pourra rien faire. (elles pourront etre modifié plus tard).
       Si vous souhaitez lui donner toutes les permissions, cochez la case ci-dessous.
     </Typography>
 
@@ -60,7 +60,7 @@ const PermissionInput = ({ permissions }) => {
       <FormControlLabel control={<Switch checked={allPermissions} onChange={handleAllPermissionsToggle} />} label="Toutes les permissions" />
     </FormGroup>
 
-    <Box mt={"10px"} sx={{ display: "flex", flexDirection: 'column' }}>
+    {permissions.length > 0 && <Box mt={"10px"} sx={{ display: "flex", flexDirection: 'column' }}>
       <Typography variant="body2" color="GrayText" mb="8px">
         Ou sélectionnez les permissions que vous souhaitez donner à l{"'"}utilisateur :
       </Typography>
@@ -76,7 +76,7 @@ const PermissionInput = ({ permissions }) => {
           />}
           label={permission.description} />)}
       </FormGroup>
-    </Box>
+    </Box>}
   </Box>
 }
 
@@ -86,11 +86,10 @@ export default function AdminCreate() {
   const notify = useNotify()
   const redirect = useRedirect()
 
-
   useEffect(() => {
     if (permissions.length > 0) return
     client.get('/admin/permissions').then(([res, data]) => {
-      setPermissions(res.data.filter((p) => p.name !== '*'))
+      setPermissions(res?.data?.filter((p) => p.name !== '*') || [])
     })
   }, [])
 
@@ -100,6 +99,12 @@ export default function AdminCreate() {
     title="Inviter des administrateurs"
     mutationOptions={{
       onError: (error) => {
+        if (error.status === 403) {
+          notify("Vous n'avez pas les permissions pour effectuer cette action", {
+            type: 'error'
+          })
+          return
+        }
         // parse the error
         notify("Une erreur est survenue lors de l'envoi de l'invitation, contactez l'équipe de développement", {
           type: 'error'

@@ -129,6 +129,9 @@ export class AuthService {
 
   async isUsableStwt(stwt: string) {
     try {
+
+      // Verify already check if the stwt is expired
+      // so we don't need to check it again
       const stwtResult = await this.verifyStwt(stwt)
       if (!stwtResult.success) {
         return stwtResult
@@ -137,12 +140,15 @@ export class AuthService {
       const stwtInDb = await this.prismaService.stwt.findUnique({
         where: {
           token: stwt,
-          expiresAt: {
-            gt: new Date()
-          }
+          // No need to query for the expiresAt field
+          // because the verify method already check if the stwt is expired
+          // expiresAt: {
+          //   gt: new Date()
+          // }
         }
       })
 
+      // If the "deletedAt" field is not null, it means that the stwt is already used
       if (!stwtInDb || stwtInDb.deletedAt) {
         return createResult(null, false, {
           type: 'INVALID_SIGNUP_TOKEN',
@@ -169,6 +175,54 @@ export class AuthService {
         data: {
           deletedAt: new Date(),
           consumerId
+        }
+      })
+    } catch (e) {
+      this.loggerService.error(e, 'AuthService')
+    }
+  }
+
+  /**
+   * The purpose of this method is to cleanup the database
+   * after a stwt is expired. This method is called in the
+   * "AuthGuard" when the stwt is expired or in the "AuthController" on the
+   * signup route when the stwt is expired.
+   * 
+   * It will remove an unfinished user and the stwt.
+   */
+  async cleanupStwtFailProcess(stwt: string) {
+    try {
+      const stwtInDb = await this.prismaService.stwt.findUnique({
+        where: {
+          token: stwt,
+          // We only want to delete stwt that are expired
+          // because we need to keep the stwt that is "soft deleted" because
+          // it could be used to complete the signup process
+          expiresAt: {
+            lt: new Date()
+          }
+        }
+      })
+
+      if (!stwtInDb) {
+        return
+      }
+
+      // If the stwt was used to create a user and the user is not
+      // completed when the stwt is expired, delete the user
+      if (stwtInDb.consumerId) {
+        await this.prismaService.user.delete({
+          where: {
+            completed: false,
+            id: stwtInDb.consumerId
+          }
+        })
+      }
+
+      // Delete the stwt
+      await this.prismaService.stwt.delete({
+        where: {
+          id: stwtInDb.id
         }
       })
     } catch (e) {

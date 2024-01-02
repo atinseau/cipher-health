@@ -42,7 +42,6 @@ export class UserController {
     @Body() body: any,
     @Stwt() stwt?: IStwt
   ) {
-
     // TODO: improve this guard by checking "completed" field instead of profile existence
     if (user.profile) {
       throw createRawHttpError(HttpStatus.CONFLICT, 'This user already has a profile.')
@@ -58,7 +57,9 @@ export class UserController {
         profile: output.data,
         admin: {
           // if permissions is provided in stwt data, use it, otherwise use empty array
-          permissions: stwt.data?.permissions || []
+          permissions: stwt.data?.permissions || [],
+          // if creatorId is provided in stwt data, use it, otherwise use null
+          creatorId: stwt.data?.creatorId || null,
         },
         user
       })
@@ -69,12 +70,12 @@ export class UserController {
           // The next errors should never happen because user is already created
           // and verified, it's a side effect of "createAdmin" method that can also
           // create a user if it doesn't exist
+          DUPLICATE_PHONE: HttpStatus.INTERNAL_SERVER_ERROR,
           DUPLICATE_EMAIL: HttpStatus.INTERNAL_SERVER_ERROR,
           PHONE_FORMAT_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
         })
       }
 
-      // CREATE ADMIN PROFILE HERE
       return {
         success: true,
         data: result.data
