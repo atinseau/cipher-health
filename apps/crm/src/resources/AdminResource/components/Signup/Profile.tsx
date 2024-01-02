@@ -275,6 +275,11 @@ export default function Profile({ stwt }: { stwt: string }) {
       disableNextStep.current = true
       setStep(0) // workaround to force the user to go back to the first step
       return
+    } else if (error) {
+      notify('Une erreur est survenue, veuillez réessayer plus tard', {
+        type: 'error'
+      })
+      return
     }
 
     notify('Votre profile a bien été créé, vous pouvez maintenant vous connectez !', {

@@ -10,7 +10,7 @@ import { UserService } from "../user/user.service";
 import { AdminService } from "./admin.service";
 import { ListQuery, IListQuery } from "@/utils/decorators/searchQuery";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
-import { RequiredPermissions } from "./admin.decorator";
+import { RequiredAdmin, RequiredPermissions } from "./admin.decorator";
 import { inviteAdminSchema } from "./admin.schema";
 import { AuthService } from "../auth/auth.service";
 import { MailService } from "@/common/mail/mail.service";
@@ -89,6 +89,7 @@ export class AdminController {
    * that's mean that the user must have the ALL permission.
    */
   @Post('invite')
+  @RequiredAdmin()
   @RequiredPermissions(['ALL'])
   async inviteAdmin(@User() user: UserModel, @Body() body: any) {
 
@@ -110,7 +111,7 @@ export class AdminController {
     // attach the permissions to his account.
     const stwtResult = await this.authService.createStwt('ADMIN', {
       permissions: payload.data.permissions,
-      creatorId: user.id
+      creatorId: user.admin?.id
     })
     if (!stwtResult.success) {
       throw createHttpError(stwtResult)

@@ -53,6 +53,7 @@ export class UserController {
 
     // Ask profile creation for admin user by stwt method
     if (stwt && stwt.type === 'ADMIN') {
+
       const result = await this.adminService.createAdmin({
         profile: output.data,
         admin: {

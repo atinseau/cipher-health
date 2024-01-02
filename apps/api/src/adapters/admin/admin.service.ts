@@ -66,6 +66,7 @@ export class AdminService implements OnApplicationBootstrap {
         data: {
           userId,
           permissions: adminCreation?.permissions || [],
+          creatorId: adminCreation?.creatorId || null,
         }
       })
       return createResult(admin)

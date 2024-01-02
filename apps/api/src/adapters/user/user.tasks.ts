@@ -30,7 +30,7 @@ export class UserTasks {
       const result = await this.prismaService.refreshToken.deleteMany({
         where: {
           expiresAt: {
-            lte: new Date()
+            lt: new Date()
           }
         }
       })
