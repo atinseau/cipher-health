@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "clean": "rm -rf .next",
+    "fclean": "rm -rf .next node_modules .turbo",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
