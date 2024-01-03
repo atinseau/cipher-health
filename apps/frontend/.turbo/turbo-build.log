@@ -1,36 +1,0 @@
-
-> frontend@0.1.0 build /home/arthur/cipher-health/apps/frontend
-> next build
-
-   ▲ Next.js 14.0.2
-   - Environments: .env
-
-   Creating an optimized production build ...
-
-warn - No utility classes were detected in your source files. If this is unexpected, double-check the `content` option in your Tailwind CSS configuration.
-warn - https://tailwindcss.com/docs/content-configuration
- ✓ Compiled successfully
-   Linting and checking validity of types ...
-   Collecting page data ...
-   Generating static pages (0/4) ...
-   Generating static pages (1/4) 
-   Generating static pages (2/4) 
-   Generating static pages (3/4) 
- ✓ Generating static pages (4/4) 
-   Finalizing page optimization ...
-   Collecting build traces ...
-
-Route (app)                              Size     First Load JS
-┌ λ /                                    249 B          95.1 kB
-├ ○ /_not-found                          871 B          85.3 kB
-└ λ /api/auth/[...nextauth]              0 B                0 B
-+ First Load JS shared by all            84.4 kB
-  ├ chunks/399fa1b5-21d55e1f84ea6039.js  53.3 kB
-  ├ chunks/51-0001eee1e4d8ccde.js        29.2 kB
-  ├ chunks/main-app-dcd065ce89882298.js  218 B
-  └ chunks/webpack-f17c0a70385b2aa7.js   1.68 kB
-
-
-○  (Static)   prerendered as static content
-λ  (Dynamic)  server-rendered on demand using Node.js
-

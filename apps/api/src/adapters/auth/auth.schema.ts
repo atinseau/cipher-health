@@ -1,4 +1,10 @@
-import { COUNTRIES } from "@cipher-health/utils";
+import {
+  COUNTRIES,
+  regexContainLowerCaseLetters,
+  regexContainNumbers,
+  regexContainSpecialChar,
+  regexContainUpperCaseLetters,
+} from "@cipher-health/utils";
 import { z } from "zod";
 
 /**
@@ -12,9 +18,11 @@ export const signupSchema = z.object({
   email: z.string().email(),
   password: z
     .string()
-    .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?.!@$%^&*-]).{8,}$/, {
-      message: 'Password is too weak, it should contain at least 8 characters, one uppercase, one lowercase, one number and one special character (#?!@$%.^&*-)'
-    }),
+    .regex(regexContainLowerCaseLetters, 'Password must contain at least one lowercase letter')
+    .regex(regexContainUpperCaseLetters, 'Password must contain at least one uppercase letter')
+    .regex(regexContainNumbers, 'Password must contain at least one number')
+    .regex(regexContainSpecialChar, 'Password must contain at least one special character')
+    .min(8, 'Password is too short - should be 8 chars minimum.'),
   confirmPassword: z.string(),
   phone: z.string(),
   country: z.string().refine((country) => {

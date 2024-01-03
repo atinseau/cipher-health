@@ -1,5 +1,6 @@
-// tailwind.config.js
+  // tailwind.config.js
 import { nextui } from "@nextui-org/react";
+import type { Config } from 'tailwindcss'
 
 // Due to the monorepo structure, we need to get the absolute path of the nextui package
 // to make sure Tailwind can find the files to compile
@@ -7,19 +8,51 @@ const nextuiPath = require
   .resolve("@nextui-org/theme")
   .replace('/dist/index.js', '')
 
-/**
- * @type {import('tailwindcss').Config}
- */
-const config = {
+const config: Config = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
     nextuiPath + "/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        base: '16px'
+      },
+      borderRadius: {
+        sm: '4px'
+      },
+      colors: {
+        black: '#2D2D2D',
+        indigo: {
+          200: "#F6F6FF",
+          300: "#EEEAFF",
+          400: "#AC9AF8",
+          500: "#7556F4",
+          600: "#5841B7",
+          700: "#3B2B7A"
+        },
+        gray: {
+          300: "#FAFAFA",
+          400: "#EAEAEA",
+          500: "#B2B2B2",
+          600: "#808080",
+          700: "#545454"
+        },
+        danger: {
+          DEFAULT: '#EF6262',
+          600: '#D24444'
+        },
+        success: {
+          DEFAULT: '#45D4B2',
+          600: '#35B395'
+        }
+      }
+    },
   },
   darkMode: "class",
-  plugins: [nextui()]
+  plugins: [nextui({
+    addCommonColors: true,
+  })]
 }
 
 export default config;
