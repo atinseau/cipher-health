@@ -33,6 +33,7 @@ const signupSchema = z.object({
   email: z.string().email(),
   password: z
     .string()
+    // TODO: use all regex from utils to validate password
     .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?.!@$%^&*-]).{8,}$/, {
       message: 'Password is too weak, it should contain at least 8 characters, one uppercase, one lowercase, one number and one special character (#?!@$%.^&*-)'
     }),
