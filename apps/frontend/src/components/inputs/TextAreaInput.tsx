@@ -1,4 +1,4 @@
-import { TextAreaProps, Textarea } from "@nextui-org/react";
+import { TextAreaProps, Textarea } from "@nextui-org/input";
 import BaseInput, { BaseInputProps } from "./BaseInput";
 
 type TextAreaInputProps = BaseInputProps & TextAreaProps & {

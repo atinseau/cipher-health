@@ -75,7 +75,7 @@ export default function PasswordInput(props: PasswordInputProps) {
     />
     <div className="text-gray-600 text-xs flex gap-1 items-center mt-2">
       <span className="whitespace-nowrap">Sécurité :</span>
-      <Progress value={passwordStrength} classNames={{
+      <Progress aria-label="password progression" value={passwordStrength} classNames={{
         base: 'h-[4px]',
         indicator: classNames({
           '!bg-danger': passwordStrength <= 50,

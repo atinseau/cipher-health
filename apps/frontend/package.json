@@ -15,10 +15,12 @@
     "@cipher-health/utils": "workspace:*",
     "@nextui-org/react": "^2.2.9",
     "@tw-classed/react": "^1.7.0",
+    "@types/react-datepicker": "^4.19.5",
     "classnames": "^2.5.1",
     "framer-motion": "^10.17.0",
     "next": "14.0.4",
     "react": "18.2.0",
+    "react-datepicker": "^4.25.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.12.0"
   },

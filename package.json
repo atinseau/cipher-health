@@ -6,11 +6,11 @@
     "down": "docker-compose -f docker/docker-compose.yml down",
     "predev": "pnpm run up",
     "dev": "FORCE_COLOR=true turbo dev --filter=!@cipher-health/frontend",
-    "clean": "FORCE_COLOR=true turbo clean --filter=!@cipher-health/frontend",
-    "fclean": "FORCE_COLOR=true turbo fclean --filter=!@cipher-health/frontend && rm -rf node_modules .turbo pnpm-lock.yaml",
-    "build": "FORCE_COLOR=true turbo build --filter=!@cipher-health/frontend",
-    "test": "FORCE_COLOR=true turbo test --filter=!@cipher-health/frontend",
-    "check-types": "FORCE_COLOR=true turbo check-types --filter=!@cipher-health/frontend",
+    "clean": "FORCE_COLOR=true turbo clean",
+    "fclean": "FORCE_COLOR=true turbo fclean && rm -rf node_modules .turbo pnpm-lock.yaml",
+    "build": "FORCE_COLOR=true turbo build",
+    "test": "FORCE_COLOR=true turbo test",
+    "check-types": "FORCE_COLOR=true turbo check-types",
     "prepare": "husky install"
   },
   "devDependencies": {

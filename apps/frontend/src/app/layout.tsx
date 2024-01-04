@@ -1,7 +1,8 @@
 import { NextUIProvider } from '@/contexts/NextUIProvider/NextUIProvider'
-import { Roboto } from 'next/font/google'
+import { Roboto, Work_Sans } from 'next/font/google'
 
 import '@/styles/globals.scss'
+import classNames from 'classnames'
 
 export const metadata = {
   title: 'Next.js',
@@ -18,6 +19,14 @@ const roboto = Roboto({
   subsets: ['latin'],
 })
 
+const workSans = Work_Sans({
+  variable: '--font-work-sans',
+  subsets: ['latin'],
+  weight: [
+    '700'
+  ]
+})
+
 export default function RootLayout({
   children,
 }: {
@@ -25,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={classNames(roboto.className, workSans.variable)}>
         <NextUIProvider>
           {children}
         </NextUIProvider>
