@@ -1,10 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import TextInput, { TextInputProps } from "./TextInput";
-import { AiOutlineEyeInvisible } from "react-icons/ai";
-import { AiOutlineEye } from "react-icons/ai";
-
+import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 import { Progress } from "@nextui-org/progress";
 
 
