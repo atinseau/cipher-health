@@ -7,3 +7,4 @@ node_modules
 **/.turbo
 
 k8s
+.circleci

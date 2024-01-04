@@ -2,10 +2,13 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
+orbs:
+  helm: circleci/helm@3.0.0
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  deploy:
+  pre-deploy:
     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/configuration-reference/#executor-job
     docker:
@@ -15,8 +18,8 @@ jobs:
     steps:
     - checkout
     - run:
-        name: "Test"
-        command: echo "Hello"
+        name: Setup k8s cluster
+        command: helm version
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -24,4 +27,4 @@ jobs:
 workflows:
   main-workflow:
     jobs:
-    - deploy
+    - pre-deploy

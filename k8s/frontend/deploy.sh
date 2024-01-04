@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ -z "$ENVIRONMENT" ]; then
-  echo "ENVIRONMENT variable is not set"
-  exit 1
-fi
-
 # Variables
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ROOT_DIR=$( cd $SCRIPT_DIR/../.. && pwd )
@@ -23,13 +18,9 @@ docker build \
   -f docker/build.Dockerfile \
   $ROOT_DIR
 
-if [ "$ENVIRONMENT" != "local" ]; then
-  echo "Pushing image to registry"
-fi
 
 # Helm install
-
-HELM_ARGS="$FRONTEND_RELEASE ./helm/ -n $ENVIRONMENT -f $ROOT_DIR/k8s/values.yaml $@"
+HELM_ARGS="$FRONTEND_RELEASE ./helm/ -n local -f $ROOT_DIR/k8s/values.yaml --set frontend.ingress.host=\"ch-frontend.local.com\""
 HELM_DIFF=$(helm diff upgrade $HELM_ARGS --allow-unreleased | wc -l)
 
 if [ "$HELM_DIFF" -gt 0 ]; then
