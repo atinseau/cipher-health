@@ -17,6 +17,7 @@ jobs:
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
     - checkout
+    - helm/install_helm_client
     - run:
         name: Setup k8s cluster
         command: helm version
