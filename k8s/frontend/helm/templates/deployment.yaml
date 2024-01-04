@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-deployment
+  labels:
+    app: nextjs
+spec:
+  replicas: 1 # TODO: scale smartly
+  selector:
+    matchLabels:
+      app: nextjs
+  template:
+    metadata:
+      labels:
+        app: nextjs
+    spec:
+      containers:
+        - name: nextjs-container
+          imagePullPolicy: Never
+          image: nextjs:latest
+          resources:
+            limits: # TODO: tune those values for best efficiency
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3000
+              name: nextjs-port
