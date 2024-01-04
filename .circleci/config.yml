@@ -19,8 +19,9 @@ jobs:
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
     - checkout
+    - kubernetes/install-kubeconfig:
+        kubeconfig: KUBECONFIG_DATA
     - kubernetes/install-kubectl
-    - kubernetes/install-kubeconfig
     - helm/install_helm_client
     - run:
         name: Setup k8s cluster
