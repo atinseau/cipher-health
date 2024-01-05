@@ -73,7 +73,7 @@ commands:
           helm upgrade \
             -n $CIRCLE_BRANCH --create-namespace \
             --install <<parameters.release-name>> <<parameters.chart-path>> \
-            -f ./k8s/values \
+            -f ./k8s/values.yaml \
             <<parameters.extra-args>>
 
 
