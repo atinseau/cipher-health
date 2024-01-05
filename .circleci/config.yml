@@ -24,6 +24,10 @@ commands:
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
           helm install ingress-nginx-release ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace || true
+    - run:
+        name: Install ghcr.io credentials
+        command: |
+          kubectl create secret docker-registry regcred --docker-server=https://ghcr.io --docker-username=$GITHUB_USERNAME --docker-password=$CR_PAT --docker-email=$GITHUB_EMAIL
   setup-docker:
     steps:
     - setup_remote_docker:
@@ -54,10 +58,24 @@ commands:
           docker tag $IMAGE_ID $IMAGE_TAG
           docker push $IMAGE_TAG
   helm-upgrade:
+    parameters:
+      release-name:
+        type: string
+      chart-path:
+        type: string
+      extra-args:
+        default: ""
+        type: string
     steps:
     - run:
-        name: Install Helm chart
-        command: echo "Installing Helm"
+        name: "Upgrade Helm Chart"
+        command: |
+          helm upgrade \
+            -n $CIRCLE_BRANCH --create-namespace \
+            --install <<parameters.release-name>> <<parameters.chart-path>> \
+            -f ./k8s/values \
+            <<parameters.extra-args>>
+
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -67,6 +85,7 @@ jobs:
     # See: https://circleci.com/docs/configuration-reference/#executor-job
     docker:
     - image: cimg/base:stable
+
     # Add steps to the job
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
@@ -77,7 +96,14 @@ jobs:
         image-context: .
         image-path: ./k8s/frontend/docker/build.Dockerfile
         image-name: ch-frontend
-    - helm-upgrade
+    - helm-upgrade:
+        release-name: ch-frontend
+        chart-path: ./k8s/frontend/helm
+        extra-args: |
+          --set frontend.ingress.host=ch-frontend-$CIRCLE_BRANCH.com \
+          --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend:$CIRCLE_BRANCH \
+          --set frontend.image.pullSecrets=regcred
+
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 

@@ -14,6 +14,10 @@ spec:
       labels:
         app: nextjs
     spec:
+      {{- if hasKey .Values.frontend.image "pullSecrets" }}
+      imagePullSecrets:
+        - name: {{ .Values.frontend.image.pullSecrets }}
+      {{- end }}
       containers:
         - name: nextjs-container
           imagePullPolicy: Never
