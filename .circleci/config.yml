@@ -73,6 +73,9 @@ jobs:
     - checkout
     - setup-k8s
     - setup-docker
+    - run:
+        name: Docker history
+        command: docker history --no-trunc ch-frontend:develop
     - push-image:
         image-context: .
         image-path: ./k8s/frontend/docker/build.Dockerfile
