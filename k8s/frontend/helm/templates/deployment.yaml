@@ -16,7 +16,7 @@ spec:
     spec:
       {{- if hasKey .Values.frontend.image "pullSecrets" }}
       imagePullSecrets:
-        - name: {{ .Values.frontend.image.pullSecrets }}
+        - name: {{ .Values.frontend.image.pullSecrets.name }}
       {{- end }}
       containers:
         - name: nextjs-container

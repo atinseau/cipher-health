@@ -106,7 +106,7 @@ jobs:
         extra-args: |
           --set frontend.ingress.host=ch-frontend-$CIRCLE_BRANCH.com \
           --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend:$CIRCLE_BRANCH \
-          --set frontend.image.pullSecrets=regcred \
+          --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
 
 # Orchestrate jobs using workflows
