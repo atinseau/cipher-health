@@ -28,6 +28,7 @@ commands:
         name: Install ghcr.io credentials
         command: |
           kubectl create secret docker-registry regcred \
+            -n $CIRCLE_BRANCH \
             --docker-server=https://ghcr.io \
             --docker-username=$GITHUB_USERNAME \
             --docker-password=$CR_PAT \
