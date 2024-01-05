@@ -68,10 +68,10 @@ jobs:
     - checkout
     - setup-k8s
     - setup-docker
-    - run:
-        name: Test
-        command: pwd && ls -la
-
+    - push-image:
+        image-context: .
+        image-path: ./k8s/frontend/docker/build.Dockerfile
+        image-name: ch-frontend
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 
