@@ -9,8 +9,8 @@ cd $SCRIPT_DIR
 
 # Build docker image
 
-FRONTEND_IMAGE="ch-frontend"
-FRONTEND_TAG="local"
+FRONTEND_IMAGE="ch-frontend-local"
+FRONTEND_TAG="latest"
 FRONTEND_RELEASE="${FRONTEND_IMAGE}-release"
 
 if [[ "$USE_GHCR" == 1 ]]; then

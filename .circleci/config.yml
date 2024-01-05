@@ -50,15 +50,15 @@ commands:
         name: Build Docker image
         command: |
           docker build \
-            -t $GITHUB_USERNAME/<<parameters.image-name>>:$CIRCLE_BRANCH \
+            -t $GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest \
             -f <<parameters.image-path>> \
             <<parameters.image-context>>
     - run:
         name: Push Docker image
         command: |
           echo $CR_PAT
-          IMAGE_ID=$(docker images -q $GITHUB_USERNAME/<<parameters.image-name>>:$CIRCLE_BRANCH)
-          IMAGE_TAG=ghcr.io/$GITHUB_USERNAME/<<parameters.image-name>>:$CIRCLE_BRANCH
+          IMAGE_ID=$(docker images -q $GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest)
+          IMAGE_TAG=ghcr.io/$GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest
           echo $CR_PAT | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
           docker tag $IMAGE_ID $IMAGE_TAG
           docker push $IMAGE_TAG
@@ -106,7 +106,7 @@ jobs:
         chart-path: ./k8s/frontend/helm
         extra-args: |
           --set frontend.ingress.host=ch-frontend.$CIRCLE_BRANCH.com \
-          --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend:$CIRCLE_BRANCH \
+          --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest \
           --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
 
