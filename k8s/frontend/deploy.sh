@@ -27,8 +27,10 @@ if [[ "$USE_GHCR" == 1 ]]; then
   docker tag $IMAGE_ID ghcr.io/$GHCR_IMAGE_NAME
   docker push ghcr.io/$GHCR_IMAGE_NAME
 
+  LAST_DIGEST=$(docker manifest inspect ghcr.io/$GHCR_IMAGE_NAME -v | jq -r '.Descriptor.digest')
+
   HELM_IMAGE_ARGS="\
-    --set frontend.image.name=ghcr.io/$GHCR_IMAGE_NAME \
+    --set frontend.image.name=ghcr.io/atinseau/${FRONTEND_IMAGE}@${LAST_DIGEST} \
     --set frontend.image.pullSecrets.name=regcred \
     --set frontend.image.pullPolicy=Always \
   "

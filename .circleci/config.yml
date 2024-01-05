@@ -5,8 +5,12 @@ version: 2.1
 orbs:
   helm: circleci/helm@3.0.0
   kubernetes: circleci/kubernetes@1.3.1
+  jq: circleci/jq@3.0.0
 
 commands:
+  setup-runner:
+    steps:
+      - jq/install
   setup-k8s:
     steps:
     - kubernetes/install-kubeconfig:
@@ -95,6 +99,7 @@ jobs:
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
     - checkout
+    - setup-runner
     - setup-k8s
     - setup-docker
     - push-image:
@@ -106,7 +111,7 @@ jobs:
         chart-path: ./k8s/frontend/helm
         extra-args: |
           --set frontend.ingress.host=ch-frontend.$CIRCLE_BRANCH.com \
-          --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest \
+          --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GHCR_IMAGE_NAME -v | jq -r '.Descriptor.digest') \
           --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
 
