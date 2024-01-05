@@ -29,6 +29,7 @@ HELM_ARGS="\
   -f $ROOT_DIR/k8s/values.yaml \
   --set frontend.ingress.host=ch-frontend.local.com \
   --set frontend.image.name=$FRONTEND_IMAGE:$FRONTEND_TAG \
+  --set frontend.image.pullPolicy=Never \
 "
 HELM_DIFF=$(helm diff upgrade $HELM_ARGS --allow-unreleased | wc -l)
 

@@ -20,7 +20,7 @@ spec:
       {{- end }}
       containers:
         - name: nextjs-container
-          imagePullPolicy: Never
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
           image: {{ .Values.frontend.image.name }}
           resources:
             limits: # TODO: tune those values for best efficiency
