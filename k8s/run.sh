@@ -2,6 +2,12 @@
 
 # LOCAL PURPOSES ONLY
 
+export USE_GHCR=0
+if [[ "$1" == "--ghcr" ]]; then
+  echo "Switching to GHCR"
+  USE_GHCR=1
+fi
+
 ##########################
 
 # Configuring script environment

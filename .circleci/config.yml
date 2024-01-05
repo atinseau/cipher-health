@@ -24,6 +24,35 @@ commands:
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
           helm install ingress-nginx-release ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace || true
+  setup-docker:
+    steps:
+    - setup_remote_docker:
+        docker_layer_caching: true
+  push-image:
+    parameters:
+      image-context:
+        type: string
+      image-path:
+        type: string
+      image-name:
+        type: string
+    steps:
+    - run:
+        name: Build Docker image
+        command: |
+          docker build \
+            -t $GITHUB_USERNAME/<<parameters.image-name>>:$CIRCLE_BRANCH \
+            -f <<parameters.image-path>> \
+            <<parameters.image-context>>
+    - run:
+        name: Push Docker image
+        command: |
+          echo $CR_PAT
+          IMAGE_ID=$(docker images -q $GITHUB_USERNAME/<<parameters.image-name>>:$CIRCLE_BRANCH)
+          IMAGE_TAG=ghcr.io/$GITHUB_USERNAME/<<parameters.image-name>>:$CIRCLE_BRANCH
+          echo $CR_PAT | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+          docker tag $IMAGE_ID $IMAGE_TAG
+          docker push $IMAGE_TAG
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -38,6 +67,10 @@ jobs:
     steps:
     - checkout
     - setup-k8s
+    - setup-docker
+    - run:
+        name: Test
+        command: pwd
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
