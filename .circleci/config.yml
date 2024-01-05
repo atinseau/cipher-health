@@ -70,7 +70,7 @@ jobs:
     - setup-docker
     - run:
         name: Test
-        command: pwd
+        command: pwd && ls -la
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
