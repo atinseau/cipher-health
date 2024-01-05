@@ -57,7 +57,7 @@ commands:
     steps:
     - run:
         name: Install Helm chart
-        command: echo "Installing Helm chart"
+        command: echo "Installing Helm"
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
