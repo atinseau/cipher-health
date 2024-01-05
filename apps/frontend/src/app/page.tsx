@@ -14,6 +14,8 @@ export default function Page() {
 
   return <div className="flex p-4 gap-10 flex-col items-center">
 
+    <p>Salut tout le monde</p>
+
     <DateInput />
 
     <StepBar
