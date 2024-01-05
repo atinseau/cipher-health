@@ -105,7 +105,7 @@ jobs:
         release-name: ch-frontend
         chart-path: ./k8s/frontend/helm
         extra-args: |
-          --set frontend.ingress.host=ch-frontend-$CIRCLE_BRANCH.com \
+          --set frontend.ingress.host=ch-frontend.$CIRCLE_BRANCH.com \
           --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend:$CIRCLE_BRANCH \
           --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
