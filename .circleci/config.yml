@@ -27,7 +27,12 @@ commands:
     - run:
         name: Install ghcr.io credentials
         command: |
-          kubectl create secret docker-registry regcred --docker-server=https://ghcr.io --docker-username=$GITHUB_USERNAME --docker-password=$CR_PAT --docker-email=$GITHUB_EMAIL
+          kubectl create secret docker-registry regcred \
+            --save-config --dry-run=client -o yaml \
+            --docker-server=https://ghcr.io \
+            --docker-username=$GITHUB_USERNAME \
+            --docker-password=$CR_PAT \
+            --docker-email=$GITHUB_EMAIL | kubectl apply -f -
   setup-docker:
     steps:
     - setup_remote_docker:
