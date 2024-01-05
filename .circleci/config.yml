@@ -53,6 +53,11 @@ commands:
           echo $CR_PAT | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
           docker tag $IMAGE_ID $IMAGE_TAG
           docker push $IMAGE_TAG
+  helm-upgrade:
+    steps:
+    - run:
+        name: Install Helm chart
+        command: echo "Installing Helm chart"
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -72,6 +77,7 @@ jobs:
         image-context: .
         image-path: ./k8s/frontend/docker/build.Dockerfile
         image-name: ch-frontend
+    - helm-upgrade
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 
