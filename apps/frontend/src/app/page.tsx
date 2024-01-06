@@ -14,7 +14,41 @@ export default function Page() {
 
   return <div className="flex p-4 gap-10 flex-col items-center">
 
-    <p>Salut tout le monde coucou zoé</p>
+    <div className="flex gap-2 flex-col items-center">
+      <p>Filled (default)</p>
+
+      <div className="flex gap-2">
+        <Button>Se connecter</Button>
+        <Button isDisabled>Se connecter</Button>
+      </div>
+
+      <div className="flex gap-2">
+        <Button variant="filled" color="secondary">Se connecter</Button>
+        <Button variant="filled" color="secondary" isDisabled>Se connecter</Button>
+      </div>
+
+    </div>
+
+    <div className="flex gap-2 flex-col items-center">
+      <p>Outlined</p>
+
+      <div className="flex gap-2">
+        <Button variant="outlined">Se connecter</Button>
+        <Button variant="outlined" isDisabled>Se connecter</Button>
+      </div>
+
+    </div>
+
+    <div className="flex gap-2 flex-col items-center">
+      <p>Plain</p>
+
+      <div className="flex gap-2">
+        <Button variant="plain">Se connecter</Button>
+        <Button variant="plain" isDisabled>Se connecter</Button>
+      </div>
+
+    </div>
+
 
     <DateInput />
 
@@ -32,15 +66,6 @@ export default function Page() {
     <CodeInput onChange={(e) => {
       console.log(e)
     }} />
-
-
-    <div className="flex gap-2">
-      <Button variant="bordered">Se connecter</Button>
-      <Button variant="bordered" isDisabled>Se connecter</Button>
-
-      <Button variant="solid">Se connecter</Button>
-      <Button variant="solid" isDisabled>Se connecter</Button>
-    </div>
 
     <PasswordInput defaultValue="091209" placeholder="password" />
 
