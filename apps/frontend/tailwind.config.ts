@@ -16,7 +16,10 @@ const config: Config = {
   theme: {
     extend: {
       fontSize: {
-        base: '16px'
+        sm: '12px',
+        base: '16px',
+        lg: '20px',
+        xl: '24px',
       },
       borderRadius: {
         sm: '4px'
@@ -51,7 +54,14 @@ const config: Config = {
   },
   darkMode: "class",
   plugins: [nextui({
-    addCommonColors: true,
+    themes: {
+      light: {
+        layout: {
+          hoverOpacity: 1,
+          disabledOpacity: 1
+        }
+      }
+    }
   })]
 }
 

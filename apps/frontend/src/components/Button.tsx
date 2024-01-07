@@ -1,22 +1,18 @@
-import { createVariants, pickVariant } from '@/utils/variants'
-import {
-  Button as NextUIButton,
-  ButtonProps as NextUIButtonProps
-} from '@nextui-org/button'
-import classNames from 'classnames'
+import { extendsVariants } from '@/utils/variants'
+import { Button as NextUIButton } from '@nextui-org/button'
 
-const buttonVariants = createVariants<NextUIButtonProps>({
+const Button = extendsVariants(NextUIButton, {
   "filled": {
     className: "text-white rounded-lg",
     colors: {
-      "primary": {
-        default: "bg-indigo-500",
-        disabled: "bg-gray-600",
-        hover: "bg-indigo-600 opacity-100"
-      },
+      "primary": [
+        "bg-indigo-500",
+        "data-[disabled=true]:bg-gray-500",
+        "data-[hover=true]:bg-indigo-600"
+      ],
       "secondary": [
         "bg-indigo-300 text-indigo-500",
-        "data-[disabled=true]:bg-gray-400 data-[disabled=true]:text-gray-600 data-[disabled=true]:opacity-100",
+        "data-[disabled=true]:bg-gray-400 data-[disabled=true]:text-gray-600",
         "data-[hover=true]:bg-indigo-400 data-[hover=true]:text-white"
       ]
     }
@@ -26,8 +22,8 @@ const buttonVariants = createVariants<NextUIButtonProps>({
     colors: {
       "primary": [
         "bg-white border border-indigo-500 text-indigo-500 border-[2px]",
-        "data-[disabled=true]:border-gray-500 data-[disabled=true]:text-gray-500 data-[disabled=true]:opacity-100",
-        "data-[hover=true]:border-indigo-600 data-[hover=true]:text-indigo-600 data-[hover=true]:opacity-100",
+        "data-[disabled=true]:border-gray-500 data-[disabled=true]:text-gray-500",
+        "data-[hover=true]:border-indigo-600 data-[hover=true]:text-indigo-600",
       ],
     }
   },
@@ -35,45 +31,18 @@ const buttonVariants = createVariants<NextUIButtonProps>({
     props: {
       disableAnimation: true,
     },
+    className: "p-0 h-auto",
     colors: {
       "primary": [
         "text-indigo-500 bg-transparent underline underline-offset-4",
-        "data-[disabled=true]:text-gray-600 data-[disabled=true]:opacity-100",
-        "data-[hover=true]:text-indigo-600 data-[hover=true]:opacity-100"
+        "data-[disabled=true]:text-gray-600",
+        "data-[hover=true]:text-indigo-600"
       ],
     }
   },
+}, {
+  defaultVariant: "filled",
+  defaultColor: "primary",
 })
 
-
-type ButtonProps<T extends keyof typeof buttonVariants> = Omit<NextUIButtonProps, 'variant' | 'color'> & {
-  children: React.ReactNode
-  variant?: T
-  color?: keyof typeof buttonVariants[T]['colors']
-}
-
-
-export default function Button<T extends keyof typeof buttonVariants>(props: ButtonProps<T>) {
-
-  const {
-    children,
-    className,
-    variant = "filled",
-    color = "primary",
-    ...buttonProps
-  } = props
-
-  const {
-    className: variantClassName,
-    props: variantProps
-  } = pickVariant(buttonVariants, variant, color as string)
-
-  return <NextUIButton {...buttonProps} {...variantProps} className={classNames(
-    className,
-    variantClassName
-  )}>
-    {children}
-  </NextUIButton>
-
-
-}
+export default Button

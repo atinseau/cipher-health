@@ -1,94 +1,16 @@
-'use client'
-
-import Button from "@/components/Button"
-import StepBar from "@/components/StepBar"
-import CodeInput from "@/components/inputs/CodeInput"
-import DateInput from "@/components/inputs/DateInput"
-import PasswordInput from "@/components/inputs/PasswordInput"
-import TextAreaInput from "@/components/inputs/TextAreaInput"
-import TextInput from "@/components/inputs/TextInput"
-
-import { AiOutlineMail } from "react-icons/ai"
+import ForgotPassword from "@/components/Authentification/ForgotPassword/ForgotPassword";
+import ForgotPasswordReset from "@/components/Authentification/ForgotPassword/ForgotPasswordReset";
+import Signin from "@/components/Authentification/Signin/Signin";
+import TwoFa from "@/components/Authentification/TwoFa/TwoFa";
 
 export default function Page() {
 
-  return <div className="flex p-4 gap-10 flex-col items-center">
+  return <div className="flex flex-col gap-32">
 
-    <div className="flex gap-2 flex-col items-center">
-      <p>Filled (default)</p>
+    <ForgotPasswordReset />
+    <ForgotPassword />
+    <TwoFa />
+    <Signin />
 
-      <div className="flex gap-2">
-        <Button>Se connecter</Button>
-        <Button isDisabled>Se connecter</Button>
-      </div>
-
-      <div className="flex gap-2">
-        <Button variant="filled" color="secondary">Se connecter</Button>
-        <Button variant="filled" color="secondary" isDisabled>Se connecter</Button>
-      </div>
-
-    </div>
-
-    <div className="flex gap-2 flex-col items-center">
-      <p>Outlined</p>
-
-      <div className="flex gap-2">
-        <Button variant="outlined">Se connecter</Button>
-        <Button variant="outlined" isDisabled>Se connecter</Button>
-      </div>
-
-    </div>
-
-    <div className="flex gap-2 flex-col items-center">
-      <p>Plain</p>
-
-      <div className="flex gap-2">
-        <Button variant="plain">Se connecter</Button>
-        <Button variant="plain" isDisabled>Se connecter</Button>
-      </div>
-
-    </div>
-
-
-    <DateInput />
-
-    <StepBar
-      currentStep={1}
-      steps={[
-        { title: "Connexion" },
-        { title: "Informations" },
-        { title: "Coordonées" },
-        { title: "Prise en charge" },
-      ]}
-    />
-
-
-    <CodeInput onChange={(e) => {
-      console.log(e)
-    }} />
-
-    <PasswordInput defaultValue="091209" placeholder="password" />
-
-    <TextAreaInput
-      label="Salut"
-      placeholder="placeholder"
-      helperText="helperText"
-      subLabel="subLabel"
-    />
-
-    <TextInput
-      label="Salut"
-      placeholder="placeholder"
-      helperText="helperText"
-      subLabel="subLabel"
-      endContent={<AiOutlineMail className="text-indigo-500" />}
-    />
-
-
-    {/* <h1>Salut</h1>
-    <h2>Salut</h2>
-    <h3>Salut</h3>
-    <h4>Salut</h4>
-    <p>Salut</p> */}
   </div>
 }

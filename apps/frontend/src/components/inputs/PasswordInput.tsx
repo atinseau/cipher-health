@@ -15,7 +15,9 @@ import {
 import classNames from "classnames";
 
 
-type PasswordInputProps = TextInputProps
+type PasswordInputProps = TextInputProps & {
+  enableStrength?: boolean
+}
 
 export default function PasswordInput(props: PasswordInputProps) {
 
@@ -29,6 +31,10 @@ export default function PasswordInput(props: PasswordInputProps) {
   const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (props.onChange) {
       props.onChange(e)
+    }
+
+    if (!props.enableStrength) {
+      return
     }
 
     const value = e.target.value
@@ -60,7 +66,7 @@ export default function PasswordInput(props: PasswordInputProps) {
 
   }, [])
 
-  return <div>
+  return <div className="w-full">
     <TextInput
       {...props}
       onChange={handlePasswordChange}
@@ -71,7 +77,7 @@ export default function PasswordInput(props: PasswordInputProps) {
         onClick={() => setShowPassword(!showPassword)}
       />}
     />
-    <div className="text-gray-600 text-xs flex gap-1 items-center mt-2">
+    {props.enableStrength && <div className="text-gray-600 text-xs flex gap-1 items-center mt-2">
       <span className="whitespace-nowrap">Sécurité :</span>
       <Progress aria-label="password progression" value={passwordStrength} classNames={{
         base: 'h-[4px]',
@@ -81,6 +87,6 @@ export default function PasswordInput(props: PasswordInputProps) {
           '!bg-success': passwordStrength > 90,
         })
       }} />
-    </div>
+    </div>}
   </div>
 } 

@@ -20,7 +20,7 @@ export default function BaseInput(props: BaseInputProps & { children: React.Reac
   const subLabelAction = typeof subLabel === "object" ? subLabel.action : undefined
   const subLabelValue = typeof subLabel === "object" ? subLabel.value : subLabel
 
-  return <div>
+  return <div className="w-full">
     {label && <h6 className="text-indigo-600 mb-2">{label}<span className="text-danger">{required && " *"}</span></h6>}
     {helperText && <p className="text-xs mb-2 text-gray-600">{helperText}</p>}
     {children}
