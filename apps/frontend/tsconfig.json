@@ -10,7 +10,7 @@
     "module": "esnext",
     "baseUrl": ".",
     "moduleResolution": "Bundler",
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
