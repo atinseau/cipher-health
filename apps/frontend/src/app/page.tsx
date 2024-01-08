@@ -1,16 +1,19 @@
 import ForgotPassword from "@/components/Authentification/ForgotPassword/ForgotPassword";
 import ForgotPasswordReset from "@/components/Authentification/ForgotPassword/ForgotPasswordReset";
-import Signin from "@/components/Authentification/Signin/Signin";
-import TwoFa from "@/components/Authentification/TwoFa/TwoFa";
+import SigninCredential from "@/components/Authentification/Signin/SigninCredential";
+import SignupRegistrationStep from "@/components/Authentification/Signup/SignupRegistrationStep";
+import SigninTwoFa from "@/components/Authentification/Signin/SigninTwoFa";
 
 export default function Page() {
 
-  return <div className="flex flex-col gap-32">
+  return <div className="flex flex-col gap-32 items-center">
+
+    <SignupRegistrationStep />
 
     <ForgotPasswordReset />
     <ForgotPassword />
-    <TwoFa />
-    <Signin />
+    <SigninTwoFa />
+    <SigninCredential />
 
   </div>
 }

@@ -21,6 +21,9 @@ const config: Config = {
         lg: '20px',
         xl: '24px',
       },
+      fontFamily: {
+        sofiaProSoft: ['var(--font-sofia-pro-soft)']
+      },
       borderRadius: {
         sm: '4px'
       },
@@ -44,6 +47,9 @@ const config: Config = {
         danger: {
           DEFAULT: '#EF6262',
           600: '#D24444'
+        },
+        pink: {
+          500: "#E1007A",
         },
         success: {
           DEFAULT: '#45D4B2',

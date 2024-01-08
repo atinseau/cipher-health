@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import { ComponentProps } from "react"
 
-type Colors<Key extends string | number | symbol = string> = Record<Key, string | string[]>
+type Color = string | string[]
 
 type Variant<ComponentProps> = {
   className?: string
@@ -9,21 +9,18 @@ type Variant<ComponentProps> = {
   colors: ComponentProps extends { classNames?: infer T }
   ? (
     T extends Record<string, any>
-    ? Record<string, Partial<Colors<keyof T>>>
-    : Colors
+    ? Record<string, Partial<Record<keyof T, Color>>> & { primary: Partial<Record<keyof T, Color>> }
+    : Record<string, Color | Record<string, Color>> & { primary: Color | Record<string, Color> }
   )
-  : Colors
-}
-
-
-export const prefixClassName = (className: string, prefix: string) => {
-  return className.split(' ').map(className => `${prefix}${className}`).join(' ')
+  : Record<string, Color | Record<string, Color>> & { primary: Color | Record<string, Color> }
 }
 
 // TODO: impl raw variant creation to be used with pickVariant manually
-// export function createVariants() {
-
-// }
+export function createVariants<
+  T extends Record<string, Variant<{}>> = Record<string, Variant<{}>>,
+>(variants: T) {
+  return variants
+}
 
 export function extendsVariants<
   ReactComponent extends React.ElementType,
@@ -54,7 +51,7 @@ export function extendsVariants<
       className: variantClassName,
       props: variantProps,
       classNames: colorClassNames,
-    } = pickVariant(variants, variant as string, color as string)
+    } = pickVariant(variants, variant as V, color as keyof T[V]['colors'])
 
     return <Component
       {...rest as any}
@@ -67,10 +64,14 @@ export function extendsVariants<
   // return variants
 }
 
-export const pickVariant = (variants: Record<string, Variant<{} | { classNames?: Record<string, string> }>>, variant: string, color: string) => {
+export function pickVariant<
+  T extends Record<string, Variant<any>>,
+  K extends keyof T,
+  C extends keyof T[K]['colors'],
+>(variants: T, variant: K, color: C) {
 
   const variantObject = variants[variant]
-  const colorObject = variantObject?.colors[color]
+  const colorObject = variantObject?.colors[color as string]
 
   const colorClassName = typeof colorObject === 'string' || Array.isArray(colorObject) ? colorObject : undefined
   const colorClassNames = !(typeof colorObject === 'string') && !Array.isArray(colorObject) ? colorObject : undefined

@@ -1,22 +1,58 @@
+import { createVariants, pickVariant } from '@/utils/variants'
 import { twMerge } from 'tailwind-merge'
+
+
+const authContainerVariants = createVariants({
+  "contained": {
+    colors: {
+      primary: {
+        base: "items-center",
+        content: "flex flex-col gap-8 justify-center items-center max-w-[480px] w-full",
+        header: "flex flex-col gap-2 text-center",
+        headerTitle: "text-indigo-500"
+      },
+    }
+  },
+  "full": {
+    colors: {
+      primary: {
+        headerTitle: "text-pink-500 font-SofiaProSoft"
+      },
+    }
+  }
+})
 
 type AuthContainerProps = {
   title: string
-  subTitle: string
-  className?: string
-  subTitleClassName?: string
+  subTitle?: string
+  variant?: string
+  color?: string
+  className?: string // act like base className
+  classNames?: {
+    header?: string
+    headerTitle?: string
+    headerSubTitle?: string
+    content?: string
+  },
   children?: React.ReactNode
   footer?: React.ReactNode
 }
 
+
 export default function AuthContainer(props: AuthContainerProps) {
 
-  return <div className={twMerge("flex flex-col gap-8 items-center max-w-[608px] w-full", props.className)}>
-    <div className="flex flex-col gap-2 text-center">
-      <h1 className="text-xl text-indigo-500">{props.title}</h1>
-      <p className={twMerge("text-sm text-gray-600", props.subTitleClassName)}>{props.subTitle}</p>
+  const { classNames } = pickVariant(
+    authContainerVariants,
+    props?.variant || "contained" as any,
+    props?.color || "primary" as any,
+  )
+
+  return <div className={twMerge("flex flex-col gap-8 max-w-[608px] w-full", classNames?.base, props.className)}>
+    <div className={twMerge(classNames?.header, props?.classNames?.header)}>
+      <h1 className={twMerge("text-xl", classNames?.headerTitle, props?.classNames?.headerTitle)}>{props.title}</h1>
+      {props.subTitle && <p className={twMerge("text-sm text-gray-600", props.classNames?.headerSubTitle)}>{props.subTitle}</p>}
     </div>
-    <div className="flex flex-col gap-8 justify-center items-center max-w-[480px] w-full">
+    <div className={twMerge("flex flex-col gap-8 w-full", classNames?.content, props?.classNames?.content)}>
       {props.children}
       {props.footer}
     </div>

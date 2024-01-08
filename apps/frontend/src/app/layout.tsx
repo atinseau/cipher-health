@@ -1,5 +1,6 @@
 import { NextUIProvider } from '@/contexts/NextUIProvider/NextUIProvider'
 import { Roboto, Work_Sans } from 'next/font/google'
+import localFont from 'next/font/local'
 
 import '@/styles/globals.scss'
 import classNames from 'classnames'
@@ -27,6 +28,20 @@ const workSans = Work_Sans({
   ]
 })
 
+const sofiaProSoft = localFont({
+  variable: '--font-sofia-pro-soft',
+  src: [
+    {
+      path: '../fonts/SofiaProSoft/SofiaProSoftReg.otf',
+      weight: '400'
+    },
+    {
+      path: '../fonts/SofiaProSoft/SofiaProSoftBold.otf',
+      weight: '700'
+    }
+  ]
+})
+
 export default function RootLayout({
   children,
 }: {
@@ -34,7 +49,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={classNames(roboto.className, workSans.variable)}>
+      <body className={classNames(roboto.className, workSans.variable, sofiaProSoft.variable)}>
         <NextUIProvider>
           {children}
         </NextUIProvider>
