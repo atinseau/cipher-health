@@ -5,6 +5,7 @@ type Color = string | string[]
 
 type Variant<ComponentProps> = {
   className?: string
+  classNames?: Record<string, Color>
   props?: Partial<ComponentProps>
   colors: ComponentProps extends { classNames?: infer T }
   ? (
@@ -74,14 +75,28 @@ export function pickVariant<
   const colorObject = variantObject?.colors[color as string]
 
   const colorClassName = typeof colorObject === 'string' || Array.isArray(colorObject) ? colorObject : undefined
-  const colorClassNames = !(typeof colorObject === 'string') && !Array.isArray(colorObject) ? colorObject : undefined
+  const colorClassNames = !(typeof colorObject === 'string') && !Array.isArray(colorObject) ? colorObject : {}
+
 
   const variantClassName = variantObject?.className
+  const variantClassNames = variantObject?.classNames || {}
   const variantProps = variantObject?.props
+
+  const mergedClassNames = {
+    ...variantClassNames
+  }
+
+  for (const [key, value] of Object.entries(colorClassNames)) {
+    if (mergedClassNames[key]) {
+      mergedClassNames[key] = classNames(mergedClassNames[key], value)
+    } else {
+      mergedClassNames[key] = value
+    }
+  }
 
   return {
     className: classNames(variantClassName, colorClassName),
-    classNames: colorClassNames,
+    classNames: mergedClassNames,
     props: variantProps
   }
 

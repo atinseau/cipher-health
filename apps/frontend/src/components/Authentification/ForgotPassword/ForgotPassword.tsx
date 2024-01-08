@@ -9,9 +9,7 @@ export default function ForgotPassword() {
   return <AuthContainer
     title="Veuillez renseigner votre e-mail"
     subTitle="Un lien de réinitialisation va vous être envoyé"
-    classNames={{
-      headerSubTitle: "text-base text-black"
-    }}
+    color="secondary"
     footer={<>
       <Button className="w-full max-w-[148px]" isDisabled>Envoyer</Button>
       <div className="flex gap-2 items-center">

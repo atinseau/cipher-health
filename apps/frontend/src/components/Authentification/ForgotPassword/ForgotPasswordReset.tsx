@@ -7,9 +7,7 @@ export default function ForgotPasswordReset() {
   return <AuthContainer
     title="Entrez votre nouveau mot de passe"
     subTitle="Lorem ipsum dolor sit amet"
-    classNames={{
-      headerSubTitle: "text-base text-black"
-    }}
+    color="secondary"
     footer={<Button isDisabled>Se connecter</Button>}
   >
     <div className="w-full flex flex-col gap-8">
