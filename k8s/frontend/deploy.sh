@@ -15,6 +15,11 @@ FRONTEND_RELEASE="${FRONTEND_IMAGE}-release"
 
 if [[ "$USE_GHCR" == 1 ]]; then
 
+  if [[ -z "$CR_PAT" ]]; then
+    echo "CR_PAT is not set"
+    exit 1
+  fi
+
   GHCR_IMAGE_NAME="atinseau/${FRONTEND_IMAGE}:${FRONTEND_TAG}"
 
   docker build \
