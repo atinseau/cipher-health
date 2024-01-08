@@ -1,10 +1,10 @@
-import Button from "../../components/Button"
-import StepBar from "../../components/StepBar"
-import CodeInput from "../../components/Inputs/CodeInput"
-import DateInput from "../../components/Inputs/DateInput"
-import PasswordInput from "../../components/Inputs/PasswordInput"
-import TextAreaInput from "../../components/Inputs/TextAreaInput"
-import TextInput from "../../components/Inputs/TextInput"
+import Button from "@/components/Button"
+import StepBar from "@/components/StepBar"
+import CodeInput from "@/components/Inputs/CodeInput"
+import DateInput from "@/components/Inputs/DateInput"
+import PasswordInput from "@/components/Inputs/PasswordInput"
+import TextAreaInput from "@/components/Inputs/TextAreaInput"
+import TextInput from "@/components/Inputs/TextInput"
 
 import { AiOutlineMail } from "react-icons/ai"
 
