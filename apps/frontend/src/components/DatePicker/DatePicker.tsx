@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useState } from "react";
 import DayPicker from "./Day/DayPicker";
 import MonthPicker from "./Month/MonthPicker";
 import YearPicker from "./Year/YearPicker";
