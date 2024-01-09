@@ -2,7 +2,7 @@ import PasswordInput from "@/components/Inputs/PasswordInput";
 import TextInput from "@/components/Inputs/TextInput";
 import { AiOutlineMail } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@nextui-org/divider";
 import AuthContainer from "../AuthContainer";
 
 

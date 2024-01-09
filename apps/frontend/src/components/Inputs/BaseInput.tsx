@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export type BaseInputProps = {
@@ -32,7 +32,7 @@ export default function BaseInput(props: BaseInputProps & { children: React.Reac
     {helperText && <p className={"text-xs mb-2 text-gray-600"}>{helperText}</p>}
     {children}
     {subLabel && <p
-      className={classNames(twMerge("text-gray-600 mt-2", props.classNames?.subLabel), {
+      className={clsx(twMerge("text-gray-600 mt-2", props.classNames?.subLabel), {
         "cursor-pointer": subLabelAction,
         "hoverunderline": subLabelAction
       })}

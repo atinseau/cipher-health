@@ -12,7 +12,7 @@ import {
   containSpecialChar,
   containUpperCaseLetters
 } from '@cipher-health/utils'
-import classNames from "classnames";
+import clsx from "clsx";
 
 
 type PasswordInputProps = TextInputProps & {
@@ -81,7 +81,7 @@ export default function PasswordInput(props: PasswordInputProps) {
       <span className="whitespace-nowrap">Sécurité :</span>
       <Progress aria-label="password progression" value={passwordStrength} classNames={{
         base: 'h-[4px]',
-        indicator: classNames({
+        indicator: clsx({
           '!bg-danger': passwordStrength <= 50,
           '!bg-warning': passwordStrength > 50 && passwordStrength <= 90,
           '!bg-success': passwordStrength > 90,

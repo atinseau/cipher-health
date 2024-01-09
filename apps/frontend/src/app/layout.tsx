@@ -3,7 +3,7 @@ import { Roboto, Work_Sans } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import '@/styles/globals.scss'
-import classNames from 'classnames'
+import clsx from 'clsx'
 
 export const metadata = {
   title: 'Next.js',
@@ -49,7 +49,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={classNames(roboto.className, workSans.variable, sofiaProSoft.variable)}>
+      <body className={clsx(roboto.className, workSans.variable, sofiaProSoft.variable)}>
         <NextUIProvider>
           {children}
         </NextUIProvider>

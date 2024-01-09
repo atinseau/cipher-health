@@ -1,4 +1,4 @@
-import classNames from "classnames"
+import clsx from "clsx";
 
 type LinkItemProps = {
   isActive?: boolean
@@ -14,7 +14,7 @@ type StepItemProps = {
 }
 
 const LinkItem = ({ isActive, isCompleted, className }: LinkItemProps & { className?: string }) => {
-  return <span className={classNames(className, "z-0 absolute w-1/2 flex content-[''] h-[2px] bottom-[7px]", {
+  return <span className={clsx(className, "z-0 absolute w-1/2 flex content-[''] h-[2px] bottom-[7px]", {
     "bg-gray-500": isActive,
     "bg-indigo-500": isCompleted,
   })} />
@@ -23,11 +23,11 @@ const LinkItem = ({ isActive, isCompleted, className }: LinkItemProps & { classN
 const StepItem = ({ title, isActive, isCompleted, rightLink, leftLink }: StepItemProps) => {
 
   return <div className="flex flex-col items-center gap-2 relative w-full">
-    <p className={classNames({
+    <p className={clsx({
       "text-indigo-500": isActive,
       "text-gray-500": !isActive,
     })}>{title}</p>
-    <span className={classNames("bg-white z-10 flex content-[''] w-[16px] h-[16px] border-[2px] rounded-full", {
+    <span className={clsx("bg-white z-10 flex content-[''] w-[16px] h-[16px] border-[2px] rounded-full", {
       "border-indigo-500": isActive,
       "border-gray-500": !isActive,
       "bg-indigo-500 !border-indigo-500": isCompleted,

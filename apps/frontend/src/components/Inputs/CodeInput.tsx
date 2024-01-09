@@ -1,6 +1,6 @@
 'use client';
 
-import classNames from "classnames"
+import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react"
 
 
@@ -83,7 +83,7 @@ export default function CodeInput({ onChange, minLength = 6 }: CodeInputProps) {
       }}
       ref={(ref) => inputRefs.current[i] = ref!}
       onChange={(e) => handleInputChange(e, i)}
-      className={classNames("w-[48px] h-[64px] bg-indigo-300 rounded-lg text-center text-2xl")}
+      className={clsx("w-[48px] h-[64px] bg-indigo-300 rounded-lg text-center text-2xl")}
     />))}
   </div>
 }

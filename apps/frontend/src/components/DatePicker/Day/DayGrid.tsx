@@ -4,10 +4,8 @@ import { useState } from 'react';
 
 import { SlArrowLeft } from "react-icons/sl";
 import { SlArrowRight } from "react-icons/sl";
-import classNames from 'classnames';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
-
-
 
 
 type DateItem = {
@@ -27,11 +25,11 @@ function DateCell({ isDisabled, isSelected, isToday, label, date, onClick }: {
   isToday?: boolean,
   onClick?: (date?: Date) => void
 }) {
-  return <div onClick={() => onClick?.(date)} className={classNames('w-[35px] h-[24px] flex items-center justify-center', {
+  return <div onClick={() => onClick?.(date)} className={clsx('w-[35px] h-[24px] flex items-center justify-center', {
     'hover:text-indigo-500 cursor-pointer': !isSelected,
   })}>
     <span
-      className={classNames({
+      className={clsx({
         'text-gray-600': isDisabled,
         'bg-indigo-500 text-white rounded-sm w-[24px] text-center': isSelected,
         'bg-indigo-300 text-indigo-500 rounded-sm w-[24px] text-center': isToday,
@@ -56,19 +54,19 @@ function DayGridHeader({ dateCursor, setDateCursor, changeMonth, onMonthClick, o
     <SlArrowLeft className="text-indigo-500 cursor-pointer" onClick={() => changeMonth('prev')} />
     <h4
       onClick={!onMonthClick && !onYearClick ? () => setDateCursor(new Date()) : undefined}
-      className={classNames('text-base font-bold capitalize', {
+      className={clsx('text-base font-bold capitalize', {
         'hover:text-indigo-500 cursor-pointer': !onMonthClick && !onYearClick,
         'flex justify-center gap-8 w-full': onMonthClick || onYearClick,
       })}
     >
       <span
-        className={classNames(onMonthClick && "hover:text-indigo-500 cursor-pointer")}
+        className={clsx(onMonthClick && "hover:text-indigo-500 cursor-pointer")}
         onClick={onMonthClick}>
         {dateCursor.toLocaleString('default', { month: 'long' })}
       </span>
       {' '}
       <span
-        className={classNames(onYearClick && "hover:text-indigo-500 cursor-pointer")}
+        className={clsx(onYearClick && "hover:text-indigo-500 cursor-pointer")}
         onClick={onYearClick}>
         {dateCursor.toLocaleString('default', { year: 'numeric' })}
       </span>

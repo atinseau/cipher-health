@@ -1,5 +1,5 @@
 
-import classNames from "classnames";
+import clsx from "clsx";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { SlArrowLeft } from "react-icons/sl";
@@ -33,7 +33,7 @@ function MonthCell({ label, isSelected, currentMonth, onClick, date }: {
 }) {
   return <div
     onClick={() => onClick?.(date)}
-    className={classNames("w-[50px] h-[30px] flex items-center justify-center", {
+    className={clsx("w-[50px] h-[30px] flex items-center justify-center", {
       "bg-indigo-500 text-white rounded-sm": isSelected,
       "hover:text-indigo-500 cursor-pointer": !isSelected,
       "bg-indigo-300 text-indigo-500 rounded-sm": currentMonth

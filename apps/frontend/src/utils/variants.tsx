@@ -1,4 +1,4 @@
-import classNames from "classnames"
+import clsx from "clsx"
 import { ComponentProps } from "react"
 
 type Color = string | string[]
@@ -57,7 +57,7 @@ export function extendsVariants<
     return <Component
       {...rest as any}
       {...variantProps}
-      className={classNames(className, variantClassName)}
+      className={clsx(className, variantClassName)}
       classNames={colorClassNames}
     />
   }
@@ -88,14 +88,14 @@ export function pickVariant<
 
   for (const [key, value] of Object.entries(colorClassNames)) {
     if (mergedClassNames[key]) {
-      mergedClassNames[key] = classNames(mergedClassNames[key], value)
+      mergedClassNames[key] = clsx(mergedClassNames[key], value)
     } else {
       mergedClassNames[key] = value
     }
   }
 
   return {
-    className: classNames(variantClassName, colorClassName),
+    className: clsx(variantClassName, colorClassName),
     classNames: mergedClassNames,
     props: variantProps
   }
