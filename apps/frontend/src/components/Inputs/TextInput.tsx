@@ -1,7 +1,12 @@
 import { Input, InputProps } from "@nextui-org/input";
 import BaseInput, { BaseInputProps } from "./BaseInput";
 
-export type TextInputProps = BaseInputProps & InputProps
+export type TextInputProps =
+  & BaseInputProps
+  & InputProps
+  & {
+    inputRef?: React.Ref<HTMLInputElement>
+  }
 
 export default function TextInput(props: TextInputProps) {
 
@@ -12,6 +17,7 @@ export default function TextInput(props: TextInputProps) {
 
   return <BaseInput {...inputProps} label={label} required={props.required || props.isRequired}>
     <Input
+      {...inputProps || {}}
       classNames={{
         innerWrapper: "h-[42px]",
         inputWrapper: [
@@ -30,7 +36,7 @@ export default function TextInput(props: TextInputProps) {
       }}
       endContent={!inputProps.isClearable && inputProps.endContent}
       type="text"
-      {...inputProps || {}}
+      ref={props.inputRef}
     />
   </BaseInput>
 }

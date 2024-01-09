@@ -7,10 +7,38 @@ import TextAreaInput from "@/components/Inputs/TextAreaInput"
 import TextInput from "@/components/Inputs/TextInput"
 
 import { AiOutlineMail } from "react-icons/ai"
+import RadioInput from "@/components/Inputs/RadioInput"
 
 export default function Page() {
 
   return <div className="flex p-4 gap-10 flex-col items-center">
+
+    <DateInput />
+
+    <div className="flex gap-8 flex-col items-center">
+      <RadioInput
+        label="Select your favorite city"
+        orientation="horizontal"
+        items={[
+          { label: "Buenos Aires", value: "buenos-aires" },
+          { label: "Sydney", value: "sydney" },
+          { label: "San Francisco", value: "san-francisco" },
+          { label: "London", value: "london" },
+          { label: "Tokyo", value: "tokyo" },
+        ]}
+      />
+
+      <RadioInput
+        label="Vous êtes :"
+        subLabel="La réglementation du système de santé français nous oblige à vous demander cette information."
+        isRequired
+        orientation="horizontal"
+        items={[
+          { label: "Un Homme", value: "MALE" },
+          { label: "Une femme", value: "FEMALE" },
+        ]}
+      />
+    </div>
 
     <div className="flex gap-2 flex-col items-center">
       <p>Filled (default)</p>
@@ -47,9 +75,6 @@ export default function Page() {
 
     </div>
 
-
-    <DateInput />
-
     <StepBar
       currentStep={1}
       steps={[
@@ -79,12 +104,5 @@ export default function Page() {
       subLabel="subLabel"
       endContent={<AiOutlineMail className="text-indigo-500" />}
     />
-
-
-    {/* <h1>Salut</h1>
-    <h2>Salut</h2>
-    <h3>Salut</h3>
-    <h4>Salut</h4>
-    <p>Salut</p> */}
   </div>
 }
