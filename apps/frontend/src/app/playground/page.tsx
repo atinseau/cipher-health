@@ -1,3 +1,5 @@
+'use client';
+
 import Button from "@/components/Button"
 import StepBar from "@/components/StepBar"
 import CodeInput from "@/components/Inputs/CodeInput"
@@ -10,13 +12,25 @@ import { AiOutlineMail } from "react-icons/ai"
 import RadioInput from "@/components/Inputs/RadioInput"
 import Select from "@/components/Select"
 import FileInput from "@/components/Inputs/FileInput"
+import { useState } from "react";
 
 export default function Page() {
 
+  const [file, setFile] = useState<File | undefined>(undefined)
 
   return <div className="flex p-4 gap-10 flex-col items-center">
 
-    <FileInput />
+
+    <div className="flex flex-col gap-6">
+      <FileInput
+        title="Upload your file"
+        subTitle=".png, .pdf or .jpeg (5Mo max)"
+        value={file}
+        onChange={setFile}
+      />
+      <p>Controlled FileInput: {file?.name}</p>
+    </div>
+
 
     <Select
       placeholder="Select item"

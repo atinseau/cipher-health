@@ -1,6 +1,9 @@
 import TextInput from "@/components/Inputs/TextInput";
 import AuthContainer from "../../AuthContainer";
 import Select from "@/components/Select";
+import FileInput from "@/components/Inputs/FileInput";
+import InformationCard from "@/components/Cards/InformationCard";
+import { IoInformationCircleOutline } from "react-icons/io5";
 
 
 export default function SignupCurriculumVitae() {
@@ -31,7 +34,18 @@ export default function SignupCurriculumVitae() {
         isRequired
         placeholder="Le nom du diplôme obtenu"
       />
+
+      <FileInput
+        label="Votre diplôme : "
+        title="Upload your file"
+        subTitle=".png, .pdf or .jpeg (5Mo max)"
+        isRequired
+      />
     </div>
+
+    <InformationCard startContent={<IoInformationCircleOutline size={20} className="text-indigo-500" />}>
+      <p>Vous pourrez ajouter d’autres diplômes dans votre espace</p>
+    </InformationCard>
 
   </AuthContainer>
 }

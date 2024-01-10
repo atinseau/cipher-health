@@ -64,7 +64,7 @@ export default function Select(props: SelectProps) {
   return <BaseInput {...baseInput} required={props?.isRequired} classNames={{ base: 'relative' }}>
     <button
       ref={refs.setReference}
-      className={clsx("whitespace-nowrap transition-[border-radius] w-full flex justify-between items-center gap-2 border leading-[20px] border-indigo-500 rounded-sm font-normal p-[11px] font-roboto", {
+      className={clsx("hover:bg-indigo-300 whitespace-nowrap transition-[border-radius,background] w-full flex justify-between items-center gap-2 border leading-[20px] border-indigo-500 rounded-sm font-normal p-[11px] font-roboto", {
         'rounded-b-none': isOpen,
         'text-indigo-400': !selectedItem,
         'text-black': selectedItem

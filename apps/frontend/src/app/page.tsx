@@ -9,10 +9,13 @@ import SignupAddress from "@/components/Authentification/Signup/SignupAddress";
 import SignupMedicalInformation from "@/components/Authentification/Signup/SignupClient/SignupMedicalInformation";
 import SignupMedicalIdentifier from "@/components/Authentification/Signup/SignupWorker/SignupMedicialIdentifier";
 import SignupCurriculumVitae from "@/components/Authentification/Signup/SignupWorker/SignupCurriculumVitae";
+import Link from "next/link";
 
 export default function Page() {
 
   return <div className="flex flex-col gap-32 items-center">
+
+    <Link href="/playground">Go to playground</Link>
 
     <SignupCurriculumVitae />
 
