@@ -86,17 +86,10 @@ commands:
             <<parameters.extra-args>>
 
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
   deploy-frontend:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
     docker:
     - image: cimg/base:stable
-
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
     - checkout
     - setup-runner
@@ -114,10 +107,6 @@ jobs:
           --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
           --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
-
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
-
 
 workflows:
   main-workflow:

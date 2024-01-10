@@ -33,13 +33,17 @@ function MonthCell({ label, isSelected, currentMonth, onClick, date }: {
 }) {
   return <div
     onClick={() => onClick?.(date)}
-    className={clsx("w-[50px] h-[30px] flex items-center justify-center", {
-      "bg-indigo-500 text-white rounded-sm": isSelected,
-      "hover:text-indigo-500 cursor-pointer": !isSelected,
-      "bg-indigo-300 text-indigo-500 rounded-sm": currentMonth
-    })}
+    className={clsx("w-[50px] h-[30px] flex items-center justify-center")}
   >
-    {label}
+    <span
+      className={clsx("cursor-pointer p-1", {
+        "bg-indigo-500 text-white rounded-sm": isSelected,
+        "hover:text-indigo-500": !isSelected,
+        "bg-indigo-300 text-indigo-500 rounded-sm": currentMonth
+      })}
+    >
+      {label}
+    </span>
   </div>
 }
 

@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { ComponentProps } from "react"
+import { ComponentProps, forwardRef } from "react"
 
 type Color = string | string[]
 
@@ -36,10 +36,7 @@ export function extendsVariants<
   }
 ) {
 
-  return <V extends keyof T>(props: Omit<ComponentProps<ReactComponent>, 'variant' | 'color'> & {
-    variant?: V
-    color?: keyof T[V]['colors'],
-  }) => {
+  const Final = forwardRef<any, any>((props, ref) => {
 
     const {
       variant = options?.defaultVariant,
@@ -52,15 +49,21 @@ export function extendsVariants<
       className: variantClassName,
       props: variantProps,
       classNames: colorClassNames,
-    } = pickVariant(variants, variant as V, color as keyof T[V]['colors'])
+    } = pickVariant(variants, variant, color)
 
     return <Component
-      {...rest as any}
+      {...rest}
       {...variantProps}
+      ref={ref}
       className={clsx(className, variantClassName)}
       classNames={colorClassNames}
     />
-  }
+  })
+
+  return Final as <V extends keyof T>(props: Omit<ComponentProps<ReactComponent>, 'variant' | 'color'> & {
+    variant?: V
+    color?: keyof T[V]['colors']
+  }) => JSX.Element
 
   // return variants
 }

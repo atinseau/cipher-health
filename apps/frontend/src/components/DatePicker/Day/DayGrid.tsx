@@ -29,10 +29,10 @@ function DateCell({ isDisabled, isSelected, isToday, label, date, onClick }: {
     'hover:text-indigo-500 cursor-pointer': !isSelected,
   })}>
     <span
-      className={clsx({
+      className={clsx("p-1", {
         'text-gray-600': isDisabled,
-        'bg-indigo-500 text-white rounded-sm w-[24px] text-center': isSelected,
-        'bg-indigo-300 text-indigo-500 rounded-sm w-[24px] text-center': isToday,
+        'bg-indigo-500 text-white rounded-sm w-[30px] text-center': isSelected,
+        'bg-indigo-300 text-indigo-500 rounded-sm w-[30px] text-center': isToday,
       })}
     >
       {label}
@@ -162,7 +162,7 @@ export default function DayGrid({ initialDate, onChange, onMonthClick, onYearCli
       onYearClick={onYearClick}
     />
 
-    <div className='grid grid-cols-7 mt-2 gap-y-4 items-center justify-center'>
+    <div className='grid grid-cols-7 mt-2 gap-y-3 items-center justify-center'>
       {days.map((day, index) => <DateCell label={day} key={day + '_' + index} isDisabled />)}
       {currentMonthGrid().map((day, index) => <DateCell
         key={day.date + '_' + index}

@@ -11,6 +11,7 @@ export const metadata = {
 }
 
 const roboto = Roboto({
+  variable: '--font-roboto',
   weight: [
     '300',
     '400',
@@ -49,7 +50,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={clsx(roboto.className, workSans.variable, sofiaProSoft.variable)}>
+      <body className={clsx(roboto.className, roboto.variable, workSans.variable, sofiaProSoft.variable)}>
         <NextUIProvider>
           {children}
         </NextUIProvider>

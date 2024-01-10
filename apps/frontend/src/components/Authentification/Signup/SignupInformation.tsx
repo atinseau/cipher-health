@@ -58,11 +58,11 @@ export default function SignupInformation() {
         isRequired
         placeholder="Votre lieu de naissance"
       />
-
-      <InformationCard startContent={<IoInformationCircleOutline size={20} className="text-indigo-500"/>}>
-        <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>
-      </InformationCard>
     </div>
+
+    <InformationCard startContent={<IoInformationCircleOutline size={20} className="text-indigo-500" />}>
+      <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>
+    </InformationCard>
   </AuthContainer>
 
 }

@@ -31,12 +31,12 @@ const nextConfig = {
   },
 }
 
-
-
-module.exports = million.next(withBundleAnalyzer(nextConfig), {
-  mute: true,
-  
-  auto: {
-    rsc: true,
-  }
-})
+if (process.env.NODE_ENV === 'production') {
+  module.exports = million.next(withBundleAnalyzer(nextConfig), {
+    auto: {
+      rsc: true,
+    }
+  })
+} else {
+  module.exports = withBundleAnalyzer(nextConfig)
+}

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start",
     "clean": "rm -rf .next",
     "analyze": "ANALYZE=true next build",
@@ -16,6 +16,7 @@
     "@floating-ui/react": "0.26.5",
     "@nextui-org/react": "2.2.9",
     "@tw-classed/react": "1.7.0",
+    "@types/lodash": "4.14.202",
     "clsx": "1.2.1",
     "dayjs": "1.11.10",
     "duplicate-package-checker-webpack-plugin": "3.0.0",

@@ -21,8 +21,12 @@ const config: Config = {
         lg: '20px',
         xl: '24px',
       },
+      lineHeight: {
+        base: '120%'
+      },
       fontFamily: {
-        sofiaProSoft: ['var(--font-sofia-pro-soft)']
+        sofiaProSoft: ['var(--font-sofia-pro-soft)'],
+        roboto: ['var(--font-roboto)'],
       },
       borderRadius: {
         sm: '4px'

@@ -9,7 +9,8 @@ export type BaseInputProps = {
   subLabel?: string | { value: string, action: () => void };
   required?: boolean
   classNames?: {
-    subLabel?: string
+    subLabel?: string,
+    base?: string
   }
 }
 
@@ -27,7 +28,11 @@ export default function BaseInput(props: BaseInputProps & { children: React.Reac
   const subLabelAction = typeof subLabel === "object" ? subLabel.action : undefined
   const subLabelValue = typeof subLabel === "object" ? subLabel.value : subLabel
 
-  return <div className="w-full" {...containerProps} ref={props.containerRef}>
+  return <div
+    {...containerProps}
+    ref={props.containerRef}
+    className={clsx("w-full", containerProps?.className, props?.classNames?.base)}
+  >
     {label && <h6 className="text-indigo-600 mb-2">{label}<span className="text-danger">{required && " *"}</span></h6>}
     {helperText && <p className={"text-xs mb-2 text-gray-600"}>{helperText}</p>}
     {children}

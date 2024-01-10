@@ -5,10 +5,21 @@ import SignupRegistrationStep from "@/components/Authentification/Signup/SignupR
 import SigninTwoFa from "@/components/Authentification/Signin/SigninTwoFa";
 import SignupTwoFa from "@/components/Authentification/Signup/SignupTwoFa";
 import SignupInformation from "@/components/Authentification/Signup/SignupInformation";
+import SignupAddress from "@/components/Authentification/Signup/SignupAddress";
+import SignupMedicalInformation from "@/components/Authentification/Signup/SignupClient/SignupMedicalInformation";
+import SignupMedicalIdentifier from "@/components/Authentification/Signup/SignupWorker/SignupMedicialIdentifier";
+import SignupCurriculumVitae from "@/components/Authentification/Signup/SignupWorker/SignupCurriculumVitae";
 
 export default function Page() {
 
   return <div className="flex flex-col gap-32 items-center">
+
+    <SignupCurriculumVitae />
+
+    <SignupMedicalIdentifier />
+
+    <SignupMedicalInformation />
+    <SignupAddress />
 
     <SignupInformation />
     <SignupTwoFa />

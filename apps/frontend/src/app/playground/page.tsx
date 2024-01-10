@@ -8,10 +8,28 @@ import TextInput from "@/components/Inputs/TextInput"
 
 import { AiOutlineMail } from "react-icons/ai"
 import RadioInput from "@/components/Inputs/RadioInput"
+import Select from "@/components/Select"
+import FileInput from "@/components/Inputs/FileInput"
 
 export default function Page() {
 
+
   return <div className="flex p-4 gap-10 flex-col items-center">
+
+    <FileInput />
+
+    <Select
+      placeholder="Select item"
+      label="Select item"
+      helperText="helperText"
+      subLabel="subLabel"
+      isRequired
+      items={[
+        { label: "Item 1", value: "item-1" },
+        { label: "Item 2", value: "item-2" },
+        { label: "Item 3", value: "item-3" },
+      ]}
+    />
 
     <DateInput />
 

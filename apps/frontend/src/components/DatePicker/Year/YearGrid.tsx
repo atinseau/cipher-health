@@ -33,12 +33,14 @@ function YearCell({ label, isSelected, currentYear, date, onClick }: {
   currentYear?: boolean,
   onClick?: (date: Date) => void, date: Date
 }) {
-  return <div onClick={() => onClick?.(date)} className={clsx("w-[50px] h-[30px] flex items-center justify-center", {
-    "bg-indigo-500 text-white rounded-sm": isSelected,
-    "hover:text-indigo-500 cursor-pointer": !isSelected,
-    "bg-indigo-300 text-indigo-500 rounded-sm": currentYear
-  })}>
-    {label}
+  return <div onClick={() => onClick?.(date)} className={clsx("w-[50px] h-[30px] flex items-center justify-center")}>
+    <span className={clsx("p-1 cursor-pointer", {
+      "bg-indigo-500 text-white rounded-sm": isSelected,
+      "hover:text-indigo-500": !isSelected,
+      "bg-indigo-300 text-indigo-500 rounded-sm": currentYear
+    })}>
+      {label}
+    </span>
   </div>
 }
 

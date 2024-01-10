@@ -256,6 +256,9 @@ importers:
       '@tw-classed/react':
         specifier: 1.7.0
         version: 1.7.0(react@18.2.0)
+      '@types/lodash':
+        specifier: 4.14.202
+        version: 4.14.202
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -272,7 +275,7 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       million:
-        specifier: ^2.6.4
+        specifier: 2.6.4
         version: 2.6.4
       next:
         specifier: 14.0.4
@@ -5152,7 +5155,6 @@ packages:
 
   /@types/lodash@4.14.202:
     resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
-    dev: true
 
   /@types/luxon@3.3.8:
     resolution: {integrity: sha512-jYvz8UMLDgy3a5SkGJne8H7VA7zPV2Lwohjx0V8V31+SqAjNmurWMkk9cQhfvlcnXWudBpK9xPM1n4rljOcHYQ==}
