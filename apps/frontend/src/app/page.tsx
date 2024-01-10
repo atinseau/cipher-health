@@ -10,6 +10,7 @@ import SignupMedicalInformation from "@/components/Authentification/Signup/Signu
 import SignupMedicalIdentifier from "@/components/Authentification/Signup/SignupWorker/SignupMedicialIdentifier";
 import SignupCurriculumVitae from "@/components/Authentification/Signup/SignupWorker/SignupCurriculumVitae";
 import Link from "next/link";
+import SignupSpeciality from "@/components/Authentification/Signup/SignupWorker/SignupSpeciality";
 
 export default function Page() {
 
@@ -17,6 +18,7 @@ export default function Page() {
 
     <Link href="/playground">Go to playground</Link>
 
+    <SignupSpeciality />
     <SignupCurriculumVitae />
 
     <SignupMedicalIdentifier />

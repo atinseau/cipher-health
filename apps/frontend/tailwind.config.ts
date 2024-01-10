@@ -53,6 +53,7 @@ const config: Config = {
           600: '#D24444'
         },
         pink: {
+          400: "#F9CCE4",
           500: "#E1007A",
         },
         success: {

@@ -13,12 +13,22 @@ import RadioInput from "@/components/Inputs/RadioInput"
 import Select from "@/components/Select"
 import FileInput from "@/components/Inputs/FileInput"
 import { useState } from "react";
+import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
 
 export default function Page() {
 
   const [file, setFile] = useState<File | undefined>(undefined)
 
   return <div className="flex p-4 gap-10 flex-col items-center">
+
+    <AutocompleteInput
+      placeholder="Rechercher votre spécialité"
+      items={[
+        { label: "Item 1", value: "item-1" },
+        { label: "Item 2", value: "item-2" },
+        { label: "Item 3", value: "item-3" },
+      ]}
+    />
 
 
     <div className="flex flex-col gap-6">

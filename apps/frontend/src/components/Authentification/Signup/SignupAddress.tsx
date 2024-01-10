@@ -1,6 +1,6 @@
 import TextInput from "@/components/Inputs/TextInput";
 import AuthContainer from "../AuthContainer";
-import InformationCard from "@/components/Cards/InformationCard";
+import InformationCard from "@/components/Card/InformationCard";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
 

@@ -2,7 +2,7 @@ import RadioInput from "@/components/Inputs/RadioInput";
 import AuthContainer from "../AuthContainer";
 import TextInput from "@/components/Inputs/TextInput";
 import DateInput from "@/components/Inputs/DateInput";
-import InformationCard from "@/components/Cards/InformationCard";
+import InformationCard from "@/components/Card/InformationCard";
 
 import { IoInformationCircleOutline } from "react-icons/io5";
 

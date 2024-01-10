@@ -2,7 +2,7 @@ import TextInput from "@/components/Inputs/TextInput";
 import AuthContainer from "../../AuthContainer";
 import Select from "@/components/Select";
 import FileInput from "@/components/Inputs/FileInput";
-import InformationCard from "@/components/Cards/InformationCard";
+import InformationCard from "@/components/Card/InformationCard";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
 

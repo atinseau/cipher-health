@@ -1,14 +1,13 @@
 'use client';
 
-import { offset, size, useClick, useDismiss, useFloating, useInteractions } from '@floating-ui/react'
 import clsx from 'clsx';
 import { useState } from 'react';
 import { IoIosArrowDown } from "react-icons/io";
 
 import isEqual from 'lodash/isEqual'
 
-import { AnimatePresence, motion } from 'framer-motion'
 import BaseInput, { BaseInputProps } from './Inputs/BaseInput';
+import Popover, { PopoverContent, PopoverTrigger } from './Popover';
 
 type SelectItem = {
   id?: string,
@@ -35,26 +34,6 @@ export default function Select(props: SelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<SelectItem | undefined>(undefined)
 
-  const { refs, floatingStyles, context } = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    placement: 'bottom',
-    middleware: [
-      offset(0),
-      size({
-
-      })
-    ]
-  })
-
-  const focus = useClick(context)
-  const dismiss = useDismiss(context)
-
-  const { getFloatingProps, getReferenceProps } = useInteractions([
-    focus,
-    dismiss
-  ])
-
   const handleChange = (item: SelectItem) => {
     setIsOpen(false)
     setSelectedItem(item)
@@ -62,30 +41,28 @@ export default function Select(props: SelectProps) {
   }
 
   return <BaseInput {...baseInput} required={props?.isRequired} classNames={{ base: 'relative' }}>
-    <button
-      ref={refs.setReference}
-      className={clsx("hover:bg-indigo-300 whitespace-nowrap transition-[border-radius,background] w-full flex justify-between items-center gap-2 border leading-[20px] border-indigo-500 rounded-sm font-normal p-[11px] font-roboto", {
-        'rounded-b-none': isOpen,
-        'text-indigo-400': !selectedItem,
-        'text-black': selectedItem
-      })}
-      {...getReferenceProps()}
+    <Popover
+      isOpen={isOpen}
+      onOpenChange={(open) => setIsOpen(open)}
+      interactions={{
+        focus: false
+      }}
     >
-      {!selectedItem ? placeholder : (selectedItem?.label || placeholder)}
-      <IoIosArrowDown className={clsx("transition-all text-indigo-500 pt-[2px]", {
-        'rotate-180': isOpen
-      })} size={20} />
-    </button>
-    <AnimatePresence>
-      {isOpen && <motion.ul
-        initial={{ height: 0 }}
-        animate={{ height: 'auto' }}
-        exit={{ height: 0 }}
-        className={clsx('z-10 w-full overflow-hidden bg-white border border-t-0 rounded-t-none border-indigo-500 rounded-sm')}
-        ref={refs.setFloating}
-        style={floatingStyles}
-        {...getFloatingProps()}
-      >
+      <PopoverTrigger>
+        <button
+          className={clsx("hover:bg-indigo-300 whitespace-nowrap transition-[border-radius,background] w-full flex justify-between items-center gap-2 border leading-[20px] border-indigo-500 rounded-sm font-normal p-[11px] font-roboto", {
+            'rounded-b-none': isOpen,
+            'text-indigo-400': !selectedItem,
+            'text-black': selectedItem
+          })}
+        >
+          {!selectedItem ? placeholder : (selectedItem?.label || placeholder)}
+          <IoIosArrowDown className={clsx("transition-all text-indigo-500 pt-[2px]", {
+            'rotate-180': isOpen
+          })} size={20} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent>
         {items.map((item, index) => <li
           onClick={() => handleChange(item)}
           className={clsx("cursor-pointer leading-base text-base hover:bg-indigo-300 p-2.5", {
@@ -95,7 +72,7 @@ export default function Select(props: SelectProps) {
         >
           {item.label}
         </li>)}
-      </motion.ul>}
-    </AnimatePresence>
+      </PopoverContent>
+    </Popover>
   </BaseInput>
 }

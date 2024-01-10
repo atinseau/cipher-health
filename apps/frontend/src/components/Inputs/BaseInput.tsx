@@ -8,6 +8,7 @@ export type BaseInputProps = {
   label?: string
   subLabel?: string | { value: string, action: () => void };
   required?: boolean
+  withContainer?: boolean
   classNames?: {
     subLabel?: string,
     base?: string
@@ -24,6 +25,8 @@ export default function BaseInput(props: BaseInputProps & { children: React.Reac
     required,
     children
   } = props
+
+  if (props?.withContainer === false) return children
 
   const subLabelAction = typeof subLabel === "object" ? subLabel.action : undefined
   const subLabelValue = typeof subLabel === "object" ? subLabel.value : subLabel
