@@ -19,7 +19,7 @@ export default function RadioInput(props: RadioInputProps) {
     {...radioGroupProps}
     subLabel={subLabel}
     label={label}
-    required={radioGroupProps.isRequired}
+    isRequired={radioGroupProps.isRequired}
     classNames={{
       subLabel: "text-sm"
     }}

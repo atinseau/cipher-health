@@ -10,7 +10,7 @@ import TextInput from "@/components/Inputs/TextInput"
 
 import { AiOutlineMail } from "react-icons/ai"
 import RadioInput from "@/components/Inputs/RadioInput"
-import Select from "@/components/Select"
+import Select from "@/components/Inputs/SelectInput"
 import FileInput from "@/components/Inputs/FileInput"
 import { useState } from "react";
 import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
@@ -20,6 +20,57 @@ export default function Page() {
   const [file, setFile] = useState<File | undefined>(undefined)
 
   return <div className="flex p-4 gap-10 flex-col items-center">
+
+    <DateInput
+      isRequired
+      placeholder="Date de naissance"
+      autoClose
+      baseInputProps={{
+        label: "Date de naissance",
+        helperText: "helperText",
+        subLabel: "subLabel"
+      }}
+    />
+
+    <PasswordInput
+      defaultValue="091209"
+      placeholder="password"
+      enableStrength
+    />
+
+    <TextAreaInput
+      label="Salut"
+      placeholder="placeholder"
+      helperText="helperText"
+      subLabel="subLabel"
+    />
+
+    <TextInput
+      placeholder="placeholder"
+      errorText="errorText"
+      isDisabled
+      baseInputProps={{
+        label: "Salut",
+        helperText: "helperText",
+        subLabel: "subLabel"
+      }}
+      endContent={<AiOutlineMail className="text-indigo-500" />}
+    />
+
+    <Select
+      placeholder="Select item"
+      baseInputProps={{
+        label: "Select item",
+        helperText: "helperText",
+        subLabel: "subLabel"
+      }}
+      isRequired
+      items={[
+        { label: "Item 1", value: "item-1" },
+        { label: "Item 2", value: "item-2" },
+        { label: "Item 3", value: "item-3" },
+      ]}
+    />
 
     <AutocompleteInput
       placeholder="Rechercher votre spécialité"
@@ -31,31 +82,20 @@ export default function Page() {
     />
 
 
-    <div className="flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6">
       <FileInput
         title="Upload your file"
         subTitle=".png, .pdf or .jpeg (5Mo max)"
         value={file}
+        baseInputProps={{
+          label: "Salut",
+          helperText: "helperText",
+          subLabel: "subLabel"
+        }}
         onChange={setFile}
       />
       <p>Controlled FileInput: {file?.name}</p>
     </div>
-
-
-    <Select
-      placeholder="Select item"
-      label="Select item"
-      helperText="helperText"
-      subLabel="subLabel"
-      isRequired
-      items={[
-        { label: "Item 1", value: "item-1" },
-        { label: "Item 2", value: "item-2" },
-        { label: "Item 3", value: "item-3" },
-      ]}
-    />
-
-    <DateInput />
 
     <div className="flex gap-8 flex-col items-center">
       <RadioInput
@@ -127,24 +167,6 @@ export default function Page() {
       ]}
     />
 
-
     <CodeInput />
-
-    <PasswordInput defaultValue="091209" placeholder="password" />
-
-    <TextAreaInput
-      label="Salut"
-      placeholder="placeholder"
-      helperText="helperText"
-      subLabel="subLabel"
-    />
-
-    <TextInput
-      label="Salut"
-      placeholder="placeholder"
-      helperText="helperText"
-      subLabel="subLabel"
-      endContent={<AiOutlineMail className="text-indigo-500" />}
-    />
   </div>
 }

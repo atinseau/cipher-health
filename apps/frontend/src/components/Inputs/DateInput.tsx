@@ -24,8 +24,12 @@ type DateInputProps = TextInputProps & {
 
 export default function DateInput(props: DateInputProps) {
 
-  const [isOpen, setIsOpen] = useState(false)
+  const {
+    autoClose,
+    ...textInputProps
+  } = props
 
+  const [isOpen, setIsOpen] = useState(false)
   const [date, setDate] = useState<Date | undefined>(undefined)
 
   const { refs, floatingStyles, context } = useFloating({
@@ -34,7 +38,10 @@ export default function DateInput(props: DateInputProps) {
     whileElementsMounted: autoUpdate,
     onOpenChange: setIsOpen,
     middleware: [
-      offset(10),
+      offset({
+        mainAxis: 10,
+        alignmentAxis: -10
+      }),
       flip(),
       shift(),
     ]
@@ -51,17 +58,21 @@ export default function DateInput(props: DateInputProps) {
 
   const [activePicker, setActivePicker] = useState<Picker>('year')
 
-  const textInputProps = getReferenceProps() as {
+  const referenceProps = getReferenceProps() as {
     onFocus?: (e: FocusEvent<HTMLInputElement, Element>) => void
   }
 
   return (<>
     <TextInput
-      {...props}
-      value={date?.toLocaleDateString() || ''}
-      containerRef={refs.setReference}
-      endContent={<CiCalendar size={20} className="text-indigo-500" />}
       {...textInputProps}
+      {...referenceProps}
+      ref={refs.setReference}
+      baseInputProps={{
+        ...textInputProps?.baseInputProps,
+      }}
+      readOnly
+      value={date?.toLocaleDateString() || ''}
+      endContent={<CiCalendar size={20} className="text-indigo-500" />}
       onMouseUp={(e) => {
         const input = e.target as HTMLInputElement
         const cursorPosition = input.selectionStart || 0
@@ -74,7 +85,7 @@ export default function DateInput(props: DateInputProps) {
             setActivePicker('year')
           }
         }
-        textInputProps.onFocus?.(e as any)
+        referenceProps.onFocus?.(e as any)
       }}
       onFocus={undefined}
     />

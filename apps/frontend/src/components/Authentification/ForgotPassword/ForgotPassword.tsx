@@ -20,7 +20,9 @@ export default function ForgotPassword() {
   >
     <div className="w-full flex flex-col gap-8">
       <TextInput
-        label="Email :"
+        baseInputProps={{
+          label: "Email :"
+        }}
         placeholder="Votre Email"
         endContent={<AiOutlineMail className="text-indigo-500" />}
       />

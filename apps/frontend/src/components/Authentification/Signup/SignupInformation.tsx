@@ -27,13 +27,17 @@ export default function SignupInformation() {
 
       <div className="flex gap-6">
         <TextInput
-          label="Prénom : "
+          baseInputProps={{
+            label: "Prénom : "
+          }}
           placeholder="Votre prénom"
           isRequired
         />
 
         <TextInput
-          label="Nom :"
+          baseInputProps={{
+            label: "Nom :"
+          }}
           placeholder="Votre nom"
           isRequired
         />
@@ -41,12 +45,16 @@ export default function SignupInformation() {
 
       <div className="flex gap-6">
         <TextInput
-          label="Nom de naissance :"
+          baseInputProps={{
+            label: "Nom de naissance :"
+          }}
           placeholder="Votre nom de naissance"
         />
 
         <DateInput
-          label="Date de naissance :"
+          baseInputProps={{
+            label: "Date de naissance :"
+          }}
           placeholder="DD/MM/YYYY"
           autoClose
           isRequired
@@ -54,7 +62,9 @@ export default function SignupInformation() {
       </div>
 
       <TextInput
-        label="Lieu de naissance :"
+        baseInputProps={{
+          label: "Lieu de naissance :"
+        }}
         isRequired
         placeholder="Votre lieu de naissance"
       />

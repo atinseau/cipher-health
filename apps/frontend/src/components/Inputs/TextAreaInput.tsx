@@ -12,7 +12,7 @@ export default function TextAreaInput(props: TextAreaInputProps) {
     ...inputProps
   } = props
 
-  return <BaseInput {...inputProps} label={label} required={props.required || props.isRequired}>
+  return <BaseInput {...inputProps} label={label} isRequired={props.required || props.isRequired}>
     <Textarea
       placeholder={inputProps.placeholder}
       disableAnimation

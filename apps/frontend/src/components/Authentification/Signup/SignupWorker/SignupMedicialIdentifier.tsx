@@ -11,11 +11,17 @@ export default function SignupMedicalIdentifier() {
   >
     <div className="flex gap-6">
       <TextInput
-        label="Numéro RPPS :"
+        baseInputProps={{
+          label: "Numéro RPPS :"
+        }}
+        isRequired
         placeholder="11 chiffres"
       />
       <TextInput
-        label="Numéro AM :"
+        baseInputProps={{
+          label: "Numéro AM :"
+        }}
+        isRequired
         placeholder="8 chiffres"
       />
     </div>

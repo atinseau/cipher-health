@@ -15,21 +15,27 @@ export default function SignupRegistrationStep() {
 
     <div className="flex flex-col gap-6">
       <TextInput
-        label="Votre email de connexion :"
+        baseInputProps={{
+          label: "Votre email de connexion :"
+        }}
         placeholder="Votre email"
         isRequired
         endContent={<AiOutlineMail className="text-indigo-500" />}
       />
 
       <PasswordInput
-        label="Votre Mot de passe :"
+        baseInputProps={{
+          label: "Votre mot de passe :"
+        }}
         placeholder="Votre mot de passe"
         enableStrength
         isRequired
       />
 
       <TextInput
-        label="Confirmez votre mot de passe"
+        baseInputProps={{
+          label: "Confirmez votre mot de passe"
+        }}
         placeholder="Votre mot de passe"
         isRequired
         endContent={<RxCross1 className="text-red-500" size={20} />}
@@ -38,10 +44,12 @@ export default function SignupRegistrationStep() {
       <Divider />
 
       <TextInput
-        label="Téléphone :"
+        baseInputProps={{
+          label: "Téléphone :",
+          subLabel: "Lorem ipsum / utilisation pour validation compte "
+        }}
         isRequired
         placeholder="Votre numéro de téléphone"
-        subLabel="Lorem ipsum / utilisation pour validation compte "
       />
     </div>
 

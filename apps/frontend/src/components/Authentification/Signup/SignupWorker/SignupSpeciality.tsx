@@ -1,5 +1,5 @@
 import AuthContainer from "../../AuthContainer";
-import Select from "@/components/Select";
+import Select from "@/components/Inputs/SelectInput";
 import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
 import Chip from "@/components/Chip";
 
@@ -12,7 +12,9 @@ export default function SignupSpeciality() {
 
     <div className="flex flex-col gap-6">
       <Select
-        label="Votre spécialité :"
+        baseInputProps={{
+          label: "Votre spécialité :"
+        }}
         placeholder="Sélectionner dans la liste"
         items={[
           { value: "generaliste", label: "Medecin généraliste" }
@@ -20,8 +22,12 @@ export default function SignupSpeciality() {
       />
 
       <AutocompleteInput
-        label="Vos expertises : "
-        placeholder="Sélectionner dans la liste"
+        textInputProps={{
+          placeholder: "Sélectionner dans la liste",
+          baseInputProps: {
+            label: "Vos expertises : "
+          }
+        }}
         items={[
           { value: "expertise-1", label: "Expertise 1" },
           { value: "expertise-1.1", label: "Expertise 1.1" },

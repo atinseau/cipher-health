@@ -6,8 +6,8 @@ import { IoIosArrowDown } from "react-icons/io";
 
 import isEqual from 'lodash/isEqual'
 
-import BaseInput, { BaseInputProps } from './Inputs/BaseInput';
-import Popover, { PopoverContent, PopoverTrigger } from './Popover';
+import BaseInput, { BaseInputProps } from './BaseInput';
+import Popover, { PopoverContent, PopoverTrigger } from '../Popover';
 
 type SelectItem = {
   id?: string,
@@ -15,20 +15,21 @@ type SelectItem = {
   value: any
 }
 
-type SelectProps = BaseInputProps & {
+type SelectProps = {
   placeholder?: string
   isRequired?: boolean
   onChange?: (value: string) => void
   items: Array<SelectItem>
+  baseInputProps?: BaseInputProps
 }
 
-export default function Select(props: SelectProps) {
+export default function SelectInput(props: SelectProps) {
 
   const {
     placeholder,
     onChange,
     items,
-    ...baseInput
+    baseInputProps
   } = props
 
   const [isOpen, setIsOpen] = useState(false)
@@ -40,7 +41,7 @@ export default function Select(props: SelectProps) {
     onChange?.(item.value)
   }
 
-  return <BaseInput {...baseInput} required={props?.isRequired} classNames={{ base: 'relative' }}>
+  return <BaseInput {...baseInputProps} isRequired={props?.isRequired} classNames={{ base: 'relative' }}>
     <Popover
       isOpen={isOpen}
       onOpenChange={(open) => setIsOpen(open)}

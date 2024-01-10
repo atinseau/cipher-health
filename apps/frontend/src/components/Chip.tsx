@@ -19,7 +19,7 @@ const chipVariants = createVariants({
       danger: {
         container: "bg-pink-400 p-1 gap-1 rounded-md flex justify-between items-center",
         label: "text-pink-500",
-        deleteIcon: "text-pink-500",
+        deleteIcon: "text-pink-500 cursor-pointer",
       },
     }
   }

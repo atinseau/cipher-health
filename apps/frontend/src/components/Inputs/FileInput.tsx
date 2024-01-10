@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, DetailedHTMLProps, InputHTMLAttributes, useRef, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import BaseInput, { BaseInputProps } from "./BaseInput"
 import { TbFiles } from "react-icons/tb";
 import { BsFileEarmarkPdf } from "react-icons/bs";
@@ -9,16 +9,14 @@ import { HiOutlineTrash } from "react-icons/hi";
 
 
 
-type FileInputProps =
-  & BaseInputProps
-  & {
-    title: string
-    isRequired?: boolean
-    subTitle?: string
-    value?: File
-    onChange?: (file?: File) => void
-    inputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
-  }
+type FileInputProps = {
+  baseInputProps?: BaseInputProps
+  isRequired?: boolean
+  title: string
+  subTitle?: string
+  value?: File
+  onChange?: (file?: File) => void
+}
 
 export default function FileInput(props: FileInputProps) {
 
@@ -31,7 +29,7 @@ export default function FileInput(props: FileInputProps) {
     value,
     isRequired,
     onChange,
-    ...rest
+    baseInputProps,
   } = props
 
   const file = value || internalFile
@@ -48,7 +46,7 @@ export default function FileInput(props: FileInputProps) {
     }
   }
 
-  return <BaseInput {...rest} required={isRequired}>
+  return <BaseInput {...baseInputProps} isRequired={isRequired}>
     {file && <div className="border justify-between flex rounded-sm border-indigo-500 hover:bg-indigo-300 transition-background py-4 px-2.5">
       <div className="flex items-center gap-2">
         {file.type === 'application/pdf' && <BsFileEarmarkPdf size={20} className="text-indigo-500" />}
@@ -65,7 +63,6 @@ export default function FileInput(props: FileInputProps) {
       {title}
       {subTitle && <span className="text-sm">{subTitle}</span>}
       <input
-        {...props.inputProps}
         type="file"
         className="hidden"
         onChange={handleChange}

@@ -12,12 +12,16 @@ export default function ForgotPasswordReset() {
   >
     <div className="w-full flex flex-col gap-8">
       <PasswordInput
-        label="Votre nouveau mot de passe :"
+        baseInputProps={{
+          label: "Votre nouveau mot de passe :"
+        }}
         placeholder="Mot de passe"
         enableStrength
       />
       <PasswordInput
-        label="Confirmez votre mot de passe :"
+        baseInputProps={{
+          label: "Confirmez votre mot de passe :"
+        }}
         placeholder="Mot de passe"
       />
     </div>

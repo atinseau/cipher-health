@@ -63,7 +63,7 @@ export default function Popover(props: PopoverProps) {
     onOpenChange,
     placement: props?.placement || 'bottom',
     middleware: [
-      offset(props?.offset || 0),
+      offset(props?.offset || 1),
     ]
   })
 

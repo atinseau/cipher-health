@@ -19,14 +19,18 @@ export default function SigninCredential() {
   >
     <div className="w-full flex flex-col gap-8">
       <TextInput
-        label="Email :"
+        baseInputProps={{
+          label: "Email :"
+        }}
         placeholder="Votre Email"
         endContent={<AiOutlineMail className="text-indigo-500" />}
       />
       <PasswordInput
-        label="Mot de passe :"
+        baseInputProps={{
+          label: "Mot de passe :",
+          subLabel: "Mot de passe oublié ? "
+        }}
         placeholder="Votre mot de passe"
-        subLabel="Mot de passe oublié ? "
       />
     </div>
   </AuthContainer>

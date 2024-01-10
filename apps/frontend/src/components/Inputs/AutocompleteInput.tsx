@@ -16,11 +16,11 @@ type SelectItem = {
   value: any
 }
 
-type SelectProps = TextInputProps & {
+type SelectProps = {
   placeholder?: string
-  isRequired?: boolean
   onChange?: (value: string) => void
   items: Array<SelectItem>
+  textInputProps?: TextInputProps
 }
 
 export default function AutocompleteInput(props: SelectProps) {
@@ -29,9 +29,13 @@ export default function AutocompleteInput(props: SelectProps) {
     placeholder,
     onChange,
     items,
-    label,
-    ...baseInput
+    textInputProps,
   } = props
+
+  const {
+    baseInputProps,
+    ...inputProps
+  } = textInputProps || {}
 
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState<string>("")
@@ -58,16 +62,14 @@ export default function AutocompleteInput(props: SelectProps) {
   }, [search])
 
   return <BaseInput
-    {...baseInput}
-    required={props?.isRequired}
-    label={label}
+    {...baseInputProps}
     classNames={{ base: 'relative' }}
   >
     <Popover
       placement='bottom-start'
       offset={{
         mainAxis: 1,
-        alignmentAxis: -13.
+        alignmentAxis: -11
       }}
       isOpen={isOpen}
       interactions={{
@@ -77,11 +79,9 @@ export default function AutocompleteInput(props: SelectProps) {
     >
       <PopoverTrigger>
         <TextInput
-          {...baseInput}
-          placeholder={placeholder}
-          withContainer={false}
+          {...inputProps}
           classNames={{
-            inputWrapper: ["!transition-[border-radius,background]", isOpen && "!rounded-b-none"]
+            base: ["!transition-[border-radius,background]", isOpen && "!rounded-b-none"]
           }}
           onChange={(e) => handleSearch(e.target.value)}
           value={search}

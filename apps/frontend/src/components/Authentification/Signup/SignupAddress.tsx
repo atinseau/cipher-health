@@ -12,7 +12,10 @@ export default function SignupAddress() {
   >
     <div className="flex flex-col gap-6">
       <TextInput
-        label="Adresse :"
+        baseInputProps={{
+          label: "Adresse :"
+        }}
+        isRequired
         placeholder="Numéro et rue"
       />
       <TextInput placeholder="Complément d’adresse" />

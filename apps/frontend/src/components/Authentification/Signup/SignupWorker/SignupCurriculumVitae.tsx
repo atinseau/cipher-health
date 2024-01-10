@@ -1,6 +1,6 @@
 import TextInput from "@/components/Inputs/TextInput";
 import AuthContainer from "../../AuthContainer";
-import Select from "@/components/Select";
+import Select from "@/components/Inputs/SelectInput";
 import FileInput from "@/components/Inputs/FileInput";
 import InformationCard from "@/components/Card/InformationCard";
 import { IoInformationCircleOutline } from "react-icons/io5";
@@ -15,7 +15,9 @@ export default function SignupCurriculumVitae() {
     <div className="flex flex-col gap-6">
       <div className="flex gap-6">
         <Select
-          label="Type de diplôme :"
+          baseInputProps={{
+            label: "Type de diplôme :"
+          }}
           isRequired
           placeholder="Sélectionner dans la liste"
           items={[
@@ -23,20 +25,26 @@ export default function SignupCurriculumVitae() {
           ]}
         />
         <TextInput
-          label="Année d’obtention : "
+          baseInputProps={{
+            label: "Année d’obtention : "
+          }}
           isRequired
           placeholder="L'année d'obtention"
         />
       </div>
 
       <TextInput
-        label="Nom du diplôme obtenu : "
+        baseInputProps={{
+          label: "Nom du diplôme obtenu : "
+        }}
         isRequired
         placeholder="Le nom du diplôme obtenu"
       />
 
       <FileInput
-        label="Votre diplôme : "
+        baseInputProps={{
+          label: "Votre diplôme : "
+        }}
         title="Upload your file"
         subTitle=".png, .pdf or .jpeg (5Mo max)"
         isRequired
