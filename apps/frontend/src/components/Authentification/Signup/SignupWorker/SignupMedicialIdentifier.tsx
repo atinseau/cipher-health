@@ -1,7 +1,6 @@
 import TextInput from "@/components/Inputs/TextInput";
 import AuthContainer from "../../AuthContainer";
 import InformationCard from "@/components/Card/InformationCard";
-import { IoInformationCircleOutline } from "react-icons/io5";
 
 
 export default function SignupMedicalIdentifier() {
@@ -26,7 +25,7 @@ export default function SignupMedicalIdentifier() {
       />
     </div>
 
-    <InformationCard startContent={<IoInformationCircleOutline size={20} className="text-indigo-500" />}>
+    <InformationCard>
       <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>
     </InformationCard>
 

@@ -51,7 +51,7 @@ export default function SelectInput(props: SelectProps) {
     >
       <PopoverTrigger>
         <button
-          className={clsx("hover:bg-indigo-300 whitespace-nowrap transition-[border-radius,background] w-full flex justify-between items-center gap-2 border leading-[20px] border-indigo-500 rounded-sm font-normal p-[11px] font-roboto", {
+          className={clsx("relative z-[11] hover:bg-indigo-300 whitespace-nowrap transition-[border-radius,background] w-full flex justify-between items-center gap-2 border leading-[20px] border-indigo-500 rounded-sm font-normal p-[11px] font-roboto", {
             'rounded-b-none': isOpen,
             'text-indigo-400': !selectedItem,
             'text-black': selectedItem
@@ -66,7 +66,7 @@ export default function SelectInput(props: SelectProps) {
       <PopoverContent>
         {items.map((item, index) => <li
           onClick={() => handleChange(item)}
-          className={clsx("cursor-pointer leading-base text-base hover:bg-indigo-300 p-2.5", {
+          className={clsx("cursor-pointer leading-[20px] text-base hover:bg-indigo-300 p-2.5", {
             'bg-indigo-300': isEqual(selectedItem, item)
           })}
           key={item.id || index}

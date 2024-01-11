@@ -12,3 +12,11 @@ html, * {
 p, h1, h2, h3, h4 {
   @apply text-black;
 }
+
+.next-image-reset {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+}

@@ -14,12 +14,33 @@ import Select from "@/components/Inputs/SelectInput"
 import FileInput from "@/components/Inputs/FileInput"
 import { useState } from "react";
 import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
+import DrawInput from "@/components/Inputs/DrawInput";
+import AvatarInput from "@/components/Inputs/AvatarInput";
 
 export default function Page() {
 
   const [file, setFile] = useState<File | undefined>(undefined)
+  const [file2, setFile2] = useState<File | undefined>(undefined)
 
   return <div className="flex p-4 gap-10 flex-col items-center">
+
+    <div className="w-full flex flex-col gap-6">
+      <AvatarInput
+        baseInputProps={{ label: "Photo de profil :" }}
+        value={file2}
+        onChange={setFile2}
+      />
+      <p>Controlled AvatarInput: {file2?.name}</p>
+    </div>
+
+
+
+    <DrawInput
+      baseInputProps={{
+        label: "Votre signature :",
+      }}
+      title="Dessiner avec votre souris"
+    />
 
     <DateInput
       isRequired
@@ -39,10 +60,13 @@ export default function Page() {
     />
 
     <TextAreaInput
-      label="Salut"
+      baseInputProps={{
+        label: "Salut",
+        helperText: "helperText",
+        subLabel: "subLabel"
+      }}
       placeholder="placeholder"
-      helperText="helperText"
-      subLabel="subLabel"
+
     />
 
     <TextInput

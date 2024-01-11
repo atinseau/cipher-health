@@ -81,7 +81,11 @@ export default function AutocompleteInput(props: SelectProps) {
         <TextInput
           {...inputProps}
           classNames={{
-            base: ["!transition-[border-radius,background]", isOpen && "!rounded-b-none"]
+            base: [
+              "z-[11] relative",
+              "!transition-[border-radius,background]",
+              isOpen && "!rounded-b-none"
+            ]
           }}
           onChange={(e) => handleSearch(e.target.value)}
           value={search}

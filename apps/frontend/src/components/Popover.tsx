@@ -33,6 +33,7 @@ type PopoverTriggerProps = {
 
 type PopoverContentProps = {
   children: React.ReactNode
+  as?: 'ul' | 'div'
 }
 
 type PopoverContext = {
@@ -63,7 +64,7 @@ export default function Popover(props: PopoverProps) {
     onOpenChange,
     placement: props?.placement || 'bottom',
     middleware: [
-      offset(props?.offset || 1),
+      offset(props?.offset || 0),
     ]
   })
 
@@ -111,8 +112,10 @@ export function PopoverContent(props: PopoverContentProps) {
 
   const { isOpen, refs, floatingStyles, getFloatingProps } = usePopover()
 
+  const MotionComponent = motion[props.as || 'ul']
+
   return <AnimatePresence>
-    {isOpen && <motion.ul
+    {isOpen && <MotionComponent
       initial={{ height: 0 }}
       animate={{ height: 'auto' }}
       exit={{ height: 0 }}
@@ -122,6 +125,6 @@ export function PopoverContent(props: PopoverContentProps) {
       {...getFloatingProps()}
     >
       {props.children}
-    </motion.ul>}
+    </MotionComponent>}
   </AnimatePresence>
 }

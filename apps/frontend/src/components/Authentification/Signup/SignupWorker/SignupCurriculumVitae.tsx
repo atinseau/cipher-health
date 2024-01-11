@@ -3,7 +3,6 @@ import AuthContainer from "../../AuthContainer";
 import Select from "@/components/Inputs/SelectInput";
 import FileInput from "@/components/Inputs/FileInput";
 import InformationCard from "@/components/Card/InformationCard";
-import { IoInformationCircleOutline } from "react-icons/io5";
 
 
 export default function SignupCurriculumVitae() {
@@ -16,7 +15,8 @@ export default function SignupCurriculumVitae() {
       <div className="flex gap-6">
         <Select
           baseInputProps={{
-            label: "Type de diplôme :"
+            label: "Type de diplôme :",
+            subLabel: "Sélectionner dans la liste"
           }}
           isRequired
           placeholder="Sélectionner dans la liste"
@@ -51,7 +51,7 @@ export default function SignupCurriculumVitae() {
       />
     </div>
 
-    <InformationCard startContent={<IoInformationCircleOutline size={20} className="text-indigo-500" />}>
+    <InformationCard>
       <p>Vous pourrez ajouter d’autres diplômes dans votre espace</p>
     </InformationCard>
 

@@ -11,12 +11,17 @@ import SignupMedicalIdentifier from "@/components/Authentification/Signup/Signup
 import SignupCurriculumVitae from "@/components/Authentification/Signup/SignupWorker/SignupCurriculumVitae";
 import Link from "next/link";
 import SignupSpeciality from "@/components/Authentification/Signup/SignupWorker/SignupSpeciality";
+import SignupSignature from "@/components/Authentification/Signup/SignupWorker/SignupSignature";
+import SignupDescription from "@/components/Authentification/Signup/SignupWorker/SignupDescription";
 
 export default function Page() {
 
   return <div className="flex flex-col gap-32 items-center">
 
     <Link href="/playground">Go to playground</Link>
+
+    <SignupDescription />
+    <SignupSignature />
 
     <SignupSpeciality />
     <SignupCurriculumVitae />

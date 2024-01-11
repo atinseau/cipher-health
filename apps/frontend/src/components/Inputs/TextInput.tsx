@@ -14,12 +14,15 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((props, ref) => {
     ...inputProps
   } = props
 
-  return <BaseInput {...baseInputProps} isRequired={inputProps?.isRequired}>
+  return <BaseInput
+    {...baseInputProps}
+    isRequired={inputProps?.isRequired}
+  >
     <Input
       {...inputProps}
       ref={ref}
     />
-  </BaseInput>
+  </BaseInput >
 })
 
 export default TextInput
