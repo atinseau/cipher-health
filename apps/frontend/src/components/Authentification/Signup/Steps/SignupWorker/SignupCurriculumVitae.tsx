@@ -1,12 +1,12 @@
 import TextInput from "@/components/Inputs/TextInput";
-import AuthContainer from "../../AuthContainer";
 import Select from "@/components/Inputs/SelectInput";
 import FileInput from "@/components/Inputs/FileInput";
 import InformationCard from "@/components/Card/InformationCard";
+import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
 
 
 export default function SignupCurriculumVitae() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -55,5 +55,5 @@ export default function SignupCurriculumVitae() {
       <p>Vous pourrez ajouter d’autres diplômes dans votre espace</p>
     </InformationCard>
 
-  </AuthContainer>
+  </AuthFormContainer>
 }

@@ -1,13 +1,13 @@
 import RadioInput from "@/components/Inputs/RadioInput";
-import AuthContainer from "../AuthContainer";
 import TextInput from "@/components/Inputs/TextInput";
 import DateInput from "@/components/Inputs/DateInput";
 import InformationCard from "@/components/Card/InformationCard";
+import AuthFormContainer from "../../AuthFormContainer";
 
 
 export default function SignupInformation() {
 
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -71,6 +71,6 @@ export default function SignupInformation() {
     <InformationCard>
       <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>
     </InformationCard>
-  </AuthContainer>
+  </AuthFormContainer>
 
 }

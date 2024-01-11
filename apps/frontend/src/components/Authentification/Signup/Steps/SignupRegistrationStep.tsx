@@ -3,12 +3,11 @@ import TextInput from "@/components/Inputs/TextInput";
 import { AiOutlineMail } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
 import { Divider } from "@nextui-org/divider";
-import AuthContainer from "../AuthContainer";
-
+import AuthFormContainer from "../../AuthFormContainer";
 
 
 export default function SignupRegistrationStep() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -53,5 +52,5 @@ export default function SignupRegistrationStep() {
       />
     </div>
 
-  </AuthContainer>
+  </AuthFormContainer>
 }

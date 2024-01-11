@@ -1,10 +1,10 @@
 import PasswordInput from "@/components/Inputs/PasswordInput";
-import AuthContainer from "../AuthContainer";
+import AuthFormContainer from "../AuthFormContainer";
 import Button from "@/components/Button";
 
 
 export default function ForgotPasswordReset() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Entrez votre nouveau mot de passe"
     subTitle="Lorem ipsum dolor sit amet"
     color="secondary"
@@ -25,5 +25,5 @@ export default function ForgotPasswordReset() {
         placeholder="Mot de passe"
       />
     </div>
-  </AuthContainer>
+  </AuthFormContainer>
 }

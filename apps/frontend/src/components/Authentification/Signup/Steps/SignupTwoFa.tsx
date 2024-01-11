@@ -1,11 +1,10 @@
 import CodeInput from "@/components/Inputs/CodeInput";
-import AuthContainer from "../AuthContainer";
 import Button from "@/components/Button";
-
+import AuthFormContainer from "../../AuthFormContainer";
 
 
 export default function SignupTwoFa() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     subTitle="Merci de rentrer le code reçu par sms au 06 •• •• •• 12 pour vous connecter "
     variant="full"
@@ -23,5 +22,5 @@ export default function SignupTwoFa() {
     }
   >
     <CodeInput />
-  </AuthContainer>
+  </AuthFormContainer>
 }

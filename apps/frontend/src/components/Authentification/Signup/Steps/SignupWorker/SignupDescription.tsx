@@ -1,5 +1,5 @@
+import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
 import AvatarInput from "@/components/Inputs/AvatarInput";
-import AuthContainer from "../../AuthContainer";
 import TextAreaInput from "@/components/Inputs/TextAreaInput";
 
 
@@ -7,7 +7,7 @@ import TextAreaInput from "@/components/Inputs/TextAreaInput";
 export default function SignupDescription() {
 
 
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -31,6 +31,6 @@ export default function SignupDescription() {
 
     </div>
 
-  </AuthContainer>
+  </AuthFormContainer>
 
 }

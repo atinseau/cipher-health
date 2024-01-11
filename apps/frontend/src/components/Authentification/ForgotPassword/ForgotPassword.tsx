@@ -1,12 +1,12 @@
 import TextInput from "@/components/Inputs/TextInput";
-import AuthContainer from "../AuthContainer";
+import AuthFormContainer from "../AuthFormContainer";
 import { AiOutlineMail } from "react-icons/ai";
 import Button from "@/components/Button";
 
 
 
 export default function ForgotPassword() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Veuillez renseigner votre e-mail"
     subTitle="Un lien de réinitialisation va vous être envoyé"
     color="secondary"
@@ -27,5 +27,5 @@ export default function ForgotPassword() {
         endContent={<AiOutlineMail className="text-indigo-500" />}
       />
     </div>
-  </AuthContainer>
+  </AuthFormContainer>
 }

@@ -1,9 +1,9 @@
+import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
 import TextInput from "@/components/Inputs/TextInput";
-import AuthContainer from "../../AuthContainer";
 
 
 export default function SignupMedicalInformation() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -23,5 +23,5 @@ export default function SignupMedicalInformation() {
       />
     </div>
 
-  </AuthContainer>
+  </AuthFormContainer>
 }

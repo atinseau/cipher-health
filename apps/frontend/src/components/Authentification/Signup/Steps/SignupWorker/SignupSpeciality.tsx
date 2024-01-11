@@ -1,11 +1,11 @@
-import AuthContainer from "../../AuthContainer";
 import Select from "@/components/Inputs/SelectInput";
 import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
 import Chip from "@/components/Chip";
+import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
 
 
 export default function SignupSpeciality() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -44,5 +44,5 @@ export default function SignupSpeciality() {
       </div>
     </div>
 
-  </AuthContainer>
+  </AuthFormContainer>
 }

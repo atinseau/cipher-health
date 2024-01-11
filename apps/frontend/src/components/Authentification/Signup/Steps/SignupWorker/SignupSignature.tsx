@@ -1,12 +1,12 @@
 import DrawInput from "@/components/Inputs/DrawInput";
-import AuthContainer from "../../AuthContainer";
 import InformationCard from "@/components/Card/InformationCard";
+import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
 
 
 
 export default function SignupSignature() {
 
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -23,6 +23,6 @@ export default function SignupSignature() {
       <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>
     </InformationCard>
 
-  </AuthContainer>
+  </AuthFormContainer>
 
 }

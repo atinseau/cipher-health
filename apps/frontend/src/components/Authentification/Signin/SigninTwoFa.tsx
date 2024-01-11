@@ -1,10 +1,10 @@
 import CodeInput from "@/components/Inputs/CodeInput";
-import AuthContainer from "../AuthContainer";
+import AuthFormContainer from "../AuthFormContainer";
 import Button from "@/components/Button";
 
 
 export default function SigninTwoFa() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Sécurité double authentification"
     color="secondary"
     subTitle="Merci de rentrer le code reçu par sms au 06 •• •• •• 12 pour vous connecter"
@@ -14,5 +14,5 @@ export default function SigninTwoFa() {
     </div>}
   >
     <CodeInput />
-  </AuthContainer>
+  </AuthFormContainer>
 }

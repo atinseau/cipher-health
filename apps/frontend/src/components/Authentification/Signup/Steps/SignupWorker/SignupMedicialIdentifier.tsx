@@ -1,10 +1,10 @@
 import TextInput from "@/components/Inputs/TextInput";
-import AuthContainer from "../../AuthContainer";
 import InformationCard from "@/components/Card/InformationCard";
+import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
 
 
 export default function SignupMedicalIdentifier() {
-  return <AuthContainer
+  return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
@@ -29,5 +29,5 @@ export default function SignupMedicalIdentifier() {
       <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>
     </InformationCard>
 
-  </AuthContainer>
+  </AuthFormContainer>
 }
