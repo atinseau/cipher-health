@@ -18,9 +18,13 @@ type SelectItem = {
 
 type SelectProps = {
   placeholder?: string
-  onChange?: (value: string) => void
+  onChange?: (value?: string) => void
   items: Array<SelectItem>
+  defaultValue?: string | SelectItem
   textInputProps?: TextInputProps
+  classNames?: {
+    content?: string
+  }
 }
 
 export default function AutocompleteInput(props: SelectProps) {
@@ -29,6 +33,8 @@ export default function AutocompleteInput(props: SelectProps) {
     placeholder,
     onChange,
     items,
+    classNames,
+    defaultValue,
     textInputProps,
   } = props
 
@@ -37,9 +43,13 @@ export default function AutocompleteInput(props: SelectProps) {
     ...inputProps
   } = textInputProps || {}
 
+  const defaultItem = typeof defaultValue === 'string'
+    ? items.find(item => item.value === defaultValue)
+    : defaultValue
+
   const [isOpen, setIsOpen] = useState(false)
-  const [search, setSearch] = useState<string>("")
-  const [selectedItem, setSelectedItem] = useState<SelectItem | undefined>(undefined)
+  const [search, setSearch] = useState<string>(defaultItem?.label || '')
+  const [selectedItem, setSelectedItem] = useState<SelectItem | undefined>(defaultItem)
 
   const handleChange = (item: SelectItem) => {
     setIsOpen(false)
@@ -50,6 +60,7 @@ export default function AutocompleteInput(props: SelectProps) {
 
   const handleSearch = (value: string) => {
     if (value !== selectedItem?.label) {
+      if (selectedItem) onChange?.(undefined)
       setSelectedItem(undefined)
     }
     setSearch(value)
@@ -80,6 +91,7 @@ export default function AutocompleteInput(props: SelectProps) {
       <PopoverTrigger>
         <TextInput
           {...inputProps}
+          placeholder={placeholder}
           classNames={{
             base: [
               "z-[11] relative",
@@ -92,7 +104,7 @@ export default function AutocompleteInput(props: SelectProps) {
           endContent={<IoSearch className={"text-indigo-500 pt-[2px]"} size={20} />}
         />
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent className={classNames?.content}>
         {filteredItems.map((item, index) => <li
           onClick={() => handleChange(item)}
           className={clsx("cursor-pointer leading-base text-base hover:bg-indigo-300 p-2.5", {

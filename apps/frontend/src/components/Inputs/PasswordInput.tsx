@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from "react";
+import { forwardRef, useCallback, useMemo, useState } from "react";
 import TextInput, { TextInputProps } from "./TextInput";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 import { Progress } from "@nextui-org/progress";
@@ -19,7 +19,7 @@ type PasswordInputProps = TextInputProps & {
   enableStrength?: boolean
 }
 
-export default function PasswordInput(props: PasswordInputProps) {
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
 
   const {
     enableStrength,
@@ -74,6 +74,7 @@ export default function PasswordInput(props: PasswordInputProps) {
         size="18px"
         onClick={() => setShowPassword(!showPassword)}
       />}
+      ref={ref}
     />
     {enableStrength && <div className="text-gray-600 text-xs flex gap-1 items-center mt-2">
       <span className="whitespace-nowrap">Sécurité :</span>
@@ -87,4 +88,6 @@ export default function PasswordInput(props: PasswordInputProps) {
       }} />
     </div>}
   </div>
-} 
+})
+
+export default PasswordInput

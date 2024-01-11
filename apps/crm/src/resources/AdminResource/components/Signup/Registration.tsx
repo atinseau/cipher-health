@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useNotify } from "react-admin";
 import CountrySelect from "./CountrySelect";
 import { Container } from "./SignupContainer";
-import { COUNTRIES } from "@cipher-health/utils";
+import { signupSchema } from "@cipher-health/utils/schemas";
 import { invalidLinkError } from "../../../../lib/errors";
 
 const defaultValues = {
@@ -28,27 +28,6 @@ const defaultValues = {
   "confirmPassword": "06112001..Arttsn",
   "phone": "0782887672"
 }
-
-const signupSchema = z.object({
-  email: z.string().email(),
-  password: z
-    .string()
-    // TODO: use all regex from utils to validate password
-    .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?.!@$%^&*-]).{8,}$/, {
-      message: 'Password is too weak, it should contain at least 8 characters, one uppercase, one lowercase, one number and one special character (#?!@$%.^&*-)'
-    }),
-  confirmPassword: z.string().min(1),
-  phone: z.string().min(1), // TODO: add phone validation, enforce international phone numbers only (E.164)
-  country: z.string().refine((country) => {
-    return COUNTRIES.some((c) => c.code === country)
-  }, {
-    message: 'Invalid country'
-  })
-})
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"], // path of error
-  });
 
 export default function Registration({ stwt, checkProgress }: {
   stwt: string,

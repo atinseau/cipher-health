@@ -250,6 +250,9 @@ importers:
       '@floating-ui/react':
         specifier: 0.26.5
         version: 0.26.5(react-dom@18.2.0)(react@18.2.0)
+      '@hookform/resolvers':
+        specifier: 3.3.3
+        version: 3.3.3(react-hook-form@7.49.2)
       '@nextui-org/react':
         specifier: 2.2.9
         version: 2.2.9(@types/react@18.2.46)(framer-motion@10.17.0)(react-dom@18.2.0)(react@18.2.0)(tailwind-variants@0.1.20)(tailwindcss@3.4.0)
@@ -289,15 +292,21 @@ importers:
       react-dom:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
+      react-hook-form:
+        specifier: 7.49.2
+        version: 7.49.2(react@18.2.0)
       react-icons:
         specifier: 4.12.0
         version: 4.12.0(react@18.2.0)
       react-sketch-canvas:
-        specifier: ^6.2.0
+        specifier: 6.2.0
         version: 6.2.0(react@18.2.0)
       tailwind-merge:
         specifier: 1.14.0
         version: 1.14.0
+      zod:
+        specifier: 3.22.4
+        version: 3.22.4
     devDependencies:
       '@next/bundle-analyzer':
         specifier: 14.0.4
@@ -360,6 +369,9 @@ importers:
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
+      zod:
+        specifier: 3.22.4
+        version: 3.22.4
     devDependencies:
       '@swc/cli':
         specifier: 0.1.63
@@ -11540,7 +11552,7 @@ packages:
       '@babel/core': 7.23.7
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 29.7.0(@types/node@20.10.5)(ts-node@10.9.2)
+      jest: 29.7.0(@types/node@18.19.5)
       jest-util: 29.7.0
       json5: 2.2.3
       lodash.memoize: 4.1.2

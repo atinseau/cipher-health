@@ -9,7 +9,7 @@ type AuthContainerProps = {
 export default function AuthContainer(props: AuthContainerProps) {
 
   return <div className="flex h-screen w-screen">
-    <div className="w-1/2 flex justify-center px-6 py-8">
+    <div className="w-1/2 flex justify-center px-6 pt-8 mb-8 overflow-y-scroll">
       <div className="flex flex-col w-full max-w-[608px]">
         <div className="w-full mb-8">
           <Image

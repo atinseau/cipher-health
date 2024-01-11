@@ -1,34 +1,16 @@
-import StepBar from "@/components/StepBar";
-import SignupRegistrationStep from "./Steps/SignupRegistrationStep";
-import Button from "@/components/Button";
+'use client';
 
-import { FaArrowRightLong } from "react-icons/fa6";
-
-
+import FormProvider from "@/components/Form/FormProvider";
+import { clientSteps } from "./steps";
+import SignupForm from "./SignupForm";
 
 export default function Signup() {
-  return <div className="flex flex-col justify-between h-full">
-    <div className="flex flex-col gap-12">
-      <StepBar
-        currentStep={1}
-        steps={[
-          { title: "Connexion" },
-          { title: "Informations" },
-          { title: "Coordonées" },
-          { title: "Prise en charge" },
-        ]}
-      />
-      <SignupRegistrationStep />
-    </div>
 
-    <div className="flex justify-end">
-      <Button
-        isDisabled
-        endContent={<FaArrowRightLong />}
-      >
-        Suivant
-      </Button>
-    </div>
+  const steps = clientSteps
 
-  </div>
+  // Compute steps set depending on user type
+
+  return <FormProvider steps={steps}>
+    <SignupForm />
+  </FormProvider>
 }

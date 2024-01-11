@@ -5,5 +5,10 @@
     "parser": {
       "syntax": "typescript"
     }
+  },
+  "env": {
+    "exclude": [
+      "zod"
+    ]
   }
 }

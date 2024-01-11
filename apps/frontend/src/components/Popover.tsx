@@ -6,11 +6,11 @@ import {
   useFocus,
   useInteractions,
   OffsetOptions,
-  Placement
+  Placement,
 } from "@floating-ui/react"
-import clsx from "clsx"
 import { AnimatePresence, motion } from "framer-motion"
 import React, { createContext, useContext, useMemo } from "react"
+import { twMerge } from "tailwind-merge"
 
 
 type PopoverProps = {
@@ -33,6 +33,7 @@ type PopoverTriggerProps = {
 
 type PopoverContentProps = {
   children: React.ReactNode
+  className?: string
   as?: 'ul' | 'div'
 }
 
@@ -119,7 +120,7 @@ export function PopoverContent(props: PopoverContentProps) {
       initial={{ height: 0 }}
       animate={{ height: 'auto' }}
       exit={{ height: 0 }}
-      className={clsx('z-10 w-full overflow-hidden bg-white border border-t-0 rounded-t-none border-indigo-500 rounded-sm')}
+      className={twMerge(props?.className, 'z-10 w-full overflow-y-scroll bg-white border border-t-0 rounded-t-none border-indigo-500 rounded-sm')}
       ref={refs.setFloating}
       style={floatingStyles}
       {...getFloatingProps()}

@@ -1,10 +1,3 @@
-import {
-  COUNTRIES,
-  regexContainLowerCaseLetters,
-  regexContainNumbers,
-  regexContainSpecialChar,
-  regexContainUpperCaseLetters,
-} from "@cipher-health/utils";
 import { z } from "zod";
 
 /**
@@ -14,27 +7,8 @@ import { z } from "zod";
  * At least one digit. You can remove this condition by removing (?=.*?[0-9])
  * At least one special character,  You can remove this condition by removing (?=.*?[#?!@$%.^&*-])
  */
-export const signupSchema = z.object({
-  email: z.string().email(),
-  password: z
-    .string()
-    .regex(regexContainLowerCaseLetters, 'Password must contain at least one lowercase letter')
-    .regex(regexContainUpperCaseLetters, 'Password must contain at least one uppercase letter')
-    .regex(regexContainNumbers, 'Password must contain at least one number')
-    .regex(regexContainSpecialChar, 'Password must contain at least one special character')
-    .min(8, 'Password is too short - should be 8 chars minimum.'),
-  confirmPassword: z.string(),
-  phone: z.string(),
-  country: z.string().refine((country) => {
-    return COUNTRIES.some((c) => c.code === country)
-  }, {
-    message: 'Invalid country'
-  })
-})
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"], // path of error
-  });
+export { signupSchema } from "@cipher-health/utils/schemas";
+
 
 export const signinSchema = z.object({
   email: z
