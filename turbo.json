@@ -1,23 +1,19 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
-    "precompile": {
-      "dependsOn": [
-        "@cipher-health/utils#build"
-      ]
-    },
     "build": {
       "outputs": [
-        "dist/**"
+        "dist/**",
+        ".next/**"
       ],
       "dependsOn": [
-        "^precompile"
+        "^build"
       ]
     },
     "dev": {
       "cache": false,
       "dependsOn": [
-        "^precompile"
+        "^build"
       ]
     },
     "clean": {
@@ -32,7 +28,7 @@
     "check-types": {
       "cache": false,
       "dependsOn": [
-        "^precompile"
+        "^build"
       ]
     }
   }

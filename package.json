@@ -14,8 +14,8 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@turbo/gen": "1.11.2",
-    "turbo": "1.10.16",
+    "@turbo/gen": "1.11.3",
+    "turbo": "1.11.3",
     "husky": "8.0.3"
   }
 }
