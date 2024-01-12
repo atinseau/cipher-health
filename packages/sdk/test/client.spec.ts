@@ -13,6 +13,8 @@ describe('Client class', () => {
 
   // to be sure mockRestore is called
   beforeEach(() => {
+
+    // @ts-ignore
     global.fetch = undefined
   })
 
@@ -60,7 +62,7 @@ describe('Client class', () => {
 
     const [data, error] = await client.get('mocked-url')
 
-    let fakeJsonError: Error = null
+    let fakeJsonError: Error | null = null
 
     try {
       JSON.parse('not-json')
@@ -392,7 +394,7 @@ describe('Client class', () => {
 
   it('should be able to keep response in cache if ttl is setted', async () => {
 
-    let initialTime = null
+    let initialTime: number | null = null
 
     const mockedFetch = applyMockedFetch({
       data: () => {

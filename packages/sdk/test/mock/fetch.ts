@@ -7,7 +7,7 @@ export type Route = {
 type FetchContext = {
   count: number,
   countByRoute: Record<string, number>,
-  addRoute?: (route: Route) => void
+  addRoute: (route: Route) => void
 }
 
 type FetchResultOptions = {
@@ -16,7 +16,7 @@ type FetchResultOptions = {
   status?: number | (() => number), // the status to return on all requests
 }
 
-export const createFetchResult = (options: FetchResultOptions) => {
+export const createFetchResult = (options?: FetchResultOptions) => {
 
   const defaultData = typeof options?.data === 'function' ? options?.data() : options?.data
   const defaultText = defaultData || 'ok' // TODO: change the "ok"

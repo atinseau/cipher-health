@@ -23,7 +23,7 @@ export default function AuthContainer(props: AuthContainerProps) {
         {props.children}
       </div>
     </div>
-    <div className="w-1/2 bg-indigo-400">
+    <div className="w-1/2 bg-indigo-400 select-none">
       <Image
         className="w-fit h-fit next-image-reset object-bottom"
         alt="Illustration du formulaire d'authentification"

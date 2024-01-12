@@ -69,7 +69,10 @@ const refreshRoute: Route = {
 
 describe('Authentificator', () => {
   beforeEach(() => {
+    // @ts-ignore
     global.localStorage = undefined
+
+    // @ts-ignore
     global.fetch = undefined
     refreshToken = "0"
     accessToken = "0"

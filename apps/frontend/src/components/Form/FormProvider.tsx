@@ -3,7 +3,6 @@
 import {
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -42,6 +41,7 @@ type IFormContext = {
   onSubmit: () => void
   Component: React.ComponentType
 
+  getForm: (stepIndex: number, subStepIndex: number) => UseFormReturn<any, any, any>
   subscribe: FormContextSubscribe
   unsubscribe: (stepIndex: number, subStepIndex: number) => void
 }
@@ -65,7 +65,8 @@ export default function FormProvider(props: FormProviderProps) {
     const { formRef } = getForm(stepIndex, subStepIndex)
 
     if (!formRef?.current) {
-      throw new Error("Form ref is not defined")
+      console.warn('formRef.current is null')
+      return
     }
 
     formRef.current?.dispatchEvent(new Event('submit', {
@@ -123,15 +124,12 @@ export default function FormProvider(props: FormProviderProps) {
     delete formRefs.current[si][ssi]
   }, [])
 
-  useEffect(() => {
-    console.log('getForm', getForm(0, 0))
-  }, [])
-
   return <FormContext.Provider value={{
     stepIndex,
     subStepIndex,
     steps,
     onSubmit,
+    getForm,
     subscribe,
     unsubscribe,
     Component,

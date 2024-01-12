@@ -75,7 +75,7 @@ export class Client {
   private createUrl(endpoint: string, query?: Query) {
     const url = new URL(this.options.baseUrl + this.formatEndpoint(endpoint))
     const formattedQuery = Object.keys(query || {}).reduce((acc, key) => {
-      if (typeof query[key] === 'number') {
+      if (typeof query?.[key] === 'number') {
         return {
           ...acc,
           [key]: query[key].toString()
@@ -83,7 +83,7 @@ export class Client {
       }
       return {
         ...acc,
-        [key]: query[key]
+        [key]: query?.[key]
       }
     }, {})
 
@@ -92,7 +92,7 @@ export class Client {
   }
 
   private async parseResponse(res: Response): Promise<[any | null, ClientError | Error | null]> {
-    let data = await res.text()
+    let data: string | null = await res.text()
     let error: ClientError | Error | null = null
 
     // Try to parse the response
@@ -104,7 +104,7 @@ export class Client {
     } catch (e) {
       error = new ClientError({
         data,
-        error: e,
+        error: e as Error,
         status: res.status,
       })
       data = null
@@ -130,7 +130,7 @@ export class Client {
 
     // If there is cache, no need to continue
     // We return the cached value
-    if (this.cache[url] && Date.now() - this.cache[url].timestamp < config.ttl) {
+    if (this.cache[url] && Date.now() - this.cache[url].timestamp < (config?.ttl || 0)) {
       return this.cache[url].output as any
     }
 
@@ -142,14 +142,14 @@ export class Client {
     }
 
 
-    let res: Response
+    let res: Response | null = null
     let retryCount = 0
     let maxRetry = config.skipRetry
       ? 0 // If skipRetry, retry function will do nothing
-      : this.options.maxRetry
+      : this.options.maxRetry! // 3 by default
 
     // Apply custom max retry if defined
-    if (config.maxRetry > 0) {
+    if (config.maxRetry && config.maxRetry > 0) {
       maxRetry = config.maxRetry
     } else if (config.maxRetry && config.maxRetry < 0) {
       console.warn('maxRetry must be greater than 0, to bypass retry set skipRetry to true')
@@ -198,7 +198,7 @@ export class Client {
 
     await execute.bind(this)()
 
-    const output = await this.parseResponse(res)
+    const output = await this.parseResponse(res as any)
 
     // If ttl is defined, we cache the request
     // and set and expiration date

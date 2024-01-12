@@ -6,6 +6,8 @@
     "moduleResolution": "node",
     "allowJs": true,
     "skipLibCheck": true,
+    "strictNullChecks": true,
+    "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,

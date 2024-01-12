@@ -4,6 +4,7 @@ import localFont from 'next/font/local'
 
 import '@/styles/globals.scss'
 import clsx from 'clsx'
+import AuthProvider from '@/contexts/AuthProvider/AuthProvider'
 
 export const metadata = {
   title: 'Next.js',
@@ -52,7 +53,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={clsx(roboto.className, roboto.variable, workSans.variable, sofiaProSoft.variable)}>
         <NextUIProvider>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </NextUIProvider>
       </body>
     </html>

@@ -1,9 +1,15 @@
 import { Mutex } from "async-mutex";
 import { Client, ClientOptions } from "./Client"
 import { UserType, UserModel } from '@cipher-health/api'
+import { AuthentificatorAdapter } from "./adapters/AuthentificatorAdapter";
+import { LocalStorageAdapter } from "./adapters/LocalStorageAdapter";
+
+import type { signupSchema } from '@cipher-health/utils/schemas'
+import type z from 'zod'
 
 type AuthentificatorOptions = {
-  mode: UserType
+  mode?: UserType
+  adapter?: AuthentificatorAdapter
   clientOptions?: Omit<ClientOptions, 'threadSafe'>
 }
 
@@ -11,11 +17,24 @@ export class Authentificator {
 
   private client: Client;
   private options: AuthentificatorOptions;
+  private adapter: AuthentificatorAdapter;
 
-  private refreshMutex = new Mutex()
+  private refreshMutex = new Mutex(undefined)
 
   constructor(options?: AuthentificatorOptions) {
-    this.options = options || { mode: 'CLIENT' };
+
+    const {
+      adapter,
+      ...otherOptions
+    } = options || {}
+
+    this.adapter = adapter || new LocalStorageAdapter()
+
+    this.options = {
+      mode: 'CLIENT',
+      clientOptions: {},
+      ...otherOptions
+    }
     this.client = new Client({
       ...this.options.clientOptions,
       threadSafe: true,
@@ -79,15 +98,15 @@ export class Authentificator {
       throw error
     }
 
-    localStorage.setItem('accessToken', res.data.accessToken)
-    localStorage.setItem('refreshToken', res.data.refreshToken)
+    this.setAccessToken(res.data.accessToken)
+    this.setRefreshToken(res.data.refreshToken)
     this.applyHeaders()
     release()
   }
 
   async login({ email, password }: { email: string, password: string }) {
     console.log('login')
-    
+
     // if already connected, do nothing
     if (await this.isConnected()) {
       return
@@ -107,9 +126,15 @@ export class Authentificator {
     if (error) {
       throw error
     }
-    localStorage.setItem('accessToken', res.data.accessToken)
-    localStorage.setItem('refreshToken', res.data.refreshToken)
+    this.setAccessToken(res.data.accessToken)
+    this.setRefreshToken(res.data.refreshToken)
     this.applyHeaders()
+  }
+
+  async signup(body: z.infer<typeof signupSchema>) {
+
+    console.log("Authentificator: ", body)
+
   }
 
   async logout() {
@@ -126,8 +151,8 @@ export class Authentificator {
 
     // Remove tokens from local storage in any case
     // headers will be resetted after the request
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
+    this.removeAccessToken()
+    this.removeRefreshToken()
 
     this.resetHeaders()
   }
@@ -189,10 +214,27 @@ export class Authentificator {
 
 
   private get accessToken() {
-    return localStorage.getItem('accessToken')
+    return this.adapter.accessToken
+  }
+
+  private setAccessToken(token: string) {
+    this.adapter.setAccessToken(token)
   }
 
   private get refreshToken() {
-    return localStorage.getItem('refreshToken')
+    return this.adapter.refreshToken
   }
+
+  private removeRefreshToken() {
+    this.adapter.removeRefreshToken()
+  }
+
+  private removeAccessToken() {
+    this.adapter.removeAccessToken()
+  }
+
+  private setRefreshToken(token: string) {
+    this.adapter.setRefreshToken(token)
+  }
+
 }

@@ -1,12 +1,21 @@
-import { useCallback, useMemo } from "react";
-import type { FormState } from "react-hook-form";
+import { useMemo } from "react";
+import { useFormState } from "react-hook-form";
+import useActiveForm from "./useActiveForm";
 
 
-export default function useFormError<T extends FormState<any>>(formState: T) {
+export default function useFormError(name: string) {
 
-  const getError = useCallback((name: keyof T['errors']) => {
+  const { form } = useActiveForm();
+
+  const formState = useFormState({
+    control: form.control,
+    exact: true,
+    name
+  })
+
+  const errors = useMemo(() => {
     const error = formState.errors[name]
-    if (error) {
+    if (error && formState.submitCount > 0) {
       return {
         isInvalid: true,
         errorText: error.message?.toString()
@@ -15,7 +24,5 @@ export default function useFormError<T extends FormState<any>>(formState: T) {
     return {}
   }, [formState])
 
-  return {
-    getError
-  }
+  return errors
 }

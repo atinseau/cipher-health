@@ -5,7 +5,7 @@
     "up": "docker-compose -f docker/docker-compose.yml up --build -d",
     "down": "docker-compose -f docker/docker-compose.yml down",
     "predev": "pnpm run up",
-    "dev": "FORCE_COLOR=true turbo dev --filter=!@cipher-health/frontend",
+    "dev": "FORCE_COLOR=true turbo dev",
     "clean": "FORCE_COLOR=true turbo clean",
     "fclean": "FORCE_COLOR=true turbo fclean && rm -rf node_modules .turbo pnpm-lock.yaml",
     "build": "FORCE_COLOR=true turbo build",
