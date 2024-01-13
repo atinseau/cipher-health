@@ -3,7 +3,6 @@
 import {
   createContext,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState
@@ -58,10 +57,10 @@ export default function FormProvider(props: FormProviderProps) {
   const formRefs = useRef<FormRefs>({})
 
   const getForm = useCallback((si: number, ssi: number) => {
-    return formRefs.current[si][ssi]
-  }, [])
+    return formRefs.current?.[si]?.[ssi]
+  }, [formRefs])
 
-  const dispatchSubmit = () => {
+  const dispatchSubmit = useCallback(() => {
     const { formRef } = getForm(stepIndex, subStepIndex)
 
     if (!formRef?.current) {
@@ -74,19 +73,29 @@ export default function FormProvider(props: FormProviderProps) {
       bubbles: true,
     }))
 
-    return new Promise<any>((resolve) => {
+    return new Promise<any>((resolve, reject) => {
       formRef.current?.addEventListener('afterSubmit', (e) => {
-        resolve((e as CustomEvent).detail)
+        const { detail } = e as CustomEvent
+        if (detail instanceof Error) {
+          reject(detail)
+          return
+        }
+        resolve(detail)
       }, {
         once: true
       })
     })
-  }
+  }, [stepIndex, subStepIndex])
 
-  const onSubmit = async () => {
-    const data = await dispatchSubmit()
+  const onSubmit = useCallback(async () => {
+    const { formRef } = getForm(stepIndex, subStepIndex)
+    const result = await dispatchSubmit()
 
-    console.log('data', data)
+    if (result === false) {
+      console.log('error')
+      return
+    }
+    console.log('success')
 
     // if (subStepIndex < steps[stepIndex].components.length - 1) {
     //   setSubStepIndex(subStepIndex + 1)
@@ -98,7 +107,7 @@ export default function FormProvider(props: FormProviderProps) {
     //   setSubStepIndex(0)
     //   return
     // }
-  }
+  }, [stepIndex, subStepIndex])
 
   const Component = useMemo(() => {
     const step = steps[stepIndex]

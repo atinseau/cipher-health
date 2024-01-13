@@ -1,8 +1,8 @@
 'use client';
 
-import FormProvider from "@/components/Form/FormProvider";
 import { clientSteps } from "./steps";
 import SignupForm from "./SignupForm";
+import FormProvider from "@/contexts/FormProvider/FormProvider";
 
 export default function Signup() {
 

@@ -3,7 +3,7 @@ import { Authentificator } from "../src"
 import applyMockedLocalStorage from "./mock/localStorage"
 import applyMockedFetch, { createFetchResult, Route } from "./mock/fetch"
 
-const HOST = 'http://localhost:8080/api/v1'
+const HOST = 'http://localhost:8080'
 
 let refreshToken = "0"
 let accessToken = "0"
@@ -89,7 +89,7 @@ describe('Authentificator', () => {
     })
     expect(authentificator).toBeDefined()
     expect(authentificator).toBeInstanceOf(Authentificator)
-    expect(authentificator.getClient()['options'].baseUrl).toBe(HOST)
+    expect(authentificator.getClient()['options'].baseUrl).toBe(HOST + '/api/v1')
   })
 
   it('should be able to login', async () => {

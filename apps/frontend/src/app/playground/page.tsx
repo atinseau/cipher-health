@@ -16,6 +16,7 @@ import { useState } from "react";
 import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
 import DrawInput from "@/components/Inputs/DrawInput";
 import AvatarInput from "@/components/Inputs/AvatarInput";
+import Notif from "@/components/Notif";
 
 export default function Page() {
 
@@ -23,6 +24,36 @@ export default function Page() {
   const [file2, setFile2] = useState<File | undefined>(undefined)
 
   return <div className="flex p-4 gap-10 flex-col items-center">
+
+    <Notif
+      type="file"
+      title="Salut"
+      // message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
+    />
+
+    <Notif
+      type="booking"
+      title="Lorem ipsum dolor"
+      message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
+    />
+
+    <Notif
+      type="info"
+      title="Lorem ipsum dolor"
+      message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
+    />
+
+    <Notif
+      type="success"
+      title="Lorem ipsum dolor"
+      message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
+    />
+
+    <Notif
+      type="error"
+      title="Lorem ipsum dolor"
+      message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
+    />
 
     <div className="w-full flex flex-col gap-6">
       <AvatarInput

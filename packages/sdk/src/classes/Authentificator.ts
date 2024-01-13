@@ -6,6 +6,7 @@ import { LocalStorageAdapter } from "./adapters/LocalStorageAdapter";
 
 import type { signupSchema } from '@cipher-health/utils/schemas'
 import type z from 'zod'
+import type { ClientError } from "./ClientError";
 
 type AuthentificatorOptions = {
   mode?: UserType
@@ -72,9 +73,6 @@ export class Authentificator {
    * only one will refresh the token, the others will wait for the first one to finish
    */
   private async refresh() {
-
-    console.log('refresh')
-
     if (!this.isSoftConnected()) {
       throw new Error('Cannot refresh token, not connected')
     }
@@ -105,8 +103,6 @@ export class Authentificator {
   }
 
   async login({ email, password }: { email: string, password: string }) {
-    console.log('login')
-
     // if already connected, do nothing
     if (await this.isConnected()) {
       return
@@ -131,15 +127,36 @@ export class Authentificator {
     this.applyHeaders()
   }
 
-  async signup(body: z.infer<typeof signupSchema>) {
+  async signup(body: z.infer<typeof signupSchema>): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
+    const [res, error] = await this.client.post('/auth/signup', {
+      body,
+      skipHooks: [
+        'afterRequest'
+      ],
+    })
 
-    console.log("Authentificator: ", body)
+    if (error && error.status === 409) {
+      return [null, [{
+        message: 'Email already used',
+        key: 'email'
+      }]]
+    }
 
+    if (error?.status === 422) {
+      return [null, error.data?.map((e) => ({
+        message: e.message,
+        key: e.path[0]
+      }))]
+    }
+
+    if (error) {
+      return [null, error]
+    }
+
+    return [res, null]
   }
 
   async logout() {
-    console.log('logout')
-
     // If there is no token, do nothing
     if (!this.isSoftConnected()) {
       return
@@ -162,9 +179,6 @@ export class Authentificator {
   }
 
   async isConnected() {
-
-    console.log('isConnected')
-
     if (!this.isSoftConnected()) {
       return false
     }
@@ -181,9 +195,6 @@ export class Authentificator {
   }
 
   async me() {
-
-    console.log('me')
-
     let endpoint = '/user/me'
 
     if (this.options.mode === 'ADMIN') {

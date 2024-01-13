@@ -1,9 +1,9 @@
 'use client';
 
-import DisplayFormStep from "@/components/Form/DisplayFormStep";
-import { useFormContext } from "@/components/Form/hooks/useFormContext";
 import StepBar from "@/components/StepBar";
 import SignupControl from "./SignupControl";
+import { useFormContext } from "@/contexts/FormProvider/hooks/useFormContext";
+import DisplayFormStep from "@/contexts/FormProvider/DisplayFormStep";
 
 
 export default function SignupForm() {

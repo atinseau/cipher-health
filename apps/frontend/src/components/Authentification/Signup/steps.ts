@@ -1,4 +1,4 @@
-import { FormStep } from "@/components/Form/FormProvider";
+import { FormStep } from "@/contexts/FormProvider/FormProvider";
 import SignupAddress from "./Steps/SignupAddress";
 import SignupMedicalInformation from "./Steps/SignupClient/SignupMedicalInformation";
 import SignupInformation from "./Steps/SignupInformation";

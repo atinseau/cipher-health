@@ -1,9 +1,8 @@
 'use client';
 
 import Button from "@/components/Button";
-import useActiveForm from "@/components/Form/hooks/useActiveForm";
-import useValidForm from "@/components/Form/hooks/useValidForm";
-import { useEffect } from "react";
+import useActiveForm from "@/contexts/FormProvider/hooks/useActiveForm";
+import useValidForm from "@/contexts/FormProvider/hooks/useValidForm";
 import { FaArrowRightLong } from "react-icons/fa6";
 
 

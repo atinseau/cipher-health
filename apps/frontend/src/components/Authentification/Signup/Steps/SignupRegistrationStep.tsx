@@ -3,18 +3,19 @@ import { AiOutlineMail } from "react-icons/ai";
 import { Divider } from "@nextui-org/divider";
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signupSchema } from "@cipher-health/utils/schemas";
-import { useFormStep } from "@/components/Form/hooks/useFormStep";
 
-import PasswordConfirmationField from "@/components/Form/Fields/PasswordConfirmationField";
-import TextField from "@/components/Form/Fields/TextField";
-import PasswordField from "@/components/Form/Fields/PasswordField";
-import CountryField from "@/components/Form/Fields/CountryField";
 import AuthFormContainer from "../../AuthFormContainer";
 import InputGroup from "@/components/Inputs/InputGroup";
 
-import { useAuthentificator } from '@cipher-health/sdk/react'
-
 import z from "zod";
+import { useFormStep, FormStepSubmitHandler } from "@/contexts/FormProvider/hooks/useFormStep";
+import TextField from "@/contexts/FormProvider/Fields/TextField";
+import PasswordField from "@/contexts/FormProvider/Fields/PasswordField";
+import PasswordConfirmationField from "@/contexts/FormProvider/Fields/PasswordConfirmationField";
+import CountryField from "@/contexts/FormProvider/Fields/CountryField";
+import useSignup from "@/contexts/AuthProvider/hooks/useSignup";
+import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
+import { useEffect } from "react";
 
 
 const defaultValues = {
@@ -25,20 +26,25 @@ const defaultValues = {
   "country": "FR"
 }
 
-
 export default function SignupRegistrationStep() {
 
-  const { handleSubmit, formRef } = useFormStep<z.infer<typeof signupSchema>>({
+  const { handleSubmit, formRef, setErrors } = useFormStep<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues,
   })
-  
-  const authentificator = useAuthentificator()
 
-  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
-    // throw new Error('test')
+  const signup = useSignup()
 
-    authentificator.signup(data)
+  const onSubmit: FormStepSubmitHandler<z.infer<typeof signupSchema>> = async (data) => {
+
+    const [_, errors] = await signup(data)
+
+    if (errors) {
+      setErrors(errors)
+      return false
+    }
+
+    return true
   }
 
   return <AuthFormContainer

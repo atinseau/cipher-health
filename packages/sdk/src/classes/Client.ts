@@ -60,11 +60,15 @@ export class Client {
   private options: ClientOptions = {}
 
   constructor(options?: ClientOptions) {
+
+    const baseUrl = options?.baseUrl || HOST
+    const suffix = '/api/v1'
+
     this.options = {
       threadSafe: false,
-      baseUrl: HOST,
       maxRetry: 3,
-      ...options || {}
+      ...options || {},
+      baseUrl: baseUrl.endsWith('/') ? baseUrl.slice(0, -1) + suffix : baseUrl + suffix,
     }
   }
 
@@ -177,7 +181,6 @@ export class Client {
           ...init.headers,
         }
       })
-
 
       if (this.hooks['afterRequest'] && !config.skipHooks?.includes('afterRequest')) {
         try {

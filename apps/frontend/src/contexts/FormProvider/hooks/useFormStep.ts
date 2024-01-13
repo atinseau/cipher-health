@@ -1,6 +1,11 @@
-import { UseFormProps, useForm, type FieldValues } from "react-hook-form"
-import { useCallback, useEffect, useRef } from "react"
+import { Path, UseFormProps, useForm, type FieldValues } from "react-hook-form"
+import { BaseSyntheticEvent, useCallback, useEffect, useRef } from "react"
 import { useFormContext } from "./useFormContext"
+
+export type FormStepSubmitHandler<T = any> = (
+  data: T,
+  e?: BaseSyntheticEvent<object, any, any>
+) => Promise<boolean>
 
 export const useFormStep = <
   TFieldValues extends FieldValues = FieldValues,
@@ -35,7 +40,7 @@ export const useFormStep = <
     }
   }, [])
 
-  const handleSubmit = useCallback((onSubmit: any) => {
+  const handleSubmit = useCallback((onSubmit: FormStepSubmitHandler) => {
     return form.handleSubmit(async (data, event) => {
       let result = null
       try {
@@ -50,9 +55,20 @@ export const useFormStep = <
     })
   }, [])
 
+  const setErrors = useCallback((errors: Array<{ key: string, message: string }>) => {
+
+    for (const error of errors) {
+      form.setError(error.key as Path<TFieldValues>, {
+        message: error.message,
+      })
+    }
+
+  }, [])
+
   return {
     ...form,
     handleSubmit,
+    setErrors,
     formRef,
   }
 }
