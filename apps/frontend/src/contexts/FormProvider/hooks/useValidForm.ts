@@ -1,38 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
-import { useFormContext } from "./useFormContext";
 import useActiveForm from "./useActiveForm";
-import { useFormState } from "react-hook-form";
-
 
 export default function useValidForm() {
 
   const { form } = useActiveForm();
-
-  const formState = useFormState({
-    control: form.control
-  })
-
   const [isValid, setIsValid] = useState(false);
 
-  useEffect(() => {
-    if (Object.keys(formState.errors).length !== 0) {
-      setIsValid(false)
-      return
-    }
-    setIsValid(true)
-  }, [formState])
-
-  const trigger = useCallback(() => {
-    form.trigger()
-  }, [])
+  const validate = useCallback(() => {
+    form.trigger().then(setIsValid)
+  }, [
+    form,
+    form.trigger
+  ])
 
   useEffect(() => {
-    trigger()
-    const subscription = form.watch(trigger);
+    // Set initial validity to false if there are errors on mount
+    // setIsValid(false)
+    validate() // Trigger validation on mount
+    const subscription = form.watch(validate); // Trigger validation on change
     return () => {
       subscription.unsubscribe();
     };
-  }, [form.watch])
+  }, [
+    validate,
+    form.watch
+  ])
 
   return isValid
 }

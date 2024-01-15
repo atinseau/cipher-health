@@ -15,7 +15,7 @@ export default function SignupForm() {
       <StepBar
         currentStep={stepIndex}
         steps={steps.map(step => ({
-          title: step.title
+          title: step.title, 
         }))}
       />
       <DisplayFormStep />

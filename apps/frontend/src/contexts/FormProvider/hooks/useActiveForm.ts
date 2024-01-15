@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useFormContext } from "./useFormContext";
 
 export default function useActiveForm() {
@@ -9,7 +10,16 @@ export default function useActiveForm() {
     subStepIndex,
   } = useFormContext();
 
-  const form = getForm(stepIndex, subStepIndex);
+  const form = useMemo(() => {
+    return getForm(stepIndex, subStepIndex)
+  }, [
+    stepIndex,
+    subStepIndex
+  ])
+
+  if (!form) {
+    throw new Error('No form found in context')
+  }
 
   return {
     form,

@@ -39,14 +39,33 @@ describe('Client class', () => {
 
     const mockedFetch = applyMockedFetch({
       error: true,
-      data: JSON.stringify({ "message": "error" }), // to prevent json parsing error
+      // we can't name "data" message because client error will automatically set the message to .message property
+      data: JSON.stringify({ "data": "error" }), // to prevent json parsing error
     })
 
     const [data, error] = await client.get('mocked-url')
 
     expect(data).toBeNull()
     expect(error).toBeInstanceOf(ClientError)
-    expect(error?.message).toBe(JSON.stringify({ "message": "error" }))
+    expect(error?.message).toBe(JSON.stringify({ "data": "error" }))
+
+    mockedFetch.mockRestore()
+  })
+
+  it('should be able to auto parse {.message} error response', async () => {
+
+    let client = new Client()
+
+    const mockedFetch = applyMockedFetch({
+      error: true,
+      data: JSON.stringify({ "message": "Salut les gars comment ca va mdr ?" }), // to prevent json parsing error
+    })
+
+    const [data, error] = await client.get('mocked-url')
+
+    expect(data).toBeNull()
+    expect(error).toBeInstanceOf(ClientError)
+    expect(error?.message).toBe("Salut les gars comment ca va mdr ?")
 
     mockedFetch.mockRestore()
   })

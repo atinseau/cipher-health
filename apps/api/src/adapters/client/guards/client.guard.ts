@@ -32,7 +32,7 @@ export class ClientGuard implements CanActivate {
       }
     })
     if (!client) {
-      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'There is no client associated with this user.')
+      throw createRawHttpError(HttpStatus.FORBIDDEN, 'There is no client associated with this user.')
     }
 
     user.client = client

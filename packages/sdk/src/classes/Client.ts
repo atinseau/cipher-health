@@ -193,7 +193,7 @@ export class Client {
           })
           await next
         } catch (e) {
-          console.error('Error in afterRequest hook', e)
+          console.error('Error in afterRequest hook', url, e)
           // TODO: handle error
         }
       }

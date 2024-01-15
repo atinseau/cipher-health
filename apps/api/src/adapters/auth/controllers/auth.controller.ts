@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { signinSchema, signupSchema } from '../auth.schema';
 import { UserService } from '../../user/user.service';
 import { omit } from 'lodash';
@@ -14,6 +14,7 @@ import { AuthGuard } from '../guards/auth.guard';
 // import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UserType } from '@prisma/client';
 import { dateIsExpired } from '@cipher-health/utils';
+import { SignupInfo } from '../auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -93,47 +94,73 @@ export class AuthController {
   // If the user is already created, verified and completed 
   // the signup info, return an error
   // in other cases, return the signup process info
+  // ---
+  // This function should work with stwt method and also with access token method
+  // to get the signup info of a regular user registration (without stwt)
   @Get('signup/info')
-  async signupProcessInfo(@Query('stwt') stwt: string) {
+  async signupProcessInfo(
+    @Query('stwt') stwt: string,
+    @AccessToken() accessToken: string
+  ): Promise<{ success: boolean, data: SignupInfo }> {
+    let userId: string | undefined = undefined
 
-    const stwtResult = await this.authService.findStwtByToken(stwt)
-    if (!stwtResult.success) {
-      throw createHttpError(stwtResult, {
-        STWT_NOT_FOUND: HttpStatus.NOT_FOUND,
-      })
-    }
+    if (stwt) {
+      const stwtResult = await this.authService.findStwtByToken(stwt)
+      if (!stwtResult.success) {
+        throw createHttpError(stwtResult, {
+          STWT_NOT_FOUND: HttpStatus.NOT_FOUND,
+        })
+      }
 
-    // In this case "signup/info" route is called without any guard
-    // so because the expiration check is done in "AuthGuard" we need to manually check it here
-    // with the "expiresAt" field in the associated entry in db (token = stwt, model = Stwt)
-    if (stwtResult.data.expiresAt && dateIsExpired(stwtResult.data.expiresAt)) {
-      await this.authService.cleanupStwtFailProcess(stwt)
-      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Signup token expired.')
-    }
-    // In this case, the signup token have never been used
-    // isn't owned by any user and is not deleted
-    // so it's a valid signup token for a user creation
-    if (!stwtResult.data.expiresAt || !stwtResult.data.consumerId) {
-      return {
-        success: true,
-        data: {
-          status: 'USER_NOT_CREATED'
+      // In this case "signup/info" route is called without any guard
+      // so because the expiration check is done in "AuthGuard" we need to manually check it here
+      // with the "expiresAt" field in the associated entry in db (token = stwt, model = Stwt)
+      if (stwtResult.data.expiresAt && dateIsExpired(stwtResult.data.expiresAt)) {
+        await this.authService.cleanupStwtFailProcess(stwt)
+        throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Signup token expired.')
+      }
+      // In this case, the signup token have never been used
+      // isn't owned by any user and is not deleted
+      // so it's a valid signup token for a user creation
+      if (!stwtResult.data.expiresAt || !stwtResult.data.consumerId) {
+        return {
+          success: true,
+          data: {
+            status: 'USER_NOT_CREATED'
+          }
         }
       }
+
+      // In this case, the signup token have been used
+      // is owned by a user and is not deleted
+      userId = stwtResult.data.consumerId
+    } else if (accessToken) {
+      const jwtResult = await this.jwtService.verify<UserToken>(accessToken, process.env.ACCESS_TOKEN_SECRET)
+      if (!jwtResult || await this.jwtService.isBlacklisted(accessToken)) {
+        throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid access token.')
+      }
+      userId = jwtResult.id
     }
 
-    // In this case, the signup token have been used
-    // fetch the user that used the signup token
-    const userResult = await this.userService.findById(stwtResult.data.consumerId)
+    if (!userId) {
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide a signup token or an access token.')
+    }
+
+    const userResult = await this.userService.findById(userId)
 
     // usually this should never happen
     // if a signup token exists, and it's used (expiresAt and consumerId not null)
     // it should be owned by a user
-    if (!userResult.success) {
+    // in jwt case, the user could be not found if the token is valid but the user is deleted
+    // or token is expired or invalid
+    if (!userResult || !userResult.success) {
       throw createHttpError(userResult, {
         USER_NOT_FOUND: HttpStatus.NOT_FOUND,
       })
     }
+
+    // After stwt check, it's common for both stwt and access token methods
+    // we need to check if the user is verified and completed
 
     if (!userResult.data.verified) {
       return {
@@ -159,6 +186,10 @@ export class AuthController {
         }
       }
     }
+
+    // If the user is verified and completed, return an error
+    // because it's not possible to signup again
+    throw createRawHttpError(HttpStatus.FORBIDDEN, 'User already completed the signup process.')
   }
 
 

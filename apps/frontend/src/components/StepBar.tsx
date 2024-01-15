@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 
 type LinkItemProps = {
   isActive?: boolean
@@ -27,11 +28,11 @@ const StepItem = ({ title, isActive, isCompleted, rightLink, leftLink }: StepIte
       "text-indigo-500": isActive,
       "text-gray-500": !isActive,
     })}>{title}</p>
-    <span className={clsx("bg-white z-10 flex content-[''] w-[16px] h-[16px] border-[2px] rounded-full", {
+    <span className={twMerge(clsx("bg-white z-10 flex content-[''] w-[16px] h-[16px] border-[2px] rounded-full", {
       "border-indigo-500": isActive,
       "border-gray-500": !isActive,
       "bg-indigo-500 !border-indigo-500": isCompleted,
-    })} />
+    }))} />
 
     {leftLink && <LinkItem className="right-1/2" {...leftLink} />}
     {rightLink && <LinkItem className="left-1/2" {...rightLink} />}

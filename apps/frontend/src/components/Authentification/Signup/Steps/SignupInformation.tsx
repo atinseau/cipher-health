@@ -3,15 +3,24 @@ import TextInput from "@/components/Inputs/TextInput";
 import DateInput from "@/components/Inputs/DateInput";
 import InformationCard from "@/components/Card/InformationCard";
 import AuthFormContainer from "../../AuthFormContainer";
+import { FormStepSubmitHandler, useFormStep } from "@/contexts/FormProvider/hooks/useFormStep";
+import { useCallback } from "react";
 
 
 export default function SignupInformation() {
+
+  const { handleSubmit, formRef } = useFormStep()
+
+  const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
+    console.log(data)
+    return false
+  }, [])
 
   return <AuthFormContainer
     title="Lorem ipsum"
     variant="full"
   >
-    <div className="flex flex-col gap-6">
+    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <RadioInput
         label="Vous êtes :"
         subLabel="La réglementation du système de santé français nous oblige à vous demander cette information."
@@ -66,7 +75,7 @@ export default function SignupInformation() {
         isRequired
         placeholder="Votre lieu de naissance"
       />
-    </div>
+    </form>
 
     <InformationCard>
       <p>Les informations ci-dessus seront transmises au médecin lors des RDV</p>

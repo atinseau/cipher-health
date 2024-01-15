@@ -1,15 +1,16 @@
 import { Mutex } from "async-mutex";
 import { Client, ClientOptions } from "./Client"
-import { UserType, UserModel } from '@cipher-health/api'
+import { UserType, UserModel, SignupInfo } from '@cipher-health/api'
 import { AuthentificatorAdapter } from "./adapters/AuthentificatorAdapter";
 import { LocalStorageAdapter } from "./adapters/LocalStorageAdapter";
 
 import type { signupSchema } from '@cipher-health/utils/schemas'
 import type z from 'zod'
-import type { ClientError } from "./ClientError";
+import { ClientError } from "./ClientError";
 
 type AuthentificatorOptions = {
   mode?: UserType
+  debug?: boolean
   adapter?: AuthentificatorAdapter
   clientOptions?: Omit<ClientOptions, 'threadSafe'>
 }
@@ -20,7 +21,12 @@ export class Authentificator {
   private options: AuthentificatorOptions;
   private adapter: AuthentificatorAdapter;
 
-  private refreshMutex = new Mutex(undefined)
+  private DEBUG_MODE = false
+
+  private refreshing = {
+    mutex: new Mutex(undefined),
+    success: false
+  }
 
   constructor(options?: AuthentificatorOptions) {
 
@@ -29,6 +35,7 @@ export class Authentificator {
       ...otherOptions
     } = options || {}
 
+    this.DEBUG_MODE = !!otherOptions.debug
     this.adapter = adapter || new LocalStorageAdapter()
 
     this.options = {
@@ -47,12 +54,20 @@ export class Authentificator {
       // If the refresh fails, the initial request will fail
       // and it's the responsability to the user to handle the error
       if (res.status === 401 && controller.retryCount === 0) {
-        await this.refresh()
-        return controller.retry()
+        if (await this.refresh(res.url)) {
+          controller.retry()
+        }
       }
     })
 
     this.applyHeaders()
+  }
+
+  private debug(method: string, ...args: any[]) {
+    if (!this.DEBUG_MODE) {
+      return
+    }
+    console.log(`[Authentificator] ${method}`, ...args)
   }
 
   private applyHeaders() {
@@ -67,21 +82,29 @@ export class Authentificator {
     this.client.removeHeaders()
   }
 
+  private clearSession() {
+    this.removeRefreshToken()
+    this.removeAccessToken()
+    this.resetHeaders()
+  }
+
   /**
    * This function is thread safe
    * that means that if multiple requests are made at the same time
    * only one will refresh the token, the others will wait for the first one to finish
    */
-  private async refresh() {
+  private async refresh(url?: string) {
+    this.debug('refresh', ' - ', url)
     if (!this.isSoftConnected()) {
       throw new Error('Cannot refresh token, not connected')
     }
 
-    if (this.refreshMutex.isLocked()) {
-      return this.refreshMutex.waitForUnlock()
+    if (this.refreshing.mutex.isLocked()) {
+      await this.refreshing.mutex.waitForUnlock()
+      return this.refreshing.success
     }
 
-    const release = await this.refreshMutex.acquire()
+    const release = await this.refreshing.mutex.acquire()
 
     let [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/refresh', {
       skipHooks: ['afterRequest'],
@@ -92,42 +115,57 @@ export class Authentificator {
     })
 
     if (error) {
+      // If the refresh token is invalid, we remove it from the adapter
+      this.clearSession()
       release()
-      throw error
+      this.refreshing.success = false
+      return false
     }
 
     this.setAccessToken(res.data.accessToken)
     this.setRefreshToken(res.data.refreshToken)
     this.applyHeaders()
     release()
+
+    this.refreshing.success = true
+    return true
   }
 
   async login({ email, password }: { email: string, password: string }) {
-    // if already connected, do nothing
-    if (await this.isConnected()) {
-      return
-    }
-
-    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/signin', {
-      skipHooks: ['afterRequest'],
-      query: {
-        type: this.options.mode || 'CLIENT'
-      },
-      body: {
-        email,
-        password,
+    this.debug('login', email, password)
+    try {
+      // if already connected, do nothing
+      if (await this.isConnected()) {
+        return
       }
-    })
+      const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/signin', {
+        skipHooks: ['afterRequest'],
+        query: {
+          type: this.options.mode || 'CLIENT'
+        },
+        body: {
+          email,
+          password,
+        }
+      })
 
-    if (error) {
-      throw error
+      if (error) {
+        throw error
+      }
+      this.setAccessToken(res.data.accessToken)
+      this.setRefreshToken(res.data.refreshToken)
+      this.applyHeaders()
+    } catch (e) {
+      // At this point, the user is not connected
+      // and login attempt failed, so refreshing also failed
+      // we can safely remove the tokens from the adapter before throwing the error
+      this.clearSession()
+      throw e
     }
-    this.setAccessToken(res.data.accessToken)
-    this.setRefreshToken(res.data.refreshToken)
-    this.applyHeaders()
   }
 
   async signup(body: z.infer<typeof signupSchema>): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
+    this.debug('signup', body)
     const [res, error] = await this.client.post('/auth/signup', {
       body,
       skipHooks: [
@@ -156,7 +194,31 @@ export class Authentificator {
     return [res, null]
   }
 
+  async sendVerificationCode() {
+    this.debug('sendVerificationCode')
+    const [_, error] = await this.client.get('/auth/verify')
+    if (error) {
+      return false
+    }
+    return true
+  }
+
+  async verify(code: string): Promise<[any, ClientError | null]> {
+    this.debug('verify', code)
+    const [res, error] = await this.client.post('/auth/verify/callback', {
+      body: {
+        code
+      }
+    })
+    return [
+      res?.data || null,
+      error
+    ]
+  }
+
   async logout() {
+    this.debug('logout')
+
     // If there is no token, do nothing
     if (!this.isSoftConnected()) {
       return
@@ -168,33 +230,76 @@ export class Authentificator {
 
     // Remove tokens from local storage in any case
     // headers will be resetted after the request
-    this.removeAccessToken()
-    this.removeRefreshToken()
-
-    this.resetHeaders()
+    this.clearSession()
   }
 
   private isSoftConnected() {
     return !!this.accessToken && !!this.refreshToken
   }
 
-  async isConnected() {
+  async isSafelyConnected() {
     if (!this.isSoftConnected()) {
-      return false
+      return {
+        success: false,
+        data: null
+      }
     }
 
     // Check if the token is still valid by trying to fetch the user profile
     try {
       await this.me()
     } catch (e) {
-      console.error('isConnected', e)
-      return false
+
+      // If the server is down, throw the error to the user
+      if (e.status === 500) {
+        throw e
+      }
+
+      // 403 is not an error, it means that the user havn't completed his profile yet
+      // so is considered as connected
+      if (e.status === 403) {
+        return {
+          success: true,
+          data: e
+        }
+      }
+
+      return {
+        success: false,
+        data: e
+      }
     }
 
-    return true
+    return {
+      success: true,
+      data: null
+    }
   }
 
-  async me() {
+  // this method should never throw an error
+  async getSignupInfo() {
+    this.debug('getSignupInfo')
+    if (!this.isSoftConnected()) {
+      return null
+    }
+
+    const [res, error] = await this.client.get<{ data: SignupInfo }>('/auth/signup/info')
+
+    if (error) {
+      return null
+    }
+
+    return res.data
+  }
+
+  async isConnected() {
+    const result = await this.isSafelyConnected()
+    return result.success
+  }
+
+  async me(): Promise<UserModel> {
+    this.debug('me')
+
     let endpoint = '/user/me'
 
     if (this.options.mode === 'ADMIN') {
@@ -208,6 +313,7 @@ export class Authentificator {
     const [res, error] = await this.client.get<{ data: UserModel }>(endpoint, {
       ttl: 5000
     })
+
     if (error) {
       throw error
     }

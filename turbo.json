@@ -16,6 +16,9 @@
         "^build"
       ]
     },
+    "start": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     },

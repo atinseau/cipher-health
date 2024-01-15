@@ -1,23 +1,23 @@
 import { AuthentificatorAdapter } from "./AuthentificatorAdapter";
-
+import Cookies from 'js-cookie'
 
 export class CookieAdapter implements AuthentificatorAdapter {
-  get accessToken(): string {
-    return ""
+  get accessToken() {
+    return Cookies.get('accessToken')
   }
-  get refreshToken(): string {
-    return ""
+  get refreshToken() {
+    return Cookies.get('refreshToken')
   }
   setAccessToken(token: string): void {
-    throw new Error("Method not implemented.");
+    Cookies.set('accessToken', token)
   }
   setRefreshToken(token: string): void {
-    throw new Error("Method not implemented.");
+    Cookies.set('refreshToken', token)
   }
   removeRefreshToken(): void {
-    throw new Error("Method not implemented.");
+    Cookies.remove('refreshToken')
   }
   removeAccessToken(): void {
-    throw new Error("Method not implemented.");
+    Cookies.remove('accessToken')
   }
 }

@@ -2,8 +2,6 @@ import ForgotPassword from "@/components/Authentification/ForgotPassword/ForgotP
 import ForgotPasswordReset from "@/components/Authentification/ForgotPassword/ForgotPasswordReset";
 import SigninCredential from "@/components/Authentification/Signin/SigninCredential";
 import SigninTwoFa from "@/components/Authentification/Signin/SigninTwoFa";
-import SignupTwoFa from "@/components/Authentification/Signup/Steps/SignupTwoFa";
-import SignupInformation from "@/components/Authentification/Signup/Steps/SignupInformation";
 import SignupAddress from "@/components/Authentification/Signup/Steps/SignupAddress";
 import Link from "next/link";
 import SignupDescription from "@/components/Authentification/Signup/Steps/SignupWorker/SignupDescription";
@@ -29,10 +27,6 @@ export default function Page() {
 
     <SignupMedicalInformation />
     <SignupAddress />
-
-    <SignupInformation />
-    <SignupTwoFa />
-    {/* <SignupRegistrationStep /> */}
 
     <ForgotPasswordReset />
     <ForgotPassword />

@@ -14,9 +14,6 @@ import PasswordField from "@/contexts/FormProvider/Fields/PasswordField";
 import PasswordConfirmationField from "@/contexts/FormProvider/Fields/PasswordConfirmationField";
 import CountryField from "@/contexts/FormProvider/Fields/CountryField";
 import useSignup from "@/contexts/AuthProvider/hooks/useSignup";
-import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
-import { useEffect } from "react";
-
 
 const defaultValues = {
   "email": "arthurtinseau@live.fr",

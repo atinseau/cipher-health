@@ -22,9 +22,7 @@ export default function CodeInput({ onChange, minLength = 6 }: CodeInputProps) {
       return
 
     const codeString = code.join('')
-    if (codeString.length >= minLength) {
-      onChange(codeString)
-    }
+    onChange(codeString.length < minLength ? '' : codeString)
   }, [code])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, i: number) => {

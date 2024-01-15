@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useMemo, useRef } from "react";
+import React, { createContext, forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { Authentificator } from "../../classes/Authentificator";
 import { AuthentificatorAdapter } from "../../classes/adapters/AuthentificatorAdapter";
 import { LocalStorageAdapter } from "../../classes/adapters/LocalStorageAdapter";
@@ -13,11 +13,12 @@ type AuthentificatorProviderProps = {
   children: React.ReactNode
   baseUrl: string
   adapter?: AuthentificatorAdapter
+  debug?: boolean
 }
 
 export const AuthentificatorContext = createContext({} as IAuthentificatorContext)
 
-export default function AuthentificatorProvider(props: AuthentificatorProviderProps) {
+const AuthentificatorProvider = forwardRef<Authentificator, AuthentificatorProviderProps>((props, ref) => {
 
   const authentificatorRef = useRef<Authentificator>()
 
@@ -28,6 +29,7 @@ export default function AuthentificatorProvider(props: AuthentificatorProviderPr
 
     authentificatorRef.current = new Authentificator({
       adapter: props.adapter,
+      debug: props.debug || false,
       clientOptions: {
         baseUrl: props.baseUrl,
       }
@@ -38,7 +40,11 @@ export default function AuthentificatorProvider(props: AuthentificatorProviderPr
     authentificator: authentificatorRef.current!
   }), [])
 
+  useImperativeHandle(ref, () => authentificatorRef.current!)
+
   return <AuthentificatorContext.Provider value={value}>
     {props.children}
   </AuthentificatorContext.Provider>
-}
+})
+
+export default AuthentificatorProvider

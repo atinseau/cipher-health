@@ -15,7 +15,11 @@ export class ClientError extends Error {
     const error = options?.error?.message || options?.data?.error || options?.data?.errors || options?.data || 'Unknown error'
     let message = error
 
-    super(typeof message !== 'string' ? JSON.stringify(message) : message)
+    if (typeof message === 'object') {
+      message = message?.message || JSON.stringify(message)
+    }
+
+    super(message)
 
     this.status = options.status
     this.data = error

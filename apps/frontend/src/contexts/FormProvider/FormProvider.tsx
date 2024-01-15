@@ -8,15 +8,21 @@ import {
   useState
 } from "react";
 import { UseFormReturn } from "react-hook-form";
+import useNotify from "../NotificationProvider/hooks/useNotify";
 
 export type FormStep = {
   title: string
   components: React.ComponentType[]
 }
 
+export type BeforeStepChangeHandler = (stepIndex: number, subStepIndex?: number) => Promise<any> | any
+
 type FormProviderProps = {
   children: React.ReactNode
+  initialStepIndex?: number
+  initialSubStepIndex?: number
   steps: FormStep[]
+  beforeStepChange?: BeforeStepChangeHandler
 }
 
 type FormRefs = Record<number, Record<number,
@@ -49,16 +55,47 @@ export const FormContext = createContext({} as IFormContext)
 
 export default function FormProvider(props: FormProviderProps) {
 
-  const { children, steps } = props
+  const {
+    children,
+    steps,
+    initialStepIndex = 0,
+    initialSubStepIndex = 0,
+    beforeStepChange,
+  } = props
 
-  const [stepIndex, setStepIndex] = useState(0)
-  const [subStepIndex, setSubStepIndex] = useState(0)
+  const [stepIndex, setStepIndex] = useState(initialStepIndex)
+  const [subStepIndex, setSubStepIndex] = useState(initialSubStepIndex)
 
   const formRefs = useRef<FormRefs>({})
+
+  const notify = useNotify()
 
   const getForm = useCallback((si: number, ssi: number) => {
     return formRefs.current?.[si]?.[ssi]
   }, [formRefs])
+
+  const changeStep = useCallback(async (stepConfig: { si: number, ssi?: number }) => {
+    const {
+      si,
+      ssi
+    } = stepConfig
+
+    if (si === stepIndex && ssi === subStepIndex) {
+      return
+    }
+    const beforeStepChangeResult = await beforeStepChange?.(si, ssi)
+    if (!beforeStepChangeResult) {
+      return
+    }
+    setStepIndex(si)
+    if (typeof ssi !== 'undefined') { // 0 is a valid value
+      setSubStepIndex(ssi)
+    }
+  }, [
+    beforeStepChange,
+    stepIndex,
+    subStepIndex,
+  ])
 
   const dispatchSubmit = useCallback(() => {
     const { formRef } = getForm(stepIndex, subStepIndex)
@@ -73,11 +110,16 @@ export default function FormProvider(props: FormProviderProps) {
       bubbles: true,
     }))
 
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<boolean>((resolve) => {
       formRef.current?.addEventListener('afterSubmit', (e) => {
         const { detail } = e as CustomEvent
         if (detail instanceof Error) {
-          reject(detail)
+          notify({
+            title: 'Une erreur est survenue',
+            message: detail.message,
+            type: 'error',
+          })
+          resolve(false)
           return
         }
         resolve(detail)
@@ -88,25 +130,28 @@ export default function FormProvider(props: FormProviderProps) {
   }, [stepIndex, subStepIndex])
 
   const onSubmit = useCallback(async () => {
-    const { formRef } = getForm(stepIndex, subStepIndex)
     const result = await dispatchSubmit()
 
-    if (result === false) {
-      console.log('error')
+    if (!result) {
+      console.warn('[FormProvider] Step change was prevented by onSubmit handler')
       return
     }
-    console.log('success')
 
-    // if (subStepIndex < steps[stepIndex].components.length - 1) {
-    //   setSubStepIndex(subStepIndex + 1)
-    //   return
-    // }
+    if (subStepIndex < steps[stepIndex].components.length - 1) {
+      changeStep({
+        si: stepIndex, // same step
+        ssi: subStepIndex + 1
+      })
+      return
+    }
 
-    // if (stepIndex < steps.length - 1) {
-    //   setStepIndex(stepIndex + 1)
-    //   setSubStepIndex(0)
-    //   return
-    // }
+    if (stepIndex < steps.length - 1) {
+      changeStep({
+        si: stepIndex + 1, // next step
+        ssi: 0, // first substep
+      })
+      return
+    }
   }, [stepIndex, subStepIndex])
 
   const Component = useMemo(() => {
@@ -121,8 +166,8 @@ export default function FormProvider(props: FormProviderProps) {
 
   const subscribe: FormContextSubscribe = useCallback((si, ssi, form, formRef) => {
     formRefs.current[si] = {
-      ...formRefs.current[ssi],
-      [subStepIndex]: {
+      ...formRefs.current[si],
+      [ssi]: {
         ...form,
         formRef
       }
