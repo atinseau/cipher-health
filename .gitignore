@@ -1,4 +1,8 @@
 node_modules
 docker/data
 .turbo
+
 .env.local
+.env
+*.env
+**/.env

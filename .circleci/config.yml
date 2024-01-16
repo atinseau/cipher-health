@@ -79,28 +79,25 @@ commands:
     - run:
         name: "Upgrade Helm Chart"
         command: |
-          helm upgrade \
-            -n $CIRCLE_BRANCH --create-namespace \
-            --install <<parameters.release-name>> <<parameters.chart-path>> \
+          helm template <<parameters.release-name>> <<parameters.chart-path>> \
+            -n $CIRCLE_BRANCH \
             -f ./k8s/values.yaml \
             <<parameters.extra-args>>
 
-
 jobs:
-  hello-world:
-    docker:
-    - image: cimg/base:stable
-    steps:
-    - run:
-        name: Hello world
-        command: echo "Hello world"
-    - run:
-        name: Print project variables
-        command: echo $CR_PAT
-    - run:
-        name: Print context variables
-        command: echo $MESSAGE <<pipeline.git.branch>>
-   
+  # hello-world:
+  #   docker:
+  #   - image: cimg/base:stable
+  #   steps:
+  #   - run:
+  #       name: Hello world
+  #       command: echo "Hello world"
+  #   - run:
+  #       name: Print project variables
+  #       command: echo $CR_PAT
+  #   - run:
+  #       name: Print context variables
+  #       command: echo $MESSAGE <<pipeline.git.branch>>
   deploy-frontend:
     docker:
     - image: cimg/base:stable
@@ -157,7 +154,8 @@ jobs:
 workflows:
   main-workflow:
     jobs:
-      - hello-world:
+    # - hello-world:
+    #     context: <<pipeline.git.branch>>
+      - deploy-api:
           context: <<pipeline.git.branch>>
-    # - deploy-api
     # - deploy-frontend
