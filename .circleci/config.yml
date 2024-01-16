@@ -99,6 +99,8 @@ jobs:
         image-context: .
         image-path: ./k8s/frontend/docker/build.Dockerfile
         image-name: ch-frontend
+        # extra-args: |
+          # --build-arg
     - helm-upgrade:
         release-name: ch-frontend
         chart-path: ./k8s/frontend/helm
@@ -107,8 +109,20 @@ jobs:
           --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
           --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
-
+  deploy-api:
+    docker:
+    - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup-runner
+      - setup-k8s
+      - setup-docker
+      - push-image:
+          image-context: .
+          image-path: ./k8s/api/docker/build.Dockerfile
+          image-name: ch-api
 workflows:
   main-workflow:
     jobs:
-    - deploy-frontend
+      - deploy-api
+    # - deploy-frontend
