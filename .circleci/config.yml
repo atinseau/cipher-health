@@ -137,6 +137,9 @@ jobs:
           chart-path: ./k8s/api/helm
           extra-args: |
             --set api.ingress.host=ch-api.$CIRCLE_BRANCH.com \
+            --set api.image.name=ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
+            --set api.image.pullSecrets.name=regcred \
+            --set api.image.pullPolicy=Always \
             --set nestjs.secrets.ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
             --set nestjs.secrets.REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
             --set nestjs.secrets.STWT_SECRET=$STWT_SECRET \
