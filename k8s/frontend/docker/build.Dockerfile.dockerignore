@@ -6,4 +6,3 @@ k8s
 docker
 .circleci
 .git
-apps/frontend/.env

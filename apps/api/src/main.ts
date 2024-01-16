@@ -27,6 +27,8 @@ import { GlobalModule } from './adapters/global/global.module';
     //   limit: 100,
     // }]),
     ConfigModule.forRoot({
+      envFilePath: '.env.local',
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
       isGlobal: true
     }),
     EventEmitterModule.forRoot(),

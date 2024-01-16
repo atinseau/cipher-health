@@ -87,6 +87,20 @@ commands:
 
 
 jobs:
+  hello-world:
+    docker:
+    - image: cimg/base:stable
+    steps:
+    - run:
+        name: Hello world
+        command: echo "Hello world"
+    - run:
+        name: Print project variables
+        command: $CR_PAT
+    - run:
+        name: Print context variables
+        command: $NAME
+   
   deploy-frontend:
     docker:
     - image: cimg/base:stable
@@ -121,8 +135,29 @@ jobs:
           image-context: .
           image-path: ./k8s/api/docker/build.Dockerfile
           image-name: ch-api
+      - helm-upgrade:
+          release-name: ch-api
+          chart-path: ./k8s/api/helm
+          extra-args: |
+            --set nestjs.secrets.ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
+            --set nestjs.secrets.REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
+            --set nestjs.secrets.STWT_SECRET=$STWT_SECRET \
+            --set nestjs.secrets.TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
+            --set nestjs.secrets.TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
+            --set nestjs.secrets.MAIL_PASSWORD=$MAIL_PASSWORD \
+            --set nestjs.secrets.MAIL_USER=$MAIL_USER \
+            --set nestjs.secrets.ADMIN_PASSWORD=$ADMIN_PASSWORD \
+            --set nestjs.secrets.ADMIN_EMAIL=$ADMIN_EMAIL \
+            --set nestjs.configs.ACCESS_TOKEN_EXPIRY=10s \
+            --set nestjs.configs.REFRESH_TOKEN_EXPIRY=7d \
+            --set nestjs.configs.STWT_EXPIRY=1d \
+            --set nestjs.configs.ADMIN_PANEL_URL=https://example.com \
+            --set postgres.secrets.POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+            --set postgres.secrets.POSTGRES_USER=$POSTGRES_USER
 workflows:
   main-workflow:
     jobs:
-      - deploy-api
+      - hello-world:
+          context: <<pipeline.git.branch>>
+    # - deploy-api
     # - deploy-frontend
