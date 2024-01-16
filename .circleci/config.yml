@@ -96,10 +96,10 @@ jobs:
         command: echo "Hello world"
     - run:
         name: Print project variables
-        command: $CR_PAT
+        command: echo $CR_PAT
     - run:
         name: Print context variables
-        command: $NAME
+        command: echo $NAME
    
   deploy-frontend:
     docker:
