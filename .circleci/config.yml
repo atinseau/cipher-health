@@ -141,7 +141,7 @@ jobs:
             --set nestjs.secrets.STWT_SECRET=$STWT_SECRET \
             --set nestjs.secrets.TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
             --set nestjs.secrets.TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
-            --set nestjs.secrets.MAIL_PASSWORD=$MAIL_PASSWORD \
+            --set nestjs.secrets.MAIL_PASSWORD="$MAIL_PASSWORD" \
             --set nestjs.secrets.MAIL_USER=$MAIL_USER \
             --set nestjs.secrets.ADMIN_PASSWORD=$ADMIN_PASSWORD \
             --set nestjs.secrets.ADMIN_EMAIL=$ADMIN_EMAIL \
