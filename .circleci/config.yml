@@ -136,6 +136,7 @@ jobs:
           release-name: ch-api
           chart-path: ./k8s/api/helm
           extra-args: |
+            --set api.ingress.host=ch-api.$CIRCLE_BRANCH.com \
             --set nestjs.secrets.ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
             --set nestjs.secrets.REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
             --set nestjs.secrets.STWT_SECRET=$STWT_SECRET \
