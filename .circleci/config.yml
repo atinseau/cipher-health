@@ -99,7 +99,7 @@ jobs:
         command: echo $CR_PAT
     - run:
         name: Print context variables
-        command: echo $NAME
+        command: echo $MESSAGE
    
   deploy-frontend:
     docker:
