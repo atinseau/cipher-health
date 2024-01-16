@@ -3,10 +3,15 @@
 # LOCAL PURPOSES ONLY
 
 export USE_GHCR=0
-if [[ "$1" == "--ghcr" ]]; then
-  echo "Switching to GHCR"
-  USE_GHCR=1
-fi
+export HELM_PRINT_TEMPLATE=0
+
+for i in "$@"; do
+  if [[ $i == "--ghcr" ]]; then
+    export USE_GHCR=1
+  elif [[ $i == "--template" ]]; then
+    export HELM_PRINT_TEMPLATE=1
+  fi
+done
 
 ##########################
 
@@ -37,9 +42,7 @@ helm install \
 
 # Run all deploy scripts
 
-# Frontend
+bash $SCRIPT_DIR/api/deploy.sh
 bash $SCRIPT_DIR/frontend/deploy.sh
-
-# Api
 
 ##########################

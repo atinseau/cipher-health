@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Module } from '@nestjs/common';
+import { Controller, Get, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { API_PREFIX } from '@/utils/constants';
 import { AuthModule } from './adapters/auth/auth.module';
@@ -17,6 +17,7 @@ import { ThrottlerExceptionFilter } from './common/throttler/throttler-exception
 import { MailModule } from './common/mail/mail.module';
 import { AdminModule } from './adapters/admin/admin.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { GlobalModule } from './adapters/global/global.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AuthModule,
     AdminModule,
     ClientModule,
+    GlobalModule,
   ],
   // providers: [
   //   {
@@ -51,12 +53,23 @@ export class AppModule { }
 
 
 async function bootstrap() {
+
+  if (!process.env.PORT) {
+    throw new Error('PORT env variable is not defined');
+  }
+
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix(API_PREFIX);
+
+  app.getHttpServer()
+
+  app.setGlobalPrefix(API_PREFIX, {
+    exclude: [
+      '/'
+    ]
+  });
   app.use(helmet());
   app.enableCors();
   app.useGlobalFilters(new ThrottlerExceptionFilter())
-
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT);
 }
 bootstrap();

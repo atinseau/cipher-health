@@ -6,4 +6,6 @@ k8s
 docker
 .circleci
 .git
-apps/frontend/.env
+apps/api/.env
+
+!k8s/api/docker/start.sh

@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nestjs-deployment
+  labels:
+    app: nestjs
+spec:
+  replicas: 1 # TODO: scale smartly
+  selector:
+    matchLabels:
+      app: nestjs
+  template:
+    metadata:
+      labels:
+        app: nestjs
+    spec:
+      {{- if hasKey .Values.api.image "pullSecrets" }}
+      imagePullSecrets:
+        - name: {{ .Values.api.image.pullSecrets.name }}
+      {{- end }}
+      containers:
+        - name: nestjs-container
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          image: {{ .Values.api.image.name }}
+          resources:
+            limits: # TODO: tune those values for best efficiency
+              memory: "512Mi"
+              cpu: "2.0"
+          ports:
+            - containerPort: 8080
+              name: nestjs-port
+          envFrom:
+            - configMapRef:
+                name: nestjs-config
+            - secretRef:
+                name: nestjs-secret
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: REDIS_HOST
+              value: dragonfly-service
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PORT
+              value: "8080"
+            - name: DATABASE_URL
+              value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-service:5432/postgres?schema=public
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1 # Change to ReplicaSet if you want to scale
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres-container
+          imagePullPolicy: Always
+          image: postgres:16.1-bookworm
+          resources:
+            limits: # TODO: tune those values for best efficiency
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5432
+              name: postgres-port
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dragonfly-deployment
+  labels:
+    app: dragonfly
+spec:
+  replicas: 1 # ReplicasSet if you want to scale
+  selector:
+    matchLabels:
+      app: dragonfly
+  template:
+    metadata:
+      labels:
+        app: dragonfly
+    spec:
+      containers:
+        - name: dragonfly-container
+          imagePullPolicy: Always
+          image: docker.dragonflydb.io/dragonflydb/dragonfly
+          ports:
+            - containerPort: 6379
+              name: dragonfly-port
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: 1.0

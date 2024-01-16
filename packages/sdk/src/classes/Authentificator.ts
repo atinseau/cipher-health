@@ -18,8 +18,8 @@ type AuthentificatorOptions = {
 export class Authentificator {
 
   private client: Client;
-  private options: AuthentificatorOptions;
   private adapter: AuthentificatorAdapter;
+  private mode: UserType = 'CLIENT'
 
   private DEBUG_MODE = false
 
@@ -32,19 +32,17 @@ export class Authentificator {
 
     const {
       adapter,
-      ...otherOptions
+      clientOptions,
+      debug,
+      mode
     } = options || {}
 
-    this.DEBUG_MODE = !!otherOptions.debug
+    this.DEBUG_MODE = !!debug
     this.adapter = adapter || new LocalStorageAdapter()
+    this.mode = mode || 'CLIENT'
 
-    this.options = {
-      mode: 'CLIENT',
-      clientOptions: {},
-      ...otherOptions
-    }
     this.client = new Client({
-      ...this.options.clientOptions,
+      ...clientOptions,
       threadSafe: true,
     });
 
@@ -141,7 +139,7 @@ export class Authentificator {
       const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/signin', {
         skipHooks: ['afterRequest'],
         query: {
-          type: this.options.mode || 'CLIENT'
+          type: this.mode || 'CLIENT'
         },
         body: {
           email,
@@ -302,11 +300,11 @@ export class Authentificator {
 
     let endpoint = '/user/me'
 
-    if (this.options.mode === 'ADMIN') {
+    if (this.mode === 'ADMIN') {
       endpoint = '/admin/me'
-    } else if (this.options.mode === 'CLIENT') {
+    } else if (this.mode === 'CLIENT') {
       endpoint = '/client/me'
-    } else if (this.options.mode === 'WORKER') {
+    } else if (this.mode === 'WORKER') {
       // TODO: implement worker mode
     }
 

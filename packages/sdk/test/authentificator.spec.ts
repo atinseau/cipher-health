@@ -89,7 +89,7 @@ describe('Authentificator', () => {
     })
     expect(authentificator).toBeDefined()
     expect(authentificator).toBeInstanceOf(Authentificator)
-    expect(authentificator.getClient()['options'].baseUrl).toBe(HOST + '/api/v1')
+    expect(authentificator.getClient()['baseUrl']).toBe(HOST + '/api/v1')
   })
 
   it('should be able to login', async () => {

@@ -1,4 +1,3 @@
-import { HOST } from '../constants'
 import { ClientError } from './ClientError'
 
 import { Mutex } from 'async-mutex'
@@ -57,19 +56,27 @@ export class Client {
   private hooks: { [key in HookType]: HookCallback<key> } = {} as any
   private cache: Record<string, { output: any, timestamp: number }> = {}
   private requestContext: RequestContext = {}
-  private options: ClientOptions = {}
+
+  private SUFFIX = '/api/v1'
+
+  private threadSafe = false
+  private maxRetry = 3
+  private baseUrl: string
 
   constructor(options?: ClientOptions) {
 
-    const baseUrl = options?.baseUrl || HOST
-    const suffix = '/api/v1'
+    const {
+      baseUrl = "http://localhost:8080",
+      maxRetry,
+      threadSafe
+    } = options || {}
 
-    this.options = {
-      threadSafe: false,
-      maxRetry: 3,
-      ...options || {},
-      baseUrl: baseUrl.endsWith('/') ? baseUrl.slice(0, -1) + suffix : baseUrl + suffix,
-    }
+    this.threadSafe = !!threadSafe
+    this.maxRetry = maxRetry || 3
+
+    this.baseUrl = baseUrl.endsWith('/')
+      ? baseUrl.slice(0, -1) + this.SUFFIX
+      : baseUrl + this.SUFFIX
   }
 
   private formatEndpoint(endpoint: string) {
@@ -77,7 +84,7 @@ export class Client {
   }
 
   private createUrl(endpoint: string, query?: Query) {
-    const url = new URL(this.options.baseUrl + this.formatEndpoint(endpoint))
+    const url = new URL(this.baseUrl + this.formatEndpoint(endpoint))
     const formattedQuery = Object.keys(query || {}).reduce((acc, key) => {
       if (typeof query?.[key] === 'number') {
         return {
@@ -140,7 +147,7 @@ export class Client {
 
     // If the request is already being made
     // we wait for it to finish and return the output
-    if (this.options.threadSafe && this.requestContext[url]?.mutex.isLocked()) {
+    if (this.threadSafe && this.requestContext[url]?.mutex.isLocked()) {
       await this.requestContext[url].mutex.waitForUnlock()
       return this.requestContext[url].output
     }
@@ -150,7 +157,7 @@ export class Client {
     let retryCount = 0
     let maxRetry = config.skipRetry
       ? 0 // If skipRetry, retry function will do nothing
-      : this.options.maxRetry! // 3 by default
+      : this.maxRetry! // 3 by default
 
     // Apply custom max retry if defined
     if (config.maxRetry && config.maxRetry > 0) {
@@ -159,12 +166,12 @@ export class Client {
       console.warn('maxRetry must be greater than 0, to bypass retry set skipRetry to true')
     }
 
-    if (this.options.threadSafe && !this.requestContext[url]) {
+    if (this.threadSafe && !this.requestContext[url]) {
       this.requestContext[url] = {} as any
       this.requestContext[url].mutex = new Mutex()
     }
 
-    const release = this.options.threadSafe
+    const release = this.threadSafe
       ? await this.requestContext[url].mutex.acquire()
       : undefined
 
@@ -212,7 +219,7 @@ export class Client {
       }
     }
 
-    if (this.options.threadSafe && release) {
+    if (this.threadSafe && release) {
       release()
       this.requestContext[url].output = output
     }

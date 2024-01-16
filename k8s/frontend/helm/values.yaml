@@ -1,0 +1,9 @@
+# All of these values is set by CI/CD pipeline, so never change them manually.
+# frontend:
+#   ingress:
+#     host:
+#   image:
+#     name:
+#     pullPolicy:
+#     pullSecrets:
+#       name:

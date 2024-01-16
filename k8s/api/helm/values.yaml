@@ -1,0 +1,33 @@
+# All of these values is set by CI/CD pipeline, so never change them manually.
+# api:
+#   ingress:
+#     host:
+#   image:
+#     name:
+#     pullPolicy:
+#     pullSecrets:
+#       name:
+
+# Every value below (secrets/configs.<name>.value) will be set by CI/CD pipeline.
+# Exemple: secrets.ACCESS_TOKEN_SECRET.value: <-- set by CI/CD pipeline
+nestjs:
+  secrets:
+    ACCESS_TOKEN_SECRET:
+    REFRESH_TOKEN_SECRET:
+    STWT_SECRET:
+    TWILIO_AUTH_TOKEN:
+    TWILIO_ACCOUNT_SID:
+    MAIL_PASSWORD:
+    MAIL_USER:
+    ADMIN_PASSWORD:
+    ADMIN_EMAIL:
+  configs:
+    ACCESS_TOKEN_EXPIRY:
+    REFRESH_TOKEN_EXPIRY:
+    STWT_EXPIRY:
+    ADMIN_PANEL_URL:
+
+postgres:
+  secrets:
+    POSTGRES_PASSWORD:
+    POSTGRES_USER:

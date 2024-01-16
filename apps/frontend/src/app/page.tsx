@@ -1,6 +1,8 @@
 import AuthContainer from "@/components/Authentification/AuthContainer";
 import Signup from "@/components/Authentification/Signup/Signup";
 
+console.log(process.env)
+
 export default function SignupPage() {
   return <AuthContainer src="/assets/svg/client-signup.svg">
     <Signup />

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nestjs-config
+data:
+  {{- range $key, $value := .Values.nestjs.configs }}
+  {{ $key }}: {{ $value | toString | quote }}
+  {{- end }}
+  
