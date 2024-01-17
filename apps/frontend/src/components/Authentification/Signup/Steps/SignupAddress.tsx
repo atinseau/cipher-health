@@ -78,6 +78,12 @@ export default function SignupAddress() {
       <CountryField
         name="country"
         selectProperty={(item) => item.label}
+        textInputProps={{
+          isRequired: true,
+          baseInputProps: {
+            label: "Votre pays :"
+          },
+        }}
       />
     </form>
 

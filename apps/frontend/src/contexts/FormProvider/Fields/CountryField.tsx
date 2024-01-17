@@ -3,10 +3,12 @@ import useActiveForm from "../hooks/useActiveForm";
 import { COUNTRIES } from "@cipher-health/utils";
 import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
 import useFormError from "../hooks/useFormError";
+import { TextInputProps } from "@/components/Inputs/TextInput";
 
 type CountryFieldProps = {
   name: string
   selectProperty?: (item: { label: string, value: string }) => string
+  textInputProps?: TextInputProps
 }
 
 export default function CountryField(props: CountryFieldProps) {
@@ -37,10 +39,7 @@ export default function CountryField(props: CountryFieldProps) {
       }}
       placeholder="Rechercher un pays"
       textInputProps={{
-        isRequired: true,
-        baseInputProps: {
-          label: "Votre pays :"
-        },
+        ...props.textInputProps,
         ...errors,
       }}
     />}
