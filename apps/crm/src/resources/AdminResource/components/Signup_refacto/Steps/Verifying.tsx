@@ -2,18 +2,53 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import Box from "@mui/material/Box";
-import { useState } from "react";
+import { useCallback } from "react";
 import { Container } from "../../Signup/SignupContainer";
-import Code from "../../../../../components/TwoFaCode";
+import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import CodeField from "@/components/Fields/CodeField";
+import { useMount } from "@cipher-health/utils/react";
+import { useAtom } from "jotai";
+import { signupInfoAtom, stwtAtom } from "../signupStore";
+import { authentificator } from "@/auth";
+import { useNotify } from "react-admin";
+import { codeSent, expiredCodeError } from "@/lib/errors";
 
+const twoFaSchema = z.object({
+  code: z.string().min(6).max(6),
+})
 
 export default function Verifying() {
 
-  const [code, setCode] = useState<string>()
+  const [signupInfo] = useAtom(signupInfoAtom)
+  const [stwt] = useAtom(stwtAtom)
+  const notify = useNotify()
+
+  const { handleSubmit } = useFormStep({
+    resolver: zodResolver(twoFaSchema)
+  })
+
+  useMount(async () => {
+    console.log(signupInfo)
+    // Send sms if not sent
+    if (signupInfo?.status === 'USER_NOT_VERIFIED' && !signupInfo.codeSent) {
+      await authentificator.sendVerificationCode(stwt)
+      notify(codeSent)
+    }
+  })
+
+  const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
+    const [res, error] = await authentificator.verify(data.code, stwt)
+    if (error) {
+      notify(expiredCodeError)
+      return false
+    }
+    return true
+  }, [])
 
   return <Container>
-    <Box component="form" sx={{ pt: "10px" }}>
-
+    <Box component="form" sx={{ pt: "10px" }} onSubmit={handleSubmit(onSubmit)}>
       <Box sx={{ display: "flex", flexDirection: 'column', alignItems: 'center' }}>
         <LockPersonIcon fontSize={"large"} sx={{ mb: "10px" }} />
         <Typography variant="h6">Confirmer votre compte</Typography>
@@ -22,9 +57,7 @@ export default function Verifying() {
           Merci de bien vouloir renseigner le code que vous allez recevoir.
         </Typography>
       </Box>
-
-      <Code />
-
+      <CodeField />
       <Box sx={{ mt: "20px" }}>
         <Typography variant="body2" color="GrayText">
           Votre code est valide pendant 5 minutes.
@@ -33,8 +66,8 @@ export default function Verifying() {
           Code non reçu ? <a href="#">Renvoyer</a>
         </Typography>
       </Box>
-
-      <Button sx={{ mt: "25px", width: "100%" }} variant="contained">
+      {/* TODO: impl resend code manually */}
+      <Button type="submit" sx={{ mt: "25px", width: "100%" }} variant="contained">
         Confirmer
       </Button>
     </Box>

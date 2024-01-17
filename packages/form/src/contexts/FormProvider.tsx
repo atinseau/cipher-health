@@ -4,7 +4,7 @@ import React, { createContext, useCallback, useMemo, useRef, useState } from "re
 import { UseFormProps, UseFormReturn } from "react-hook-form";
 
 export type FormStep = {
-  title: string
+  title?: string
   components: React.ComponentType[]
 }
 
@@ -46,6 +46,7 @@ type IFormContext = {
   subStepIndex: number
   steps: FormStep[]
   onSubmit: () => void
+  onSubmitCallback: (result: Record<string, any> | false | Error) => void
   Component: React.ComponentType
   submissionHistory: SubmissionHistory
   getForm: (stepIndex: number, subStepIndex: number) => FormRefs[number][number]
@@ -86,6 +87,7 @@ export function FormProvider(props: FormProviderProps) {
     }
     const beforeStepChangeResult = await beforeStepChange?.(si, ssi)
     if (!beforeStepChangeResult) {
+      console.warn('[FormProvider] beforeStepChange returned false, cannot change step')
       return
     }
     setStepIndex(si)
@@ -98,38 +100,13 @@ export function FormProvider(props: FormProviderProps) {
     subStepIndex,
   ])
 
-  const dispatchSubmit = useCallback(() => {
-    const { formRef } = getForm(stepIndex, subStepIndex)
-
-    if (!formRef?.current) {
-      console.warn('formRef.current is null')
+  const onSubmitCallback = useCallback(async (result: Record<string, any> | false | Error) => {
+    if (result instanceof Error) {
+      props.onError?.(result)
       return
     }
-
-    formRef.current?.dispatchEvent(new Event('submit', {
-      cancelable: true,
-      bubbles: true,
-    }))
-
-    return new Promise<false | Record<string, any>>((resolve) => {
-      formRef.current?.addEventListener('afterSubmit', (e) => {
-        const { detail } = e as CustomEvent
-        if (detail instanceof Error) {
-          props.onError?.(detail)
-          resolve(false)
-          return
-        }
-        resolve(detail)
-      }, {
-        once: true
-      })
-    })
-  }, [stepIndex, subStepIndex])
-
-  const onSubmit = useCallback(async () => {
-    const result = await dispatchSubmit()
     if (!result) {
-      console.warn('[FormProvider] Step change was prevented by onSubmit handler')
+      console.warn('[FormProvider] Form submission was cancelled: ', result)
       return
     }
 
@@ -155,6 +132,36 @@ export function FormProvider(props: FormProviderProps) {
       })
       return
     }
+  }, [stepIndex, subStepIndex])
+
+  // This function is only for triggering the submit event externally
+  // that's mean the click event is not triggered inside the <form/> component step
+  // but outside, for example:
+  // <>
+  //  <Form/>
+  //  <ExternalButton/> <-- By getting the context, we can trigger the submit event
+  // </>
+  const onSubmit = useCallback(async () => {
+    const { formRef } = getForm(stepIndex, subStepIndex)
+
+    if (!formRef?.current) {
+      console.error('[FormProvider] Form ref is not defined cannot submit form')
+      return
+    }
+
+    formRef.current?.dispatchEvent(new CustomEvent('submit', {
+      cancelable: true,
+      bubbles: true,
+      detail: {
+        external: true
+      }
+    }))
+
+    formRef.current?.addEventListener('afterSubmit', (e) => {
+      onSubmitCallback((e as CustomEvent).detail)
+    }, {
+      once: true
+    })
   }, [stepIndex, subStepIndex])
 
   const Component = useMemo(() => {
@@ -188,6 +195,7 @@ export function FormProvider(props: FormProviderProps) {
     submissionHistory: submissionHistoryRef.current,
     steps,
     onSubmit,
+    onSubmitCallback,
     getForm,
     subscribe,
     unsubscribe,

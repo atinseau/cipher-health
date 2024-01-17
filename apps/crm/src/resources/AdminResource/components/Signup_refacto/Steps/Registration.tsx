@@ -1,22 +1,52 @@
-
-
-
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
 import { Container } from "../../Signup/SignupContainer";
-import CountrySelect from "../../../../../components/CountrySelect";
+import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signupSchema } from "@cipher-health/utils/schemas";
+import { useCallback } from "react";
+import TextField from "@/components/Fields/TextField";
+import { authentificator } from "@/auth";
+import CountryField from "@/components/Fields/CountryField";
+import { useAtom } from "jotai";
+import { stwtAtom } from "../signupStore";
 
+const defaultValues = {
+  "email": "arthurtinseau@live.fr",
+  "password": "06112001..Arttsn",
+  "confirmPassword": "06112001..Arttsn",
+  "phone": "0782887672",
+  "country": "FR"
+}
 
 export default function Registration() {
+
+  const [stwt] = useAtom(stwtAtom)
+
+  const { handleSubmit, setErrors, formRef } = useFormStep({
+    resolver: zodResolver(signupSchema),
+    defaultValues,
+  })
+
+  const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
+    const [_, error] = await authentificator.signup(data, stwt)
+    if (error instanceof Error) {
+      throw error
+    }
+    if (error) {
+      setErrors(error)
+      return false
+    }
+    return true
+  }, [])
 
   const isSubmitting = false;
 
   return <Container>
-    <form>
+    <form ref={formRef} onSubmit={handleSubmit(onSubmit)}>
       <Box mb={"30px"}>
         <Typography variant="h6">Bienvenue !</Typography>
         <Typography variant="body2" color="GrayText">Pour créer votre compte, veuillez renseigner les champs suivant.</Typography>
@@ -25,17 +55,17 @@ export default function Registration() {
       <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <Typography mb={"5px"} variant="body1" color="GrayText">Informations</Typography>
-          <TextField required sx={{ mb: "10px" }} margin="none" label="Votre email"  />
+          <TextField name="email" required sx={{ mb: "10px" }} margin="none" label="Votre email" />
           <Box sx={{ display: 'flex', gap: "6px" }}>
-            <CountrySelect />
-            <TextField required fullWidth margin="none" label="Votre téléphone" />
+            <CountryField name="country" />
+            <TextField name="phone" required fullWidth margin="none" label="Votre téléphone" />
           </Box>
         </Box>
 
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <Typography mb={"5px"} variant="body1" color="GrayText">Sécurité</Typography>
-          <TextField required sx={{ mb: "10px" }} margin="none" label="Votre mdp" id="password" type="password"  />
-          <TextField required margin="none" label="Confirmer mdp" id="phone" type="password"  />
+          <TextField name="password" required sx={{ mb: "10px" }} margin="none" label="Votre mdp" id="password" type="password" />
+          <TextField name="confirmPassword" required margin="none" label="Confirmer mdp" id="phone" type="password" />
         </Box>
       </Box>
 

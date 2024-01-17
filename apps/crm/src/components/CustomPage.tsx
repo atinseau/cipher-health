@@ -4,7 +4,6 @@ import Box from "@mui/material/Box";
 
 type CustomPageProps = {
   children: React.ReactNode
-  isBooted?: boolean
 }
 
 const Root = styled(Box)(({ theme }) => ({
@@ -24,8 +23,8 @@ export const CustomPageContainer = styled(Paper)(({ theme }) => ({
   height: 'fit-content',
 }))
 
-export default function CustomPage({ children, isBooted }: CustomPageProps) {
+export default function CustomPage({ children }: CustomPageProps) {
   return <Root>
-    {isBooted && children}
+    {children}
   </Root>
 }

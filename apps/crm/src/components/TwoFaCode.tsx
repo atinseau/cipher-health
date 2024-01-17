@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "@mui/material/styles/styled";
 import Box from "@mui/material/Box";
 
@@ -14,27 +14,23 @@ const Input = styled('input')(() => ({
   fontSize: "25px",
 }))
 
-export default function Code() {
+
+type CodeInputProps = {
+  onChange?: (code: string) => void
+  minLength?: number
+}
+export default function Code({ onChange, minLength = 6 }: CodeInputProps) {
 
   const inputRefs = useRef<HTMLInputElement[]>([])
   const [code, setCode] = useState<string[]>([])
 
-  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
-    const pastedData = e.clipboardData.getData('text')
-    if (!numRegex.test(pastedData) && pastedData.length !== 6) {
-      e.preventDefault()
+  useEffect(() => {
+    if (!onChange)
       return
-    }
-    pastedData.split('').forEach((char, i) => {
-      inputRefs.current[i].value = char
-      setCode((prev) => {
-        const newCode = [...prev]
-        newCode[i] = char
-        return newCode
-      })
-    })
-    inputRefs.current[pastedData.length - 1].focus()
-  }, [])
+
+    const codeString = code.join('')
+    onChange(codeString.length < minLength ? '' : codeString)
+  }, [code])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, i: number) => {
     if (!numRegex.test(e.target.value)) {
@@ -61,6 +57,23 @@ export default function Code() {
       return newCode
     })
   }, [code])
+
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData('text')
+    if (!numRegex.test(pastedData) && pastedData.length !== 6) {
+      e.preventDefault()
+      return
+    }
+    pastedData.split('').forEach((char, i) => {
+      inputRefs.current[i].value = char
+      setCode((prev) => {
+        const newCode = [...prev]
+        newCode[i] = char
+        return newCode
+      })
+    })
+    inputRefs.current[pastedData.length - 1].focus()
+  }, [])
 
   return <Box sx={{ display: "flex", gap: "5px", mt: "20px", justifyContent: "center" }}>
     {Array.from({ length: 6 }).map((_, i) => (<Input

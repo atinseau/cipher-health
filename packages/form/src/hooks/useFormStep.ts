@@ -19,6 +19,7 @@ export function useFormStep<
     subscribe,
     unsubscribe,
     submissionHistory,
+    onSubmitCallback,
   } = useFormContext()
 
   const formPropsRef = useRef<UseFormProps<TFieldValues, TContext>>({
@@ -52,6 +53,8 @@ export function useFormStep<
 
   const handleSubmit = useCallback((onSubmit: FormStepSubmitHandler) => {
     return form.handleSubmit(async (data, event) => {
+      const isExternalSubmission: boolean = (event?.nativeEvent as CustomEvent)?.detail?.external || false
+
       let result: boolean | Error | null = null
       try {
         result = await onSubmit(data, submissionHistory, event)
@@ -59,12 +62,18 @@ export function useFormStep<
         result = error
       }
 
+      const contextResult = result === false || result instanceof Error ? result : data
+
       // If there is an error or the submit handler returns false, we don't want to
       // go to the next step. We just want to display the error.
       // in other cases, we go to the next step and return the submitted data.
-      formRef?.current?.dispatchEvent(new CustomEvent('afterSubmit', {
-        detail: result === false || result instanceof Error ? result : data,
-      }))
+      if (isExternalSubmission) {
+        formRef?.current?.dispatchEvent(new CustomEvent('afterSubmit', {
+          detail: contextResult,
+        }))
+      } else {
+        onSubmitCallback(contextResult)
+      }
     })
   }, [])
 

@@ -33,7 +33,6 @@ export default function SignupRegistrationStep() {
   const signup = useSignup()
 
   const onSubmit: FormStepSubmitHandler<z.infer<typeof signupSchema>> = async (data) => {
-
     const [_, errors] = await signup(data)
 
     if (errors) {

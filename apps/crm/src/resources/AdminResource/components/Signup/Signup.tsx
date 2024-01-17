@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Registration from "../Signup_refacto/Steps/Registration";
 import SignupContainer from "./SignupContainer";
 import Verifying from "./Verifying";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -7,6 +6,7 @@ import { useNotify } from "react-admin";
 import { useClient } from "@cipher-health/sdk/react";
 import Profile from "./Profile";
 import { invalidLinkError } from "../../../../lib/errors";
+import Registration from "./Registration";
 
 const steps = [
   Registration,

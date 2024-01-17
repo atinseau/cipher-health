@@ -20,8 +20,7 @@ export function useFormError(name: string) {
     if (mode === 'onSubmit' && formState.submitCount === 0) {
       return {}
     }
-
-    if (!formState.dirtyFields[name]) {
+    if (mode !== 'onSubmit' && !formState.dirtyFields[name]) {
       return {}
     }
 

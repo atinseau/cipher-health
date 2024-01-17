@@ -1,6 +1,6 @@
 import { Mutex } from "async-mutex";
 import { Client, ClientOptions } from "./Client"
-import { UserType, UserModel, SignupInfo } from '@cipher-health/api'
+import type { UserType, UserModel, SignupInfo } from '@cipher-health/api'
 import { AuthentificatorAdapter } from "./adapters/AuthentificatorAdapter";
 import { LocalStorageAdapter } from "./adapters/LocalStorageAdapter";
 
@@ -162,10 +162,11 @@ export class Authentificator {
     }
   }
 
-  async signup(body: z.infer<typeof signupSchema>): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
+  async signup(body: z.infer<typeof signupSchema>, stwt?: string): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
     this.debug('signup', body)
     const [res, error] = await this.client.post('/auth/signup', {
       body,
+      query: stwt ? { stwt } : undefined,
       skipHooks: [
         'afterRequest'
       ],
@@ -192,18 +193,21 @@ export class Authentificator {
     return [res, null]
   }
 
-  async sendVerificationCode() {
+  async sendVerificationCode(stwt?: string) {
     this.debug('sendVerificationCode')
-    const [_, error] = await this.client.get('/auth/verify')
+    const [_, error] = await this.client.get('/auth/verify', {
+      query: stwt ? { stwt } : undefined
+    })
     if (error) {
       return false
     }
     return true
   }
 
-  async verify(code: string): Promise<[any, ClientError | null]> {
+  async verify(code: string, stwt?: string): Promise<[any, ClientError | null]> {
     this.debug('verify', code)
     const [res, error] = await this.client.post('/auth/verify/callback', {
+      query: stwt ? { stwt } : undefined,
       body: {
         code
       }
@@ -275,13 +279,15 @@ export class Authentificator {
   }
 
   // this method should never throw an error
-  async getSignupInfo() {
+  async getSignupInfo(stwt?: string) {
     this.debug('getSignupInfo')
-    if (!this.isSoftConnected()) {
+    if (!this.isSoftConnected() && !stwt) {
       return null
     }
 
-    const [res, error] = await this.client.get<{ data: SignupInfo }>('/auth/signup/info')
+    const [res, error] = await this.client.get<{ data: SignupInfo }>('/auth/signup/info', {
+      query: stwt ? { stwt } : undefined
+    })
 
     if (error) {
       return null
