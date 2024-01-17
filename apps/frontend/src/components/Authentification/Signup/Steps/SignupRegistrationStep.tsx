@@ -8,12 +8,12 @@ import AuthFormContainer from "../../AuthFormContainer";
 import InputGroup from "@/components/Inputs/InputGroup";
 
 import z from "zod";
-import { useFormStep, FormStepSubmitHandler } from "@/contexts/FormProvider/hooks/useFormStep";
-import TextField from "@/contexts/FormProvider/Fields/TextField";
-import PasswordField from "@/contexts/FormProvider/Fields/PasswordField";
-import PasswordConfirmationField from "@/contexts/FormProvider/Fields/PasswordConfirmationField";
-import CountryField from "@/contexts/FormProvider/Fields/CountryField";
 import useSignup from "@/contexts/AuthProvider/hooks/useSignup";
+import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
+import TextField from "@/components/Fields/TextField";
+import PasswordField from "@/components/Fields/PasswordField";
+import PasswordConfirmationField from "@/components/Fields/PasswordConfirmationField";
+import CountryField from "@/components/Fields/CountryField";
 
 const defaultValues = {
   "email": "arthurtinseau@live.fr",

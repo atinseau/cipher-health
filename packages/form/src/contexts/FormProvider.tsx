@@ -1,14 +1,7 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { createContext, useCallback, useMemo, useRef, useState } from "react";
 import { UseFormProps, UseFormReturn } from "react-hook-form";
-import useNotify from "../NotificationProvider/hooks/useNotify";
 
 export type FormStep = {
   title: string
@@ -22,6 +15,7 @@ type FormProviderProps = {
   initialStepIndex?: number
   initialSubStepIndex?: number
   steps: FormStep[]
+  onError?: (error: Error) => void
   beforeStepChange?: BeforeStepChangeHandler
 }
 
@@ -61,7 +55,7 @@ type IFormContext = {
 
 export const FormContext = createContext({} as IFormContext)
 
-export default function FormProvider(props: FormProviderProps) {
+export function FormProvider(props: FormProviderProps) {
 
   const {
     children,
@@ -76,8 +70,6 @@ export default function FormProvider(props: FormProviderProps) {
 
   const formRefs = useRef<FormRefs>({})
   const submissionHistoryRef = useRef<SubmissionHistory>([])
-
-  const notify = useNotify()
 
   const getForm = useCallback((si: number, ssi: number) => {
     return formRefs.current?.[si]?.[ssi]
@@ -123,11 +115,7 @@ export default function FormProvider(props: FormProviderProps) {
       formRef.current?.addEventListener('afterSubmit', (e) => {
         const { detail } = e as CustomEvent
         if (detail instanceof Error) {
-          notify({
-            title: 'Une erreur est survenue',
-            message: detail.message,
-            type: 'error',
-          })
+          props.onError?.(detail)
           resolve(false)
           return
         }

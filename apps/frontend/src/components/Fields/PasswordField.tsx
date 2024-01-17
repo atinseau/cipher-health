@@ -1,6 +1,5 @@
 import PasswordInput from "@/components/Inputs/PasswordInput";
-import useActiveForm from "../hooks/useActiveForm";
-import useFormError from "../hooks/useFormError";
+import { useActiveForm, useFormError } from "@cipher-health/form";
 
 type PasswordFieldProps = {
   passwordPropertyName?: string
@@ -13,7 +12,6 @@ export default function PasswordField(props: PasswordFieldProps) {
   } = props
 
   const { form } = useActiveForm()
-
   const errors = useFormError(passwordPropertyName)
 
   return <PasswordInput

@@ -1,11 +1,11 @@
 import InformationCard from "@/components/Card/InformationCard";
 import AuthFormContainer from "../../AuthFormContainer";
-import { FormStepSubmitHandler, useFormStep } from "@/contexts/FormProvider/hooks/useFormStep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCallback } from "react";
-import TextField from "@/contexts/FormProvider/Fields/TextField";
-import CountryField from "@/contexts/FormProvider/Fields/CountryField";
+import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
+import TextField from "@/components/Fields/TextField";
+import CountryField from "@/components/Fields/CountryField";
 
 const addressSchema = z.object({
   address: z.string().min(1),

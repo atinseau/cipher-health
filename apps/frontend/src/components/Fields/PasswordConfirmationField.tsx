@@ -1,10 +1,9 @@
 import { useWatch } from "react-hook-form"
-import useActiveForm from "../hooks/useActiveForm"
 import { useMemo } from "react"
 import TextInput from "@/components/Inputs/TextInput"
 import { RxCross1 } from "react-icons/rx"
 import { FaCheck } from "react-icons/fa6"
-import useFormError from "../hooks/useFormError"
+import { useActiveForm, useFormError } from "@cipher-health/form"
 
 type PasswordConfirmationFieldProps = {
   passwordPropertyName?: string

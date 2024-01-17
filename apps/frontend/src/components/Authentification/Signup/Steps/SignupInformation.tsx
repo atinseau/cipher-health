@@ -1,13 +1,13 @@
 import InformationCard from "@/components/Card/InformationCard";
 import AuthFormContainer from "../../AuthFormContainer";
-import { FormStepSubmitHandler, useFormStep } from "@/contexts/FormProvider/hooks/useFormStep";
 import { useCallback } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import RadioField from "@/contexts/FormProvider/Fields/RadioField";
-import TextField from "@/contexts/FormProvider/Fields/TextField";
-import DateField from "@/contexts/FormProvider/Fields/DateField";
 import { getMinimalMajorBirthDate } from "@cipher-health/utils";
+import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
+import RadioField from "@/components/Fields/RadioField";
+import TextField from "@/components/Fields/TextField";
+import DateField from "@/components/Fields/DateField";
 
 const informationSchema = z.object({
   gender: z.enum(['MALE', 'FEMALE']),

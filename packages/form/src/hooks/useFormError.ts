@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useFormState } from "react-hook-form";
-import useActiveForm from "./useActiveForm";
+import { useActiveForm } from "./useActiveForm";
 
 
-export default function useFormError(name: string) {
+export function useFormError(name: string) {
 
   const { form } = useActiveForm();
 

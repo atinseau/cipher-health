@@ -2,7 +2,6 @@
 
 import { clientSteps } from "./steps";
 import SignupForm from "./SignupForm";
-import FormProvider, { FormStep } from "@/contexts/FormProvider/FormProvider";
 import { createContext, useCallback, useState } from "react";
 import Spinner from "@/components/Spinner";
 import { useAuthentificator } from "@cipher-health/sdk/react";
@@ -13,6 +12,8 @@ import { useMount } from "@cipher-health/utils/react";
 import SmoothEnter from "@/components/Animation/SmoothEnter";
 import SmoothExit from "@/components/Animation/SmoothExit";
 import { AnimatePresence } from "framer-motion";
+
+import { FormProvider, FormStep } from "@cipher-health/form"
 
 type ISignupContext = {
   hydrateSignupInfo: () => Promise<SignupInfo | null>

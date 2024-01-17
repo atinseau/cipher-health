@@ -1,6 +1,5 @@
 import TextInput, { TextInputProps } from "@/components/Inputs/TextInput";
-import useActiveForm from "../hooks/useActiveForm";
-import useFormError from "../hooks/useFormError";
+import { useActiveForm, useFormError } from "@cipher-health/form";
 
 type TextFieldProps = {
   name: string

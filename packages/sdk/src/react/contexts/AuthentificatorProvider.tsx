@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import { createContext, forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { Authentificator } from "../../classes/Authentificator";
 import { AuthentificatorAdapter } from "../../classes/adapters/AuthentificatorAdapter";
 import { LocalStorageAdapter } from "../../classes/adapters/LocalStorageAdapter";

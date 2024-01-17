@@ -16,7 +16,7 @@
   },
   "env": {
     "exclude": [
-      "zod",
+      "react-hook-form",
       "react"
     ]
   }

@@ -1,8 +1,7 @@
 import AuthFormContainer from "@/components/Authentification/AuthFormContainer";
-import TextInput from "@/components/Inputs/TextInput";
+import TextField from "@/components/Fields/TextField";
 import useCreateProfile from "@/contexts/AuthProvider/hooks/useCreateProfile";
-import TextField from "@/contexts/FormProvider/Fields/TextField";
-import { FormStepSubmitHandler, useFormStep } from "@/contexts/FormProvider/hooks/useFormStep";
+import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
 import { clientMedicalInformationSchema } from "@cipher-health/utils/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback } from "react";

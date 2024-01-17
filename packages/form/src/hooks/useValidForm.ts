@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import useActiveForm from "./useActiveForm";
+import { useActiveForm } from "./useActiveForm";
 
-export default function useValidForm() {
+export function useValidForm() {
 
   const { form } = useActiveForm();
   const [isValid, setIsValid] = useState(false);

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useFormContext } from "./useFormContext";
 
-export default function useActiveForm() {
+export function useActiveForm() {
 
   const {
     onSubmit,

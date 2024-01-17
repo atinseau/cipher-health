@@ -1,6 +1,6 @@
-import { useFormContext } from "./hooks/useFormContext"
+import { useFormContext } from "../hooks/useFormContext"
 
-export default function DisplayFormStep() {
+export function DisplayFormStep() {
   const { Component } = useFormContext()
   if (!Component) {
     throw new Error("No component to display")

@@ -1,8 +1,7 @@
 import { useContext } from "react"
-import { FormContext } from "../FormProvider"
+import { FormContext } from "../contexts/FormProvider"
 
-
-export const useFormContext = () => {
+export function useFormContext () {
   const context = useContext(FormContext)
 
   if (!context) {

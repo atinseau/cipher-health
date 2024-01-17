@@ -2,8 +2,7 @@
 
 import StepBar from "@/components/StepBar";
 import SignupControl from "./SignupControl";
-import { useFormContext } from "@/contexts/FormProvider/hooks/useFormContext";
-import DisplayFormStep from "@/contexts/FormProvider/DisplayFormStep";
+import { DisplayFormStep, useFormContext } from "@cipher-health/form";
 
 
 export default function SignupForm() {
@@ -15,7 +14,7 @@ export default function SignupForm() {
       <StepBar
         currentStep={stepIndex}
         steps={steps.map(step => ({
-          title: step.title, 
+          title: step.title,
         }))}
       />
       <DisplayFormStep />

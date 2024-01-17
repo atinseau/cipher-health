@@ -1,5 +1,5 @@
 import CodeInput from "@/components/Inputs/CodeInput";
-import useActiveForm from "../hooks/useActiveForm";
+import { useActiveForm } from "@cipher-health/form";
 import { Controller } from "react-hook-form";
 
 type CodeFieldProps = {
