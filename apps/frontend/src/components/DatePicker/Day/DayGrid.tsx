@@ -25,8 +25,8 @@ function DateCell({ isDisabled, isSelected, isToday, label, date, onClick }: {
   isToday?: boolean,
   onClick?: (date?: Date) => void
 }) {
-  return <div onClick={() => onClick?.(date)} className={clsx('w-[35px] h-[24px] flex items-center justify-center', {
-    'hover:text-indigo-500 cursor-pointer': !isSelected,
+  return <div onClick={() => onClick?.(date)} className={clsx('w-[35px] h-[24px] flex items-center justify-center cursor-pointer', {
+    'hover:text-indigo-500': !isSelected,
   })}>
     <span
       className={clsx("p-1", {

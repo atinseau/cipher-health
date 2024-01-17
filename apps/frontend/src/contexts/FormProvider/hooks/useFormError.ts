@@ -14,8 +14,18 @@ export default function useFormError(name: string) {
   })
 
   const errors = useMemo(() => {
+    const mode = form.formPropsRef?.current?.mode
     const error = formState.errors[name]
-    if (error && formState.submitCount > 0) {
+
+    if (mode === 'onSubmit' && formState.submitCount === 0) {
+      return {}
+    }
+
+    if (!formState.dirtyFields[name]) {
+      return {}
+    }
+
+    if (error) {
       return {
         isInvalid: true,
         errorText: error.message?.toString()

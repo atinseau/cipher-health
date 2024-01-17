@@ -1,6 +1,6 @@
 import { Body, Controller, Get, UseGuards } from "@nestjs/common";
 import { UserModel } from "../user/user.dto";
-import { UserService } from "../user/user.service";
+import { UserService } from "../user/services/user.service";
 import { UserGuard } from "../user/guards/user.guard";
 import { UserVerifiedGuard } from "../user/guards/user-verified.guard";
 import { ClientGuard } from "./guards/client.guard";

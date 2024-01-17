@@ -2,6 +2,7 @@ import { containLowerCaseLetters } from "../src/containLowerCaseLetters"
 import { containUpperCaseLetters } from "../src/containUpperCaseLetters"
 import { containNumbers } from "../src/containNumbers"
 import { containSpecialChar } from "../src/containSpecialChar"
+import { socialSecurityRegex } from "../src"
 
 
 
@@ -67,6 +68,16 @@ describe('Regex', () => {
     expect(containSpecialChar(f)).toBe(true)
     expect(containSpecialChar(g)).toBe(true)
 
+  })
+
+  it('Should be a valid social security number', () => {
+    expect(socialSecurityRegex.test('sdkqlsdkqsd')).toBe(false)
+    expect(socialSecurityRegex.test('101112B01826607')).toBe(true)
+    expect(socialSecurityRegex.test('201112A01826607')).toBe(true)
+    expect(socialSecurityRegex.test('185057800608436')).toBe(true)
+    expect(socialSecurityRegex.test('187082A32132111')).toBe(true)
+    expect(socialSecurityRegex.test('qsdqsd101114101826607qsdqsdq')).toBe(false)
+    expect(socialSecurityRegex.test('')).toBe(false)
   })
 
 })

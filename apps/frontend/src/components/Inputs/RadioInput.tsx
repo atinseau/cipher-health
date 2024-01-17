@@ -1,9 +1,16 @@
 import { RadioGroup, RadioGroupProps, Radio } from '@nextui-org/radio'
 import BaseInput, { BaseInputProps } from './BaseInput'
+import { ChangeEvent } from 'react'
 
-type RadioInputProps = RadioGroupProps & BaseInputProps & {
+export type RadioItem = {
+  label: string,
+  value: string
+}
+
+export type RadioInputProps = Omit<RadioGroupProps & BaseInputProps, 'onChange'> & {
   label?: string,
-  items: Array<{ label: string, value: string }>
+  items: Array<RadioItem>
+  onChange?: (item: RadioItem) => void
 }
 
 export default function RadioInput(props: RadioInputProps) {
@@ -12,8 +19,16 @@ export default function RadioInput(props: RadioInputProps) {
     label,
     items,
     subLabel,
+    onChange,
     ...radioGroupProps
   } = props
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (onChange) {
+      const item = items.find(item => item.value === e.target.value)
+      if (item) onChange(item)
+    }
+  }
 
   return <BaseInput
     {...radioGroupProps}
@@ -26,6 +41,7 @@ export default function RadioInput(props: RadioInputProps) {
   >
     <RadioGroup
       {...radioGroupProps}
+      onChange={handleChange}
       classNames={{
         wrapper: "gap-6"
       }}

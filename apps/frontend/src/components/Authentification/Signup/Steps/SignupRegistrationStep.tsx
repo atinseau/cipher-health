@@ -79,7 +79,7 @@ export default function SignupRegistrationStep() {
             type: "tel",
           }}
         />
-        <CountryField />
+        <CountryField name="country" />
       </InputGroup>
     </form>
   </AuthFormContainer>

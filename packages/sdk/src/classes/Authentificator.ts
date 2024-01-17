@@ -295,6 +295,14 @@ export class Authentificator {
     return result.success
   }
 
+  async createProfile(profile: Record<string, any>) {
+    this.debug('createProfile', profile)
+    const [res, error] = await this.client.post('/user/profile/create', {
+      body: profile
+    })
+    console.log(res, error)
+  }
+
   async me(): Promise<UserModel> {
     this.debug('me')
 

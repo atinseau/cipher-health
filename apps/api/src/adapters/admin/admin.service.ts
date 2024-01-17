@@ -1,7 +1,7 @@
 import { PrismaService } from "@/common/database/prisma.service";
 import { Logger } from "@/common/logger/logger.service";
 import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
-import { UserService } from "../user/user.service";
+import { UserService } from "../user/services/user.service";
 import { ProfileCreate, UserCreate, UserModel } from "../user/user.dto";
 import { createResult } from "@/utils/errors";
 import { AdminCreate } from "./admin.dto";

@@ -10,24 +10,24 @@ import TextInput, { TextInputProps } from './TextInput';
 import Popover, { PopoverContent, PopoverTrigger } from '../Popover';
 import isEqual from 'lodash/isEqual';
 
-type SelectItem = {
+type AutocompleteItem = {
   id?: string,
   label: string,
   value: any
 }
 
-type SelectProps = {
+type AutocompleteInputProps = {
   placeholder?: string
-  onChange?: (value?: string) => void
-  items: Array<SelectItem>
-  defaultValue?: string | SelectItem
+  onChange?: (item?: AutocompleteItem) => void
+  items: Array<AutocompleteItem>
+  defaultValue?: string | AutocompleteItem
   textInputProps?: TextInputProps
   classNames?: {
     content?: string
   }
 }
 
-export default function AutocompleteInput(props: SelectProps) {
+export default function AutocompleteInput(props: AutocompleteInputProps) {
 
   const {
     placeholder,
@@ -44,18 +44,18 @@ export default function AutocompleteInput(props: SelectProps) {
   } = textInputProps || {}
 
   const defaultItem = typeof defaultValue === 'string'
-    ? items.find(item => item.value === defaultValue)
+    ? items.find(item => item.value === defaultValue || item.label === defaultValue)
     : defaultValue
 
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState<string>(defaultItem?.label || '')
-  const [selectedItem, setSelectedItem] = useState<SelectItem | undefined>(defaultItem)
+  const [selectedItem, setSelectedItem] = useState<AutocompleteItem | undefined>(defaultItem)
 
-  const handleChange = (item: SelectItem) => {
+  const handleChange = (item: AutocompleteItem) => {
     setIsOpen(false)
     setSelectedItem(item)
     setSearch(item.label)
-    onChange?.(item.value)
+    onChange?.(item)
   }
 
   const handleSearch = (value: string) => {
@@ -74,6 +74,7 @@ export default function AutocompleteInput(props: SelectProps) {
 
   return <BaseInput
     {...baseInputProps}
+    isRequired={textInputProps?.isRequired}
     classNames={{ base: 'relative' }}
   >
     <Popover

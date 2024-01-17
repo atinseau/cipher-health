@@ -7,7 +7,7 @@ import {
   useRef,
   useState
 } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormProps, UseFormReturn } from "react-hook-form";
 import useNotify from "../NotificationProvider/hooks/useNotify";
 
 export type FormStep = {
@@ -28,15 +28,23 @@ type FormProviderProps = {
 type FormRefs = Record<number, Record<number,
   & UseFormReturn
   & {
-    formRef?: React.RefObject<HTMLFormElement>
+    formRef?: React.RefObject<HTMLFormElement>,
+    formPropsRef?: React.RefObject<UseFormProps<any, any>>
   }
 >>
+
+export type SubmissionHistory = Array<{
+  data: Record<string, any>
+  stepIndex: number
+  subStepIndex: number
+}>
 
 type FormContextSubscribe = (
   stepIndex: number,
   subStepIndex: number,
   form: UseFormReturn<any, any, any>,
-  formRef: React.RefObject<HTMLFormElement>
+  formRef: React.RefObject<HTMLFormElement>,
+  formPropsRef: React.RefObject<UseFormProps<any, any>>
 ) => void
 
 type IFormContext = {
@@ -45,8 +53,8 @@ type IFormContext = {
   steps: FormStep[]
   onSubmit: () => void
   Component: React.ComponentType
-
-  getForm: (stepIndex: number, subStepIndex: number) => UseFormReturn<any, any, any>
+  submissionHistory: SubmissionHistory
+  getForm: (stepIndex: number, subStepIndex: number) => FormRefs[number][number]
   subscribe: FormContextSubscribe
   unsubscribe: (stepIndex: number, subStepIndex: number) => void
 }
@@ -67,6 +75,7 @@ export default function FormProvider(props: FormProviderProps) {
   const [subStepIndex, setSubStepIndex] = useState(initialSubStepIndex)
 
   const formRefs = useRef<FormRefs>({})
+  const submissionHistoryRef = useRef<SubmissionHistory>([])
 
   const notify = useNotify()
 
@@ -110,7 +119,7 @@ export default function FormProvider(props: FormProviderProps) {
       bubbles: true,
     }))
 
-    return new Promise<boolean>((resolve) => {
+    return new Promise<false | Record<string, any>>((resolve) => {
       formRef.current?.addEventListener('afterSubmit', (e) => {
         const { detail } = e as CustomEvent
         if (detail instanceof Error) {
@@ -131,11 +140,17 @@ export default function FormProvider(props: FormProviderProps) {
 
   const onSubmit = useCallback(async () => {
     const result = await dispatchSubmit()
-
     if (!result) {
       console.warn('[FormProvider] Step change was prevented by onSubmit handler')
       return
     }
+
+    // Update submission history
+    submissionHistoryRef.current.push({
+      data: result,
+      stepIndex,
+      subStepIndex,
+    })
 
     if (subStepIndex < steps[stepIndex].components.length - 1) {
       changeStep({
@@ -164,12 +179,13 @@ export default function FormProvider(props: FormProviderProps) {
     subStepIndex,
   ])
 
-  const subscribe: FormContextSubscribe = useCallback((si, ssi, form, formRef) => {
+  const subscribe: FormContextSubscribe = useCallback((si, ssi, form, formRef, formPropsRef) => {
     formRefs.current[si] = {
       ...formRefs.current[si],
       [ssi]: {
         ...form,
-        formRef
+        formRef,
+        formPropsRef,
       }
     }
   }, [])
@@ -181,6 +197,7 @@ export default function FormProvider(props: FormProviderProps) {
   return <FormContext.Provider value={{
     stepIndex,
     subStepIndex,
+    submissionHistory: submissionHistoryRef.current,
     steps,
     onSubmit,
     getForm,

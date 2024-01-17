@@ -1,6 +1,6 @@
 'use client';
 
-import { FocusEvent, useRef, useState } from 'react';
+import { FocusEvent, useEffect, useState } from 'react';
 import TextInput, { TextInputProps } from './TextInput';
 
 import {
@@ -18,19 +18,24 @@ import { CiCalendar } from "react-icons/ci";
 
 import DatePicker, { Picker } from '../DatePicker/DatePicker';
 
-type DateInputProps = TextInputProps & {
+export type DateInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> & {
   autoClose?: boolean
+  defaultValue?: Date
+  onChange?: (date?: Date) => void
 }
 
 export default function DateInput(props: DateInputProps) {
 
   const {
     autoClose,
+    onChange,
+    defaultValue,
     ...textInputProps
   } = props
 
   const [isOpen, setIsOpen] = useState(false)
-  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [date, setDate] = useState<Date | undefined>(defaultValue)
+  const [activePicker, setActivePicker] = useState<Picker>('year')
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -50,17 +55,22 @@ export default function DateInput(props: DateInputProps) {
   const focus = useFocus(context)
   const dismiss = useDismiss(context);
 
-
   const { getFloatingProps, getReferenceProps } = useInteractions([
     focus,
     dismiss
   ])
 
-  const [activePicker, setActivePicker] = useState<Picker>('year')
 
   const referenceProps = getReferenceProps() as {
     onFocus?: (e: FocusEvent<HTMLInputElement, Element>) => void
   }
+
+  // Reset picker when input is unfocused
+  useEffect(() => {
+    if (!isOpen) {
+      setActivePicker('year')
+    }
+  }, [isOpen])
 
   return (<>
     <TextInput
@@ -96,6 +106,7 @@ export default function DateInput(props: DateInputProps) {
       setPicker={setActivePicker}
       onSelect={(date) => {
         setDate(date)
+        onChange?.(date)
         if (props.autoClose) {
           setIsOpen(false)
         }

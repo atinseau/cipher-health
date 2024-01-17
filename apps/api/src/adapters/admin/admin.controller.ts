@@ -6,7 +6,7 @@ import { AdminGuard } from "./guards/admin.guard";
 import { User } from "../user/user.decorator";
 import { UserModel } from "../user/user.dto";
 import { UserProfileGuard } from "../user/guards/user-profile.guard";
-import { UserService } from "../user/user.service";
+import { UserService } from "../user/services/user.service";
 import { AdminService } from "./admin.service";
 import { ListQuery, IListQuery } from "@/utils/decorators/searchQuery";
 import { createHttpError, createRawHttpError } from "@/utils/errors";

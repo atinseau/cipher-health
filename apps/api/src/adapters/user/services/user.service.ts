@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/common/database/prisma.service";
 import { Logger } from "@/common/logger/logger.service";
-import { UserCreate, UserModel } from "./user.dto";
+import { UserCreate, UserModel } from "../user.dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { createResult } from "@/utils/errors";
 import { Prisma, User, UserType } from "@prisma/client";
 import { merge, omit, omitBy } from "lodash";
-import { profileCreationSchema } from "./profile.schema";
+import { profileCreationSchema } from "../profile.schema";
 import { z } from "zod";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { PhoneService } from "@/common/phone/phone.service";

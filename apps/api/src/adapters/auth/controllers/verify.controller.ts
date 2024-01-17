@@ -1,7 +1,7 @@
 import { UserGuard } from "@/adapters/user/guards/user.guard";
 import { User } from "@/adapters/user/user.decorator";
 import { UserModel } from "@/adapters/user/user.dto";
-import { UserService } from "@/adapters/user/user.service";
+import { UserService } from "@/adapters/user/services/user.service";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { PhoneService } from "@/common/phone/phone.service";
 import { RandomService } from "@/common/random/random.service";

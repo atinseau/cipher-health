@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
 import { Request } from "express";
-import { UserService } from "../user.service";
+import { UserService } from "../services/user.service";
 import { createRawHttpError } from "@/utils/errors";
 import { Reflector } from "@nestjs/core";
 import { RequiredProfile } from "../user.decorator";

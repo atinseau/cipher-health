@@ -3,7 +3,7 @@ import { JwtService } from "@/common/jwt/jwt.service";
 import { Injectable } from "@nestjs/common";
 import { User, UserType } from "@prisma/client";
 import { v4 as uuid } from 'uuid'
-import { UserService } from "../user/user.service";
+import { UserService } from "../user/services/user.service";
 import { createResult } from "@/utils/errors";
 import { Logger } from "@/common/logger/logger.service";
 import { CryptoService } from "@/common/crypto/crypto.service";

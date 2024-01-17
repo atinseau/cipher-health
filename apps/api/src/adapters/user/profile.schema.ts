@@ -8,7 +8,7 @@ export const profileCreationSchema = z.object({
   addressDetails: z.string().min(1).optional(),
   city: z.string().min(1),
   zipCode: z.string().regex(/^\d{5}$/),
-  country: z.string().length(2), // TODO: use the dataset from @utils
+  country: z.string(),
   birthDate: z.coerce.date().max(getMinimalMajorBirthDate()),
   birthPlace: z.string().min(1).optional(),
   birthName: z.string().min(1).optional(),

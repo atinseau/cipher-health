@@ -1,5 +1,5 @@
 import { Module, Global } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserService } from './services/user.service';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { UserController } from './controllers/user.controller';
 import { UserEncryptionController } from './controllers/user-encryption.controller';
@@ -8,6 +8,7 @@ import { UserTasks } from './user.tasks';
 import { UserEvents } from './user.events';
 import { AuthService } from '../auth/auth.service';
 import { AdminService } from '../admin/admin.service';
+import { ProfileService } from './services/profile.service';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { AdminService } from '../admin/admin.service';
     UserEvents,
     AdminService,
     UserService,
+    ProfileService,
     UserTasks,
     JwtService,
     CryptoService,

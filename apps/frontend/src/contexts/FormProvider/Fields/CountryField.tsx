@@ -5,20 +5,18 @@ import AutocompleteInput from "@/components/Inputs/AutocompleteInput";
 import useFormError from "../hooks/useFormError";
 
 type CountryFieldProps = {
-  countryPropertyName?: string
+  name: string
+  selectProperty?: (item: { label: string, value: string }) => string
 }
 
 export default function CountryField(props: CountryFieldProps) {
 
-  const {
-    countryPropertyName = 'country'
-  } = props
 
   const { form } = useActiveForm()
-  const errors = useFormError(countryPropertyName)
+  const errors = useFormError(props.name)
 
   return <Controller
-    name={countryPropertyName}
+    name={props.name}
     control={form.control}
     render={({ field }) => <AutocompleteInput
       items={COUNTRIES.map((country) => ({
@@ -29,12 +27,22 @@ export default function CountryField(props: CountryFieldProps) {
       classNames={{
         content: "max-h-[150px]"
       }}
-      onChange={(e) => field.onChange(e)}
-      placeholder="Votre pays"
+      onChange={(e) => {
+        if (!e) {
+          field.onChange(undefined)
+          return
+        }
+        const value = props.selectProperty?.(e)
+        field.onChange(value || e.value)
+      }}
+      placeholder="Rechercher un pays"
       textInputProps={{
         isRequired: true,
+        baseInputProps: {
+          label: "Votre pays :"
+        },
         ...errors,
       }}
     />}
   />
-} 
+}

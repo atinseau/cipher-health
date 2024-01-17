@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { signinSchema, signupSchema } from '../auth.schema';
-import { UserService } from '../../user/user.service';
+import { UserService } from '../../user/services/user.service';
 import { omit } from 'lodash';
 import { createHttpError, createRawHttpError } from '@/utils/errors';
 import { CryptoService } from '@/common/crypto/crypto.service';
