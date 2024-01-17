@@ -5,6 +5,8 @@ import AdminCreate from "./components/Create";
 
 import { Route } from "react-router-dom";
 import AdminSignup from "./components/Signup/Signup";
+import Signup from "./components/Signup_refacto/Signup";
+
 
 export const config: ResourceProps = {
   name: 'admin',
@@ -20,5 +22,6 @@ export const adminResource = <>
   <Resource {...config} />
   <CustomRoutes noLayout>
     <Route path="/admin/signup" Component={AdminSignup} />
+    <Route path="/admin/signup_refacto" Component={Signup} />
   </CustomRoutes>
 </>

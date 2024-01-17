@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Registration from "./Registration";
+import Registration from "../Signup_refacto/Steps/Registration";
 import SignupContainer from "./SignupContainer";
 import Verifying from "./Verifying";
 import { useNavigate, useSearchParams } from "react-router-dom";
