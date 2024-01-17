@@ -58,10 +58,7 @@ export default function Signup() {
     }
     // Save signup info for later use in signup form
 
-    // @ts-ignore
     signupStore.set(stwtAtom, stwt)
-
-    // @ts-ignore
     signupStore.set(signupInfoAtom, signupInfo)
     return signupInfo
   }, [])

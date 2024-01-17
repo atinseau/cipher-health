@@ -15,7 +15,7 @@ const client = authentificator.getClient()
 const PermissionInput = ({ permissions }) => {
 
   const [allPermissions, setAllPermissions] = useState(false)
-  const [selectedPermissions, setSelectedPermissions] = useState([])
+  const [selectedPermissions, setSelectedPermissions] = useState<any[]>([])
 
   const allPermissionsController = useController({
     name: 'allPermissions',
