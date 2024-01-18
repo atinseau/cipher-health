@@ -5,6 +5,7 @@ import { UserGuard } from "../user/guards/user.guard";
 import { UserVerifiedGuard } from "../user/guards/user-verified.guard";
 import { ClientGuard } from "./guards/client.guard";
 import { AuthGuard } from "../auth/guards/auth.guard";
+import { User } from "../user/user.decorator";
 
 @UseGuards(
   AuthGuard,
@@ -20,7 +21,7 @@ export class ClientController {
   ) { }
 
   @Get('/me')
-  async me(@Body('user') user: UserModel) {
+  async me(@User() user: UserModel) {
     return {
       success: true,
       data: this.userService.sanitize(user)

@@ -5,14 +5,18 @@ import { profileCreationSchema } from "../profile.schema";
 import { IStwt, UserModel } from "@/types";
 import { createHttpError } from "@/utils/errors";
 import { clientMedicalInformationSchema } from "@cipher-health/utils/schemas";
+import { ClientService } from "@/adapters/client/client.service";
+import { UserService } from "./user.service";
 
 
 @Injectable()
 export class ProfileService {
 
   constructor(
+    private readonly userService: UserService,
     private readonly adminService: AdminService,
-  ) {}
+    private readonly clientService: ClientService,
+  ) { }
 
   async createAdminProfile(data: z.infer<typeof profileCreationSchema>, user: UserModel, stwt: IStwt) {
     const result = await this.adminService.createAdmin({
@@ -47,12 +51,29 @@ export class ProfileService {
     data: z.infer<typeof profileCreationSchema> & z.infer<typeof clientMedicalInformationSchema>,
     user: UserModel
   ) {
-    console.log('createClientProfile', data)
+    const {
+      socialSecurityNumber,
+      mutualInsuranceNumber,
+      ...profileData
+    } = data
+
+    const result = await this.clientService.createClient({
+      user,
+      profile: profileData,
+      client: {
+        socialSecurityNumber,
+        mutualInsuranceNumber
+      }
+    })
+    if (!result.success) {
+      throw createHttpError(result, {
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+      })
+    }
     return {
       success: true,
-      data
+      data: this.userService.sanitize(result.data)
     }
-
   }
 
 }

@@ -131,13 +131,8 @@ export class AdminService implements OnApplicationBootstrap {
 
     // Set user as completed when profile and admin are created for this user
     if (!userModel.completed) {
-      await this.prismaService.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          completed: true
-        }
+      await this.userService.updateById(userModel.id, {
+        completed: true
       })
     }
 

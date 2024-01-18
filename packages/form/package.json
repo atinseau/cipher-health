@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "react": "18.2.0",
-    "react-hook-form": "7.49.2"
+    "react-hook-form": "7.49.2",
+    "@cipher-health/utils": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "18.2.46",

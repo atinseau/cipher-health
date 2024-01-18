@@ -1,5 +1,3 @@
-// TODO: implement stwt cleanup every 24 hours + 1 hour
-
 import { PrismaService } from "@/common/database/prisma.service";
 import { Logger } from "@/common/logger/logger.service";
 import { Injectable } from "@nestjs/common";

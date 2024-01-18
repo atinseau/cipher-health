@@ -217,7 +217,6 @@ export class UserService {
   }
 
   sanitize(user: UserModel) {
-
     const BASE_RELATION_REMOVED_FIELDS = [
       'id',
       'userId',
@@ -227,7 +226,7 @@ export class UserService {
     ]
 
     // Reduce the size of the encryption profile to convert the buffers to hex strings
-    if (user.encryptionProfile) {
+    if (user?.encryptionProfile) {
       // prevent sending to client a buffer instead of hex string (more readable)
       merge(user.encryptionProfile, {
         recoveryKey: user.encryptionProfile.recoveryKey.toString('hex'),
@@ -240,12 +239,17 @@ export class UserService {
       ])
     }
 
-    if (user.profile) {
+    if (user?.profile) {
       // @ts-ignore
       user.profile = omit(user.profile, BASE_RELATION_REMOVED_FIELDS)
     }
 
-    if (user.admin) {
+    if (user?.client) {
+      // @ts-ignore
+      user.client = omit(user.client, BASE_RELATION_REMOVED_FIELDS)
+    }
+
+    if (user?.admin) {
       // @ts-ignore
       user.admin = omit(user.admin, BASE_RELATION_REMOVED_FIELDS)
     }

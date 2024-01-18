@@ -313,7 +313,7 @@ export class Authentificator {
     return result.success
   }
 
-  async createProfile(profile: Record<string, any>) {
+  async createProfile(profile: Record<string, any>): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
     this.debug('createProfile', profile)
     const [res, error] = await this.client.post('/user/profile/create', {
       ...this.getStwtQuery(),

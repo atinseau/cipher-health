@@ -53,6 +53,7 @@ type IFormContext = {
   onSubmitCallback: (result: Record<string, any> | false | Error) => void
   Component: React.ComponentType
   submissionHistory: SubmissionHistory
+  getCurrentSubmission: () => SubmissionHistory[number] | undefined
   getForm: (stepIndex: number, subStepIndex: number) => FormRefs[number][number]
   subscribe: FormContextSubscribe
   unsubscribe: (stepIndex: number, subStepIndex: number) => void
@@ -82,6 +83,17 @@ export function FormProvider(props: FormProviderProps) {
   const getForm = useCallback((si: number, ssi: number) => {
     return formRefs.current?.[si]?.[ssi]
   }, [formRefs])
+
+
+  // Return a pointer to the current submission
+  // this is useful to print an error message in other steps than the current one
+  // errors key can be delete with delete keyword because it's a pointer
+  // and on the next render, the errors will not be return by the useFormError hook
+  const getCurrentSubmission = useCallback(() => {
+    return submissionHistoryRef.current.find((step) => {
+      return step.stepIndex === stepIndex && step.subStepIndex === subStepIndex
+    })
+  }, [stepIndex, subStepIndex])
 
   const changeStep = useCallback(async (stepConfig: { si: number, ssi?: number }) => {
     const {
@@ -210,6 +222,7 @@ export function FormProvider(props: FormProviderProps) {
     steps,
     onSubmit,
     onSubmitCallback,
+    getCurrentSubmission,
     getForm,
     subscribe,
     unsubscribe,

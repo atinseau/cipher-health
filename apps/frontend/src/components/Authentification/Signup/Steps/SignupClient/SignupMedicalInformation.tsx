@@ -13,7 +13,7 @@ const defaultValues = {
 
 export default function SignupMedicalInformation() {
 
-  const { handleSubmit, formRef } = useFormStep({
+  const { handleSubmit, setErrors, formRef } = useFormStep({
     resolver: zodResolver(clientMedicalInformationSchema),
     defaultValues
   })
@@ -26,10 +26,12 @@ export default function SignupMedicalInformation() {
       ...submissionHistory?.map(({ data }) => data).reduce((acc, data) => ({ ...acc, ...data }), {}),
       ...data
     }
-
-    createProfile(payload)
-
-    return false
+    const [_, error] = await createProfile(payload)
+    if (error) {
+      setErrors(error)
+      return false
+    }
+    return true
   }, [])
 
   return <AuthFormContainer

@@ -3,6 +3,8 @@ import { BaseSyntheticEvent, useCallback, useEffect, useRef } from "react"
 import { useFormContext } from "./useFormContext"
 import type { SubmissionHistory } from "../contexts/FormProvider"
 
+import { useMount } from '@cipher-health/utils/react'
+
 export type FormStepSubmitHandler<T = any> = (
   data: T,
   submissionHistory?: SubmissionHistory,
@@ -22,16 +24,11 @@ export function useFormStep<
     onSubmitCallback,
     setStepIndex,
     setSubStepIndex,
+    getCurrentSubmission
   } = useFormContext()
 
-  // We need to find the submission history for the current step
-  // to know if there is initial errors to display or not.
-  const currentSubmission = submissionHistory.find((step) => {
-    return step.stepIndex === stepIndex && step.subStepIndex === subStepIndex
-  })
-
   const formPropsRef = useRef<UseFormProps<TFieldValues, TContext>>({
-    mode: currentSubmission?.errors ? 'onChange' : 'onSubmit',
+    mode: getCurrentSubmission()?.errors ? 'onChange' : 'onSubmit',
     reValidateMode: 'onChange',
     ...props,
   })
@@ -47,7 +44,7 @@ export function useFormStep<
     formRef,
     formPropsRef
   )
-
+ 
   useEffect(() => {
     if (!isSubscribed.current) {
       isSubscribed.current = true
@@ -59,14 +56,13 @@ export function useFormStep<
     }
   }, [])
 
-  useEffect(() => {
+  useMount(() => {
+    const currentSubmission = getCurrentSubmission()
     // Restoring errors from submission history (when we come back to a non current step)
     if (currentSubmission && currentSubmission.errors) {
       setErrors(currentSubmission.errors, true)
     }
-    // removing errors from submission history
-    delete currentSubmission?.errors
-  }, [form])
+  })
 
   const handleSubmit = useCallback((onSubmit: FormStepSubmitHandler) => {
     return form.handleSubmit(async (data, event) => {
@@ -105,7 +101,6 @@ export function useFormStep<
       // so we keep the errors in the submission history and when the previous step is rendered
       // we re run this function to display the error.
       if (errorStep && (errorStep.stepIndex !== stepIndex || errorStep.subStepIndex !== subStepIndex)) {
-        console.log(errorStep)
         setStepIndex(errorStep.stepIndex)
         setSubStepIndex(errorStep.subStepIndex)
         errorStep.errors = errors

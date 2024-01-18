@@ -15,6 +15,7 @@ import SignupSpeciality from "./Steps/SignupWorker/SignupSpeciality";
 export const clientSteps: FormStep[] = [
   {
     title: "Connexion",
+    keepValues: false,
     components: [
       SignupRegistrationStep,
       SignupTwoFa
@@ -43,6 +44,7 @@ export const clientSteps: FormStep[] = [
 export const workerSteps: FormStep[] = [
   {
     title: "Connexion",
+    keepValues: false,
     components: [
       SignupRegistrationStep,
       SignupTwoFa

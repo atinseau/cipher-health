@@ -9,12 +9,14 @@ import { UserEvents } from './user.events';
 import { AuthService } from '../auth/auth.service';
 import { AdminService } from '../admin/admin.service';
 import { ProfileService } from './services/profile.service';
+import { ClientService } from '../client/client.service';
 
 @Global()
 @Module({
   providers: [
     AuthService, // For AuthGuard
     UserEvents,
+    ClientService,
     AdminService,
     UserService,
     ProfileService,

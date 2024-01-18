@@ -129,8 +129,8 @@ model Client {
   updatedAt DateTime @updatedAt
 
   // extra fields for the client
-  socialSecurityNumber String
-  mutualInsuranceNumber String
+  socialSecurityNumber String?
+  mutualInsuranceNumber String?
 
   // the user who owns this client profile
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

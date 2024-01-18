@@ -15,7 +15,7 @@ type NotificationProviderProps = {
 
 type INotificationContext = {
   notify: (options: {
-    type: NotifType,
+    type?: NotifType,
     title: string,
     message?: string,
     icon?: React.ReactNode,
@@ -100,7 +100,7 @@ export default function NotificationProvider(props: NotificationProviderProps) {
     }
 
     componentRoot.render(<Notification
-      type={type}
+      type={type || 'success'}
       title={typeof options === 'string' ? options : options.title}
       message={typeof options === 'string' ? undefined : options.message}
       icon={typeof options === 'string' ? undefined : options.icon}

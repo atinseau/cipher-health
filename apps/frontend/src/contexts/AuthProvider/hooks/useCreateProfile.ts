@@ -9,7 +9,13 @@ export default function useCreateProfile() {
 
   const createProfile = useCallback(async (payload: Record<string, any>) => {
 
-    authentificator.createProfile(payload)
+    const [res, error] = await authentificator.createProfile(payload)
+
+    if (error instanceof Error) {
+      throw error
+    }
+
+    return [res, error] as const
 
   }, [])
 

@@ -18,8 +18,6 @@ export function useFormError(name: string) {
     const error = formState.errors[name]
     const errorType = error?.type
 
-    console.log(error)
-
     if (errorType === 'forced') {
       return {
         isInvalid: true,

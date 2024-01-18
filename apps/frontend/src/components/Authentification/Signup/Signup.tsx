@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation'
 import { clientSteps } from "./steps";
 import SignupForm from "./SignupForm";
 import { createContext, useCallback, useState } from "react";
@@ -14,6 +15,8 @@ import SmoothExit from "@/components/Animation/SmoothExit";
 import { AnimatePresence } from "framer-motion";
 
 import { FormProvider, FormStep } from "@cipher-health/form"
+import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
+import { DASHBOARD_URL, SIGNIN_URL } from '@/utils/constants';
 
 type ISignupContext = {
   hydrateSignupInfo: () => Promise<SignupInfo | null>
@@ -26,14 +29,26 @@ export default function Signup() {
   const [steps, setSteps] = useState<FormStep[]>([])
   const [stepIndex, setStepIndex] = useState<number>(0)
   const [subStepIndex, setSubStepIndex] = useState<number>(0)
+  const notify = useNotify()
+  const router = useRouter()
+
 
   const authentificator = useAuthentificator()
 
   const hydrateSignupInfo = useCallback(async () => {
     const signupInfo = await authentificator.getSignupInfo()
+
     // Save signup info for later use in signup form
     signupStore.set(signupInfoAtom, signupInfo)
     return signupInfo
+  }, [])
+
+  const handleRedirect = useCallback(() => {
+    notify({
+      title: "Félicitations !",
+      message: "Votre compte a été créé avec succès",
+    })
+    router.push(DASHBOARD_URL)
   }, [])
 
   useMount(() => {
@@ -41,6 +56,16 @@ export default function Signup() {
     let computedSteps = clientSteps
 
     hydrateSignupInfo().then((signupInfo) => {
+      if (signupInfo?.status === 'USER_ALREADY_CREATED') {
+        router.push(SIGNIN_URL)
+        notify({
+          type: 'info',
+          title: "Vous avez déjà un compte",
+          message: "Redirection vers la page de connexion",
+        })
+        return
+      }
+
       if (signupInfo?.status === "USER_NOT_VERIFIED") {
         setStepIndex(0)
         setSubStepIndex(1)
@@ -66,6 +91,7 @@ export default function Signup() {
             steps={steps}
             initialStepIndex={stepIndex}
             initialSubStepIndex={subStepIndex}
+            afterLastStep={handleRedirect}
             beforeStepChange={hydrateSignupInfo}
           >
             <SignupForm />

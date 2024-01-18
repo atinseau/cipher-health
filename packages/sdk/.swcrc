@@ -17,7 +17,8 @@
   "env": {
     "exclude": [
       "zod",
-      "react"
+      "react",
+      "@cipher-health/utils"
     ]
   }
 }

@@ -10,7 +10,7 @@ export default function SignupForm() {
   const { stepIndex, steps } = useFormContext()
 
   return <div className="flex flex-col justify-between h-full">
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-12 mb-6">
       <StepBar
         currentStep={stepIndex}
         steps={steps.map(step => ({

@@ -189,7 +189,12 @@ export class AuthController {
 
     // If the user is verified and completed, return an error
     // because it's not possible to signup again
-    throw createRawHttpError(HttpStatus.FORBIDDEN, 'User already completed the signup process.')
+    return {
+      success: false,
+      data: {
+        status: 'USER_ALREADY_CREATED',
+      }
+    }
   }
 
 

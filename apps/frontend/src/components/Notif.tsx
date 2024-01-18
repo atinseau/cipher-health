@@ -42,14 +42,6 @@ const notifVariants = createVariants({
       }
     }
   },
-  'warning': {
-    props: {
-      icon: <IoInformationCircleOutline size={20} className="text-indigo-500" />
-    },
-    colors: {
-      primary: ""
-    }
-  },
   'error': {
     props: {
       icon: <RxCross1 size={20} className="text-white" />
