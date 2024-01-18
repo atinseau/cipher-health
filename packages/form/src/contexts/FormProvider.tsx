@@ -6,6 +6,8 @@ import { UseFormProps, UseFormReturn } from "react-hook-form";
 export type FormStep = {
   title?: string
   components: React.ComponentType[]
+  keepValues?: boolean
+  // scopedValues?: boolean
 }
 
 export type BeforeStepChangeHandler = (stepIndex: number, subStepIndex?: number) => Promise<any> | any
@@ -17,6 +19,7 @@ type FormProviderProps = {
   steps: FormStep[]
   onError?: (error: Error) => void
   beforeStepChange?: BeforeStepChangeHandler
+  afterLastStep?: () => void
 }
 
 type FormRefs = Record<number, Record<number,
@@ -31,6 +34,7 @@ export type SubmissionHistory = Array<{
   data: Record<string, any>
   stepIndex: number
   subStepIndex: number
+  errors?: Array<{ key: string, message: string }>
 }>
 
 type FormContextSubscribe = (
@@ -52,6 +56,8 @@ type IFormContext = {
   getForm: (stepIndex: number, subStepIndex: number) => FormRefs[number][number]
   subscribe: FormContextSubscribe
   unsubscribe: (stepIndex: number, subStepIndex: number) => void
+  setStepIndex: React.Dispatch<React.SetStateAction<number>>
+  setSubStepIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
 export const FormContext = createContext({} as IFormContext)
@@ -64,6 +70,7 @@ export function FormProvider(props: FormProviderProps) {
     initialStepIndex = 0,
     initialSubStepIndex = 0,
     beforeStepChange,
+    afterLastStep,
   } = props
 
   const [stepIndex, setStepIndex] = useState(initialStepIndex)
@@ -111,11 +118,14 @@ export function FormProvider(props: FormProviderProps) {
     }
 
     // Update submission history
-    submissionHistoryRef.current.push({
-      data: result,
-      stepIndex,
-      subStepIndex,
-    })
+    const keepValues = typeof steps[stepIndex].keepValues === 'undefined' ? true : steps[stepIndex].keepValues
+    if (keepValues) {
+      submissionHistoryRef.current.push({
+        data: result,
+        stepIndex,
+        subStepIndex,
+      })
+    }
 
     if (subStepIndex < steps[stepIndex].components.length - 1) {
       changeStep({
@@ -126,12 +136,16 @@ export function FormProvider(props: FormProviderProps) {
     }
 
     if (stepIndex < steps.length - 1) {
+      // TODO: for scoped values, we need clear the form values of the last step
       changeStep({
         si: stepIndex + 1, // next step
         ssi: 0, // first substep
       })
       return
     }
+
+    // Last step
+    afterLastStep?.()
   }, [stepIndex, subStepIndex])
 
   // This function is only for triggering the submit event externally
@@ -142,7 +156,7 @@ export function FormProvider(props: FormProviderProps) {
   //  <ExternalButton/> <-- By getting the context, we can trigger the submit event
   // </>
   const onSubmit = useCallback(async () => {
-    const { formRef } = getForm(stepIndex, subStepIndex)
+    const { formRef } = getForm(stepIndex, subStepIndex) || {}
 
     if (!formRef?.current) {
       console.error('[FormProvider] Form ref is not defined cannot submit form')
@@ -199,6 +213,8 @@ export function FormProvider(props: FormProviderProps) {
     getForm,
     subscribe,
     unsubscribe,
+    setStepIndex,
+    setSubStepIndex,
     Component,
   }}>
     {children}

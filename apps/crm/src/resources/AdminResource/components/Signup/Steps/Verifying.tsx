@@ -3,17 +3,17 @@ import Button from "@mui/material/Button";
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import Box from "@mui/material/Box";
 import { useCallback } from "react";
-import { Container } from "../../Signup/SignupContainer";
 import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import CodeField from "@/components/Fields/CodeField";
 import { useMount } from "@cipher-health/utils/react";
 import { useAtom } from "jotai";
-import { signupInfoAtom, stwtAtom } from "../signupStore";
+import { signupInfoAtom } from "../signupStore";
 import { authentificator } from "@/auth";
 import { useNotify } from "react-admin";
 import { codeSent, expiredCodeError } from "@/lib/errors";
+import { CustomPageContainer } from "@/components/CustomPage";
 
 const twoFaSchema = z.object({
   code: z.string().min(6).max(6),
@@ -22,7 +22,6 @@ const twoFaSchema = z.object({
 export default function Verifying() {
 
   const [signupInfo] = useAtom(signupInfoAtom)
-  const [stwt] = useAtom(stwtAtom)
   const notify = useNotify()
 
   const { handleSubmit } = useFormStep({
@@ -33,13 +32,13 @@ export default function Verifying() {
     console.log(signupInfo)
     // Send sms if not sent
     if (signupInfo?.status === 'USER_NOT_VERIFIED' && !signupInfo.codeSent) {
-      await authentificator.sendVerificationCode(stwt)
+      await authentificator.sendVerificationCode()
       notify(codeSent)
     }
   })
 
   const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
-    const [res, error] = await authentificator.verify(data.code, stwt)
+    const [res, error] = await authentificator.verify(data.code)
     if (error) {
       notify(expiredCodeError)
       return false
@@ -47,7 +46,7 @@ export default function Verifying() {
     return true
   }, [])
 
-  return <Container>
+  return <CustomPageContainer>
     <Box component="form" sx={{ pt: "10px" }} onSubmit={handleSubmit(onSubmit)}>
       <Box sx={{ display: "flex", flexDirection: 'column', alignItems: 'center' }}>
         <LockPersonIcon fontSize={"large"} sx={{ mb: "10px" }} />
@@ -71,5 +70,5 @@ export default function Verifying() {
         Confirmer
       </Button>
     </Box>
-  </Container>
+  </CustomPageContainer>
 }

@@ -3,7 +3,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
-import { Container } from "../../Signup/SignupContainer";
 import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema } from "@cipher-health/utils/schemas";
@@ -11,8 +10,7 @@ import { useCallback } from "react";
 import TextField from "@/components/Fields/TextField";
 import { authentificator } from "@/auth";
 import CountryField from "@/components/Fields/CountryField";
-import { useAtom } from "jotai";
-import { stwtAtom } from "../signupStore";
+import { CustomPageContainer } from "@/components/CustomPage";
 
 const defaultValues = {
   "email": "arthurtinseau@live.fr",
@@ -24,15 +22,13 @@ const defaultValues = {
 
 export default function Registration() {
 
-  const [stwt] = useAtom(stwtAtom)
-
   const { handleSubmit, setErrors, formRef } = useFormStep({
     resolver: zodResolver(signupSchema),
     defaultValues,
   })
 
   const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
-    const [_, error] = await authentificator.signup(data, stwt)
+    const [_, error] = await authentificator.signup(data)
     if (error instanceof Error) {
       throw error
     }
@@ -45,7 +41,7 @@ export default function Registration() {
 
   const isSubmitting = false;
 
-  return <Container>
+  return <CustomPageContainer>
     <form ref={formRef} onSubmit={handleSubmit(onSubmit)}>
       <Box mb={"30px"}>
         <Typography variant="h6">Bienvenue !</Typography>
@@ -73,5 +69,5 @@ export default function Registration() {
         {isSubmitting ? <CircularProgress size="24px" sx={{ color: "black" }} /> : 'Créer mon compte'}
       </Button>
     </form>
-  </Container>
+  </CustomPageContainer>
 }

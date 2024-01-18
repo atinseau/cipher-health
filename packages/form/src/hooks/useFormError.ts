@@ -16,6 +16,16 @@ export function useFormError(name: string) {
   const errors = useMemo(() => {
     const mode = form.formPropsRef?.current?.mode
     const error = formState.errors[name]
+    const errorType = error?.type
+
+    console.log(error)
+
+    if (errorType === 'forced') {
+      return {
+        isInvalid: true,
+        errorText: error?.message?.toString()
+      }
+    }
 
     if (mode === 'onSubmit' && formState.submitCount === 0) {
       return {}

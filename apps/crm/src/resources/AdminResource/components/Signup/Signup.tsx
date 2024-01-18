@@ -1,75 +1,108 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import SignupContainer from "./SignupContainer";
-import Verifying from "./Verifying";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { DisplayFormStep, FormProvider, FormStep } from "@cipher-health/form";
+import CustomPage from "@/components/CustomPage";
+import Registration from "./Steps/Registration";
+import Verifying from "./Steps/Verifying";
+import ProfileInformation from "./Steps/Profile/ProfileInformation";
+import ProfileAddress from "./Steps/Profile/ProfileAddress";
 import { useNotify } from "react-admin";
-import { useClient } from "@cipher-health/sdk/react";
-import Profile from "./Profile";
-import { invalidLinkError } from "../../../../lib/errors";
-import Registration from "./Registration";
 
-const steps = [
-  Registration,
-  Verifying,
-  Profile,
+import { useMount } from "@cipher-health/utils/react"
+import { useCallback, useState } from "react";
+import { authentificator } from "@/auth";
+import { signupInfoAtom, signupStore } from "./signupStore";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { invalidLinkError } from "@/lib/errors";
+import { Provider } from "jotai";
+
+const signupSteps: FormStep[] = [
+  {
+    keepValues: false,
+    components: [
+      Registration
+    ],
+  },
+  {
+    keepValues: false,
+    components: [
+      Verifying
+    ]
+  },
+  {
+    components: [
+      ProfileInformation,
+      ProfileAddress
+    ]
+  }
 ]
 
-export default function AdminSignup() {
+export default function Signup() {
+
+  const notify = useNotify()
+  const navigate = useNavigate()
 
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const notify = useNotify()
-  const client = useClient()
+  const [steps, setSteps] = useState<FormStep[]>([])
+  const [stepIndex, setStepIndex] = useState<number>(0)
+  const [subStepIndex, setSubStepIndex] = useState<number>(0)
 
-
-  const stwtRef = useRef<string>(searchParams.get('stwt'))
-
-  const [step, setStep] = useState(0)
-  const [isBooting, setIsBooting] = useState(true)
-
-  const Step = steps[step]
-
-  useEffect(() => {
-    if (!stwtRef.current) {
+  const hydrateSignupInfo = useCallback(async () => {
+    const stwt = searchParams.get('stwt')
+    if (!stwt) {
       notify(invalidLinkError)
       navigate('/login')
       return
     }
 
-    checkProgress()
-  }, [])
+    authentificator.setStwt(stwt)
 
-  const checkProgress = useCallback(async () => {
-    const [res, error] = await client.get('/auth/signup/info', {
-      ttl: 100, // 100ms of cache
-      query: {
-        stwt: stwtRef.current!
-      }
-    })
-    setIsBooting(false)
-
-    if (error) {
-      console.error(error)
-      notify("Le lien est expiré ou invalide, merci de contacter l'administrateur qui vous a invité", {
-        type: 'error'
-      })
+    const signupInfo = await authentificator.getSignupInfo()
+    if (!signupInfo) {
+      notify(invalidLinkError)
       navigate('/login')
       return
     }
-
-    if (res?.data?.status === 'USER_NOT_VERIFIED') {
-      setStep(1)
-    } else if (res?.data?.status === 'USER_NOT_COMPLETED') {
-      setStep(2)
-    }
-
-    return res?.data
+    // Save signup info for later use in signup form
+    signupStore.set(signupInfoAtom, signupInfo)
+    return signupInfo
   }, [])
 
-  return <SignupContainer isBooted={!isBooting}>
-    <Step
-      checkProgress={checkProgress}
-      stwt={stwtRef.current!}
-    />
-  </SignupContainer>
+  useMount(() => {
+    hydrateSignupInfo().then((signupInfo) => {
+
+      if (signupInfo?.status === 'USER_NOT_VERIFIED') {
+        setStepIndex(1)
+        setSubStepIndex(0)
+      }
+
+      if (signupInfo?.status === 'USER_NOT_COMPLETED') {
+        setStepIndex(2)
+        setSubStepIndex(0)
+      }
+
+      setSteps(signupSteps)
+    })
+  })
+
+  return <CustomPage>
+    {steps.length ? <Provider store={signupStore}>
+      <FormProvider
+        steps={steps}
+        initialStepIndex={stepIndex}
+        initialSubStepIndex={subStepIndex}
+        beforeStepChange={hydrateSignupInfo}
+        afterLastStep={() => {
+          navigate('/login')
+          notify('Votre profile a bien été créé, vous pouvez maintenant vous connectez !', {
+            type: 'success'
+          })
+        }}
+        onError={(error) => notify(error.message, {
+          type: "error"
+        })}
+      >
+        <DisplayFormStep />
+      </FormProvider>
+    </Provider> : null}
+  </CustomPage>
+
 }

@@ -1,9 +1,8 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Create, SimpleForm, TextInput, useNotify, usePermissions, useRedirect } from "react-admin";
+import { Create, SimpleForm, TextInput, useNotify, useRedirect } from "react-admin";
 import { authentificator } from "../../../auth";
 import { useCallback, useEffect, useState } from "react";
-import { BooleanInput } from 'react-admin';
 import Switch from '@mui/material/Switch'
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -111,7 +110,6 @@ export default function AdminCreate() {
         })
       },
       onSuccess: ({ data }) => {
-        console.log('data:', data)
         notify('Invitation envoyée avec succès !', {
           type: 'success'
         })

@@ -7,7 +7,7 @@ import {
   RadioGroupProps as RadioGroupPropsMui
 } from "@mui/material/RadioGroup";
 
-interface RadioGroupProps extends FormControlProps {
+export interface RadioGroupProps extends FormControlProps {
   label: string
   id: string
   name?: string

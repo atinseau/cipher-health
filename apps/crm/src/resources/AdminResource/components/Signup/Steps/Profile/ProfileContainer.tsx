@@ -4,13 +4,16 @@ import Typography from "@mui/material/Typography";
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Container } from "../../../Signup/SignupContainer";
+import { useFormContext } from "@cipher-health/form";
+import { CustomPageContainer } from "@/components/CustomPage";
 
 
 
 export default function ProfileContainer({ children }: { children: React.ReactNode }) {
 
-  return <Container sx={{ minWidth: 400 }}>
+  const { onSubmit } = useFormContext()
+
+  return <CustomPageContainer sx={{ minWidth: 400 }}>
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Typography variant="h6">Création de votre profile</Typography>
       <Typography variant="body2" color="GrayText">
@@ -30,7 +33,7 @@ export default function ProfileContainer({ children }: { children: React.ReactNo
             Précédent
           </Button>
 
-          <Button variant="contained">
+          <Button variant="contained" onClick={onSubmit}>
             {/* {step === steps.length - 1 ? 'Terminer' : 'Suivant'} */}
             Suivant
           </Button>
@@ -38,5 +41,5 @@ export default function ProfileContainer({ children }: { children: React.ReactNo
 
       </Box>
     </LocalizationProvider>
-  </Container>
+  </CustomPageContainer>
 }

@@ -21,6 +21,8 @@ export class Authentificator {
   private adapter: AuthentificatorAdapter;
   private mode: UserType = 'CLIENT'
 
+  private stwt?: string
+
   private DEBUG_MODE = false
 
   private refreshing = {
@@ -129,6 +131,16 @@ export class Authentificator {
     return true
   }
 
+  private getStwtQuery() {
+    return this.stwt
+      ? { query: { stwt: this.stwt } }
+      : {}
+  }
+
+  setStwt(stwt: string) {
+    this.stwt = stwt
+  }
+
   async login({ email, password }: { email: string, password: string }) {
     this.debug('login', email, password)
     try {
@@ -162,11 +174,11 @@ export class Authentificator {
     }
   }
 
-  async signup(body: z.infer<typeof signupSchema>, stwt?: string): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
+  async signup(body: z.infer<typeof signupSchema>): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {
     this.debug('signup', body)
     const [res, error] = await this.client.post('/auth/signup', {
       body,
-      query: stwt ? { stwt } : undefined,
+      ...this.getStwtQuery(),
       skipHooks: [
         'afterRequest'
       ],
@@ -193,10 +205,10 @@ export class Authentificator {
     return [res, null]
   }
 
-  async sendVerificationCode(stwt?: string) {
+  async sendVerificationCode() {
     this.debug('sendVerificationCode')
     const [_, error] = await this.client.get('/auth/verify', {
-      query: stwt ? { stwt } : undefined
+      ...this.getStwtQuery(),
     })
     if (error) {
       return false
@@ -204,10 +216,10 @@ export class Authentificator {
     return true
   }
 
-  async verify(code: string, stwt?: string): Promise<[any, ClientError | null]> {
+  async verify(code: string): Promise<[any, ClientError | null]> {
     this.debug('verify', code)
     const [res, error] = await this.client.post('/auth/verify/callback', {
-      query: stwt ? { stwt } : undefined,
+      ...this.getStwtQuery(),
       body: {
         code
       }
@@ -279,14 +291,14 @@ export class Authentificator {
   }
 
   // this method should never throw an error
-  async getSignupInfo(stwt?: string) {
+  async getSignupInfo() {
     this.debug('getSignupInfo')
-    if (!this.isSoftConnected() && !stwt) {
+    if (!this.isSoftConnected() && !this.stwt) {
       return null
     }
 
     const [res, error] = await this.client.get<{ data: SignupInfo }>('/auth/signup/info', {
-      query: stwt ? { stwt } : undefined
+      ...this.getStwtQuery(),
     })
 
     if (error) {
@@ -304,9 +316,22 @@ export class Authentificator {
   async createProfile(profile: Record<string, any>) {
     this.debug('createProfile', profile)
     const [res, error] = await this.client.post('/user/profile/create', {
+      ...this.getStwtQuery(),
       body: profile
     })
-    console.log(res, error)
+
+    if (error?.status === 422) {
+      return [null, error.data?.map((e) => ({
+        message: e.message,
+        key: e.path[0]
+      }))]
+    }
+
+    if (error) {
+      return [null, error]
+    }
+
+    return [res.data, error]
   }
 
   async me(): Promise<UserModel> {
