@@ -25,7 +25,7 @@ spec:
           resources:
             limits: # TODO: tune those values for best efficiency
               memory: "512Mi"
-              cpu: "2.0"
+              cpu: "500m"
           ports:
             - containerPort: 8080
               name: nestjs-port
@@ -111,4 +111,4 @@ spec:
           resources:
             limits:
               memory: 4Gi
-              cpu: 1.0
+              cpu: "500m"
