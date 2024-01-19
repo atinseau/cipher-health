@@ -11,6 +11,7 @@ export type FormStep = {
 }
 
 export type BeforeStepChangeHandler = (stepIndex: number, subStepIndex?: number) => Promise<any> | any
+export type OnSubmitCallback = (data: { result: boolean | Error | null, data: Record<string, any> }) => void
 
 type FormProviderProps = {
   children: React.ReactNode
@@ -34,7 +35,7 @@ export type SubmissionHistory = Array<{
   data: Record<string, any>
   stepIndex: number
   subStepIndex: number
-  errors?: Array<{ key: string, message: string }>
+  errors?: Record<string, string>
 }>
 
 type FormContextSubscribe = (
@@ -50,7 +51,8 @@ type IFormContext = {
   subStepIndex: number
   steps: FormStep[]
   onSubmit: () => void
-  onSubmitCallback: (result: Record<string, any> | false | Error) => void
+  onSubmitCallback: OnSubmitCallback
+  addNewSubmissionHistory: (data: Record<string, any>) => void
   Component: React.ComponentType
   submissionHistory: SubmissionHistory
   getCurrentSubmission: () => SubmissionHistory[number] | undefined
@@ -119,7 +121,30 @@ export function FormProvider(props: FormProviderProps) {
     subStepIndex,
   ])
 
-  const onSubmitCallback = useCallback(async (result: Record<string, any> | false | Error) => {
+  const addNewSubmissionHistory = useCallback((data: Record<string, any>) => {
+    // Update submission history
+    // in any case, we need to keep the values of the last step
+    const keepValues = typeof steps[stepIndex].keepValues === 'undefined' ? true : steps[stepIndex].keepValues
+    if (keepValues) {
+
+      // remove this step from the submission history if it exists
+      const index = submissionHistoryRef.current.findIndex((step) => {
+        return step.stepIndex === stepIndex && step.subStepIndex === subStepIndex
+      })
+
+      if (index !== -1) {
+        submissionHistoryRef.current.splice(index, 1)
+      }
+
+      submissionHistoryRef.current.push({
+        data,
+        stepIndex,
+        subStepIndex,
+      })
+    }
+  }, [stepIndex, subStepIndex])
+
+  const onSubmitCallback: OnSubmitCallback = useCallback(async ({ result }) => {
     if (result instanceof Error) {
       props.onError?.(result)
       return
@@ -127,16 +152,6 @@ export function FormProvider(props: FormProviderProps) {
     if (!result) {
       console.warn('[FormProvider] Form submission was cancelled: ', result)
       return
-    }
-
-    // Update submission history
-    const keepValues = typeof steps[stepIndex].keepValues === 'undefined' ? true : steps[stepIndex].keepValues
-    if (keepValues) {
-      submissionHistoryRef.current.push({
-        data: result,
-        stepIndex,
-        subStepIndex,
-      })
     }
 
     if (subStepIndex < steps[stepIndex].components.length - 1) {
@@ -223,6 +238,7 @@ export function FormProvider(props: FormProviderProps) {
     onSubmit,
     onSubmitCallback,
     getCurrentSubmission,
+    addNewSubmissionHistory,
     getForm,
     subscribe,
     unsubscribe,

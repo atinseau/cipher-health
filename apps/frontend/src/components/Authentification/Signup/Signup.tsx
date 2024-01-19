@@ -3,20 +3,20 @@
 import { useRouter } from 'next/navigation'
 import { clientSteps } from "./steps";
 import SignupForm from "./SignupForm";
-import { createContext, useCallback, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
 import { useAuthentificator } from "@cipher-health/sdk/react";
 import { signupInfoAtom, signupStore } from "./signupStore";
 import { Provider } from "jotai";
 import { SignupInfo } from "@cipher-health/sdk";
-import { useMount } from "@cipher-health/utils/react";
 import SmoothEnter from "@/components/Animation/SmoothEnter";
 import SmoothExit from "@/components/Animation/SmoothExit";
 import { AnimatePresence } from "framer-motion";
 
 import { FormProvider, FormStep } from "@cipher-health/form"
 import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
-import { DASHBOARD_URL, SIGNIN_URL } from '@/utils/constants';
+import { DASHBOARD_URL } from '@/utils/constants';
+import useUser from '@/contexts/AuthProvider/hooks/useUser';
 
 type ISignupContext = {
   hydrateSignupInfo: () => Promise<SignupInfo | null>
@@ -29,9 +29,10 @@ export default function Signup() {
   const [steps, setSteps] = useState<FormStep[]>([])
   const [stepIndex, setStepIndex] = useState<number>(0)
   const [subStepIndex, setSubStepIndex] = useState<number>(0)
+  const { isConnected, loading } = useUser()
+
   const notify = useNotify()
   const router = useRouter()
-
 
   const authentificator = useAuthentificator()
 
@@ -51,21 +52,23 @@ export default function Signup() {
     router.push(DASHBOARD_URL)
   }, [])
 
-  useMount(() => {
+  useEffect(() => {
+    if (loading) return
+    if (isConnected) {
+      router.push(DASHBOARD_URL)
+      notify({
+        type: 'info',
+        title: "Vous êtes déjà connecté",
+        message: "Redirection vers votre espace personnel",
+      })
+      return
+    }
+
+    if (steps.length) return // To be sure not to recompute steps
+
     // Compute steps set depending on user type
     let computedSteps = clientSteps
-
     hydrateSignupInfo().then((signupInfo) => {
-      if (signupInfo?.status === 'USER_ALREADY_CREATED') {
-        router.push(SIGNIN_URL)
-        notify({
-          type: 'info',
-          title: "Vous avez déjà un compte",
-          message: "Redirection vers la page de connexion",
-        })
-        return
-      }
-
       if (signupInfo?.status === "USER_NOT_VERIFIED") {
         setStepIndex(0)
         setSubStepIndex(1)
@@ -75,10 +78,9 @@ export default function Signup() {
         setStepIndex(1)
         setSubStepIndex(0)
       }
-
       setSteps(computedSteps)
     })
-  })
+  }, [isConnected])
 
   return <AnimatePresence>
     {!steps.length

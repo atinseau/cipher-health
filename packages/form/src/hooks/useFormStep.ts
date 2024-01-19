@@ -1,4 +1,4 @@
-import { Path, UseFormProps, useForm, type FieldValues } from "react-hook-form"
+import { DefaultValues, Path, UseFormProps, useForm, type FieldValues } from "react-hook-form"
 import { BaseSyntheticEvent, useCallback, useEffect, useRef } from "react"
 import { useFormContext } from "./useFormContext"
 import type { SubmissionHistory } from "../contexts/FormProvider"
@@ -24,6 +24,7 @@ export function useFormStep<
     onSubmitCallback,
     setStepIndex,
     setSubStepIndex,
+    addNewSubmissionHistory,
     getCurrentSubmission
   } = useFormContext()
 
@@ -31,6 +32,8 @@ export function useFormStep<
     mode: getCurrentSubmission()?.errors ? 'onChange' : 'onSubmit',
     reValidateMode: 'onChange',
     ...props,
+    // override defaultValues with the current submission data (if any)
+    defaultValues: (getCurrentSubmission()?.data || props?.defaultValues || {}) as DefaultValues<TFieldValues>,
   })
 
   const form = useForm(formPropsRef.current)
@@ -44,7 +47,7 @@ export function useFormStep<
     formRef,
     formPropsRef
   )
- 
+
   useEffect(() => {
     if (!isSubscribed.current) {
       isSubscribed.current = true
@@ -58,6 +61,7 @@ export function useFormStep<
 
   useMount(() => {
     const currentSubmission = getCurrentSubmission()
+
     // Restoring errors from submission history (when we come back to a non current step)
     if (currentSubmission && currentSubmission.errors) {
       setErrors(currentSubmission.errors, true)
@@ -66,16 +70,23 @@ export function useFormStep<
 
   const handleSubmit = useCallback((onSubmit: FormStepSubmitHandler) => {
     return form.handleSubmit(async (data, event) => {
-      const isExternalSubmission: boolean = (event?.nativeEvent as CustomEvent)?.detail?.external || false
 
+      // We add the current step to the submission history
+      // This is useful to restore errors when we come back to a non current step
+      // Even if the form is not submitted, we want to keep the data
+      addNewSubmissionHistory(data)
+
+      const isExternalSubmission: boolean = (event?.nativeEvent as CustomEvent)?.detail?.external || false
       let result: boolean | Error | null = null
       try {
         result = await onSubmit(data, submissionHistory, event)
       } catch (error) {
         result = error
       }
-
-      const contextResult = result === false || result instanceof Error ? result : data
+      const contextResult = {
+        result,
+        data
+      }
 
       // If there is an error or the submit handler returns false, we don't want to
       // go to the next step. We just want to display the error.
@@ -90,28 +101,49 @@ export function useFormStep<
     })
   }, [])
 
-  const setErrors = useCallback((errors: Array<{ key: string, message: string }>, forceDisplay?: boolean) => {
-    for (const error of errors) {
 
-      const errorStep = submissionHistory.find((step) => {
-        return Object.keys(step.data).includes(error.key)
-      })
+  const setErrors = useCallback((errors: Array<{ key: string, message: string }> | Record<string, string>, forcedDisplay?: boolean) => {
+    if (!errors) {
+      return
+    }
 
-      // If the error is not in the current step, we need to go to the step where the error is
-      // so we keep the errors in the submission history and when the previous step is rendered
-      // we re run this function to display the error.
-      if (errorStep && (errorStep.stepIndex !== stepIndex || errorStep.subStepIndex !== subStepIndex)) {
-        setStepIndex(errorStep.stepIndex)
-        setSubStepIndex(errorStep.subStepIndex)
-        errorStep.errors = errors
+    if (typeof errors === 'object' && Array.isArray(errors)) {
+      for (const error of errors) {
+        const { key, message } = error
+        const concernedErrorStep = submissionHistory.find((step) => {
+          return Object.keys(step.data).includes(key)
+        })
+
+        if (concernedErrorStep && (!concernedErrorStep.errors || !concernedErrorStep.errors[key])) {
+          concernedErrorStep.errors = concernedErrorStep.errors || {}
+          concernedErrorStep.errors[key] = message
+        }
+      }
+    }
+
+    for (const step of submissionHistory) {
+
+      const errors = Object.entries(step?.errors || {})
+
+      // Current step
+      if (errors?.length && step.stepIndex === stepIndex && step.subStepIndex === subStepIndex) {
+        errors.forEach(([key, message]) => {
+          form.setError(key as Path<TFieldValues>, {
+            type: forcedDisplay ? 'forced' : undefined,
+            message: message
+          })
+        })
         return
       }
 
-      form.setError(error.key as Path<TFieldValues>, {
-        message: error.message,
-        type: forceDisplay ? 'forced' : undefined
-      })
+      // Other steps
+      if (errors.length) {
+        setStepIndex(step.stepIndex)
+        setSubStepIndex(step.subStepIndex)
+        return
+      }
     }
+
   }, [])
 
   return {

@@ -36,10 +36,12 @@ export type ProfileCreate = Omit<Profile,
   | 'userId'
   | 'addressDetails'
   | 'birthName'
+  | 'birthDate'
   | 'birthPlace'
 > & {
   birthName?: string,
-  birthPlace?: string,
+  birthPlace: string,
+  birthDate: string,
   addressDetails?: string
 }
 

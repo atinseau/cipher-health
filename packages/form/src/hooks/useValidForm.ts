@@ -16,6 +16,7 @@ export function useValidForm() {
     const currentSubmission = getCurrentSubmission()
     if (currentSubmission?.errors) {
       setIsValid(false)
+      // TODO: fix this workaround 
       delete currentSubmission.errors
       return
     }

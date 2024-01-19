@@ -40,7 +40,7 @@ export class AdminService implements OnApplicationBootstrap {
           lastName: 'Admin',
           address: 'Admin',
           addressDetails: 'Admin',
-          birthDate: new Date(),
+          birthDate: new Date().toISOString(),
           birthName: 'Admin',
           birthPlace: 'Admin',
           city: 'Admin',
@@ -110,7 +110,7 @@ export class AdminService implements OnApplicationBootstrap {
       }
       user = result.data
     }
-
+  
     const profile = this.userService.createProfile(user.id, userCreation.profile)
     const admin = this.createStandaloneAdmin(user.id, userCreation.admin)
 

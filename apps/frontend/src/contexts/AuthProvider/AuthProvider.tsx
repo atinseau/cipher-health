@@ -2,9 +2,10 @@
 
 import { type Authentificator, CookieAdapter } from "@cipher-health/sdk";
 import { AuthentificatorProvider } from "@cipher-health/sdk/react";
-import { useEffect, useRef } from "react";
-import { userAtom, authStore } from "./authStore";
+import { useRef } from "react";
+import { userAtom, authStore, isConnectedAtom } from "./authStore";
 import { useMount } from "@cipher-health/utils/react";
+import { Provider } from "jotai";
 
 type AuthProviderProps = {
   children: React.ReactNode
@@ -20,11 +21,14 @@ export default function AuthProvider(props: AuthProviderProps) {
     if (authentificator === null) return
 
     authentificator.isConnected().then(async (isConnected) => {
-      if (!isConnected) return
+      if (!isConnected) {
+        authStore.set(isConnectedAtom, false)
+        return
+      }
       const user = await authentificator.me().catch(() => null)
       authStore.set(userAtom, user)
+      authStore.set(isConnectedAtom, !!user)
     })
-
   })
 
   return <AuthentificatorProvider
@@ -32,6 +36,8 @@ export default function AuthProvider(props: AuthProviderProps) {
     adapter={new CookieAdapter()}
     ref={authentificatorRef}
   >
-    {props.children}
+    <Provider store={authStore}>
+      {props.children}
+    </Provider>
   </AuthentificatorProvider>
 }

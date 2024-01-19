@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/comm
 import { UserModel } from "../user.dto";
 import { UserService } from "../services/user.service";
 import { profileCreationSchema } from "../profile.schema";
-import { createHttpError, createRawHttpError } from "@/utils/errors";
+import { createRawHttpError } from "@/utils/errors";
 import { UserGuard } from "../guards/user.guard";
 import { UserVerifiedGuard } from "../guards/user-verified.guard";
 import { User } from "../user.decorator";

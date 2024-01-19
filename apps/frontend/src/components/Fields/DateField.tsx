@@ -10,17 +10,16 @@ type DateFieldProps = {
 export default function DateField(props: DateFieldProps) {
 
   const { form } = useActiveForm()
-
-  const errors = useFormError(props.name)
+  const error = useFormError(props.name)
 
   return <Controller
     control={form.control}
     name={props.name}
     render={({ field }) => <DateInput
       {...props.dateInputProps}
-      {...errors}
-      defaultValue={field.value}
-      onChange={field.onChange}
+      {...error}
+      defaultValue={field.value && new Date(field.value)}
+      onChange={(date) => field.onChange(date?.toISOString())}
     />}
   />
 }

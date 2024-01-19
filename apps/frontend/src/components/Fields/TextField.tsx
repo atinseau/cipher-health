@@ -14,11 +14,11 @@ export default function TextField(props: TextFieldProps) {
   } = props
 
   const { form } = useActiveForm()
-  const errors = useFormError(name)
+  const error = useFormError(name)
 
   return <TextInput
     {...textInputProps}
-    {...errors}
+    {...error}
     {...form.register(name)}
   />
 }

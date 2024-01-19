@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useFormState } from "react-hook-form";
 import { useActiveForm } from "./useActiveForm";
 
-
 export function useFormError(name: string) {
 
   const { form } = useActiveForm();

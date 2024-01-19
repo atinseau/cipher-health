@@ -1,44 +1,31 @@
 import InformationCard from "@/components/Card/InformationCard";
 import AuthFormContainer from "../../AuthFormContainer";
 import { useCallback } from "react";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getMinimalMajorBirthDate } from "@cipher-health/utils";
 import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
 import RadioField from "@/components/Fields/RadioField";
 import TextField from "@/components/Fields/TextField";
 import DateField from "@/components/Fields/DateField";
+import { informationSchema } from "@cipher-health/utils/schemas";
 
-const informationSchema = z.object({
-  gender: z.enum(['MALE', 'FEMALE']),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  birthDate: z.coerce.date().max(getMinimalMajorBirthDate(), {
-    message: "Vous devez être majeur"
-  }),
-  birthPlace: z.string().min(1).optional(),
-  birthName: z.string().optional(),
-})
 
-const defaultValues = {
-  "gender": "FEMALE",
-  "firstName": "qsd",
-  "lastName": "qsd",
-  "birthDate": new Date("1984-10-09T23:00:00.000Z"),
-  "birthPlace": "qsdqsd",
-  "birthName": "qsd"
-}
+// const defaultValues = {
+//   "gender": "FEMALE",
+//   "firstName": "qsdd",
+//   "lastName": "qsd",
+//   "birthDate": "1984-10-09T23:00:00.000Z",
+//   "birthPlace": "qsdqsd",
+//   "birthName": "qsd"
+// }
 
 export default function SignupInformation() {
 
   const { handleSubmit, formRef } = useFormStep({
     resolver: zodResolver(informationSchema),
-    mode: 'onChange',
-    defaultValues
+    // defaultValues,
   })
 
   const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
-    console.log(data)
     return true
   }, [])
 

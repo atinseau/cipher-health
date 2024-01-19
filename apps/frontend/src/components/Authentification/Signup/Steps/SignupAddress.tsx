@@ -1,33 +1,25 @@
 import InformationCard from "@/components/Card/InformationCard";
 import AuthFormContainer from "../../AuthFormContainer";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useCallback } from "react";
 import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
 import TextField from "@/components/Fields/TextField";
 import CountryField from "@/components/Fields/CountryField";
+import { addressSchema } from "@cipher-health/utils/schemas";
 
-const addressSchema = z.object({
-  address: z.string().min(1),
-  zipCode: z.string().regex(/^\d{5}$/),
-  addressDetails: z.string().min(1).optional(),
-  city: z.string().min(1),
-  country: z.string(),
-})
-
-const defaultValues = {
-  "address": "Loir et cher",
-  "zipCode": "75017",
-  "addressDetails": "Paris",
-  "city": "Paris",
-  "country": "France"
-}
+// const defaultValues = {
+//   "address": "Loir et cher",
+//   "zipCode": "75017",
+//   "addressDetails": "Paris",
+//   "city": "Paris",
+//   "country": "France"
+// }
 
 export default function SignupAddress() {
 
   const { handleSubmit, formRef } = useFormStep({
     resolver: zodResolver(addressSchema),
-    defaultValues
+    // defaultValues,
   })
 
   const onSubmit: FormStepSubmitHandler = useCallback(async () => {

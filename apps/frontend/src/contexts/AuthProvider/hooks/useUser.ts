@@ -1,7 +1,14 @@
 import { useAtom } from "jotai";
-import { userAtom } from "../authStore";
+import { isConnectedAtom, userAtom } from "../authStore";
 
 
 export default function useUser() {
-  return useAtom(userAtom)
+  const [user] = useAtom(userAtom)
+  const [isConnected] = useAtom(isConnectedAtom)
+
+  return {
+    user,
+    isConnected,
+    loading: isConnected === undefined,
+  }
 }

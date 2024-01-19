@@ -15,19 +15,10 @@ import PasswordField from "@/components/Fields/PasswordField";
 import PasswordConfirmationField from "@/components/Fields/PasswordConfirmationField";
 import CountryField from "@/components/Fields/CountryField";
 
-const defaultValues = {
-  "email": "arthurtinseau@live.fr",
-  "password": "06112001..Arttsn",
-  "confirmPassword": "06112001..Arttsn",
-  "phone": "0782887672",
-  "country": "FR"
-}
-
 export default function SignupRegistrationStep() {
 
   const { handleSubmit, formRef, setErrors } = useFormStep<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
-    defaultValues,
   })
 
   const signup = useSignup()

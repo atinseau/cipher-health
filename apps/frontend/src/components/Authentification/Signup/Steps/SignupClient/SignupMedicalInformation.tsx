@@ -6,16 +6,10 @@ import { clientMedicalInformationSchema } from "@cipher-health/utils/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback } from "react";
 
-const defaultValues = {
-  "socialSecurityNumber": "187082A32132111",
-  "mutualInsuranceNumber": "qsd"
-}
-
 export default function SignupMedicalInformation() {
 
   const { handleSubmit, setErrors, formRef } = useFormStep({
     resolver: zodResolver(clientMedicalInformationSchema),
-    defaultValues
   })
 
   const createProfile = useCreateProfile()
@@ -26,6 +20,7 @@ export default function SignupMedicalInformation() {
       ...submissionHistory?.map(({ data }) => data).reduce((acc, data) => ({ ...acc, ...data }), {}),
       ...data
     }
+
     const [_, error] = await createProfile(payload)
     if (error) {
       setErrors(error)

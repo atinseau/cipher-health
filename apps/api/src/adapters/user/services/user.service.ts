@@ -182,6 +182,7 @@ export class UserService {
       const result = await this.prismaService.profile.create({
         data: {
           ...payload,
+          
           userId
         }
       })

@@ -8,6 +8,7 @@ import useVerify from "@/contexts/AuthProvider/hooks/useVerify";
 import { useMount } from '@cipher-health/utils/react'
 import { FormStepSubmitHandler, useFormStep } from "@cipher-health/form";
 import CodeField from "@/components/Fields/CodeField";
+import { getSecretPhoneNumber } from "@cipher-health/utils";
 
 const twoFaSchema = z.object({
   code: z.string().min(6).max(6),
@@ -33,9 +34,11 @@ export default function SignupTwoFa() {
     return verify(data.code)
   }, [])
 
+  const phone = signupInfo?.status === 'USER_NOT_VERIFIED' ? signupInfo.phone : ''
+
   return <AuthFormContainer
     title="Lorem ipsum"
-    subTitle="Merci de rentrer le code reçu par sms au 06 •• •• •• 12 pour vous connecter "
+    subTitle={phone ? "Merci de rentrer le code reçu par sms au " + getSecretPhoneNumber(phone) + " pour vous connecter " : undefined}
     variant="full"
     classNames={{
       header: "flex flex-col gap-8",

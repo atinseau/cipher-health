@@ -24,6 +24,7 @@ export class UserGuard implements CanActivate {
 
     const result = await this.userService.findById(req.userJwt.id, {
       encryptionProfile: true,
+      profile: true,
     })
 
     if (!result.success) {

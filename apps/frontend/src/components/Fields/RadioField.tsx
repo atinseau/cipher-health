@@ -1,5 +1,5 @@
 import RadioInput, { RadioItem, RadioInputProps } from "@/components/Inputs/RadioInput";
-import { useActiveForm } from "@cipher-health/form";
+import { useActiveForm, useFormError } from "@cipher-health/form";
 import { Controller } from "react-hook-form";
 
 type RadioFieldProps = {
@@ -12,7 +12,7 @@ export default function RadioField(props: RadioFieldProps) {
 
   const { form } = useActiveForm()
 
-  // TODO: consume errors
+  const error = useFormError(props.name)
 
   return <Controller
     control={form.control}
@@ -20,6 +20,8 @@ export default function RadioField(props: RadioFieldProps) {
     render={({ field }) => <RadioInput
       {...props.radioInputProps}
       items={props.items}
+      isInvalid={error?.isInvalid}
+      errorMessage={error?.errorText}
       defaultValue={field.value}
       onChange={(item) => {
         field.onChange(item.value)

@@ -167,6 +167,7 @@ export class AuthController {
         success: true,
         data: {
           status: 'USER_NOT_VERIFIED',
+          phone: userResult.data.phone,
           // if the user is not verified, we need to check if the last verification request
           // was less than 5 minutes ago, if so, we return that the code was sent
           codeSent: !!(

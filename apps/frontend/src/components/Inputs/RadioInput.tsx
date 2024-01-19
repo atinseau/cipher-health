@@ -50,7 +50,7 @@ export default function RadioInput(props: RadioInputProps) {
         key={index}
         value={item.value}
         classNames={{
-          base: 'max-w-[none] flex-1 whitespace-nowrap rounded-sm p-2.5 m-0 border border-indigo-500 data-[selected=true]:bg-indigo-300',
+          base: 'max-w-[none] data-[invalid=true]:border-danger flex-1 whitespace-nowrap rounded-sm p-2.5 m-0 border border-indigo-500 data-[selected=true]:bg-indigo-300',
           label: "text-base",
           control: "bg-indigo-500",
           wrapper: "group-data-[selected=true]:border-indigo-500"

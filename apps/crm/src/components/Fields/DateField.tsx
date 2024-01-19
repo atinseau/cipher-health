@@ -20,7 +20,7 @@ export default function DateField(props: DateFieldProps) {
     render={({ field: { value, ref, ...rest }, formState }) => <DatePicker
       sx={{ flex: 1 }}
       {...rest}
-      defaultValue={formState?.defaultValues?.birthDate && dayjs(formState?.defaultValues?.birthDate)}
+      defaultValue={formState?.defaultValues?.[name] && dayjs(formState?.defaultValues?.[name])}
       inputRef={(e) => e && ref({ ...e, focus: () => e?.focus() })}
       label="Date de naissance"
       slotProps={{
