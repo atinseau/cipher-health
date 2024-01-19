@@ -54,13 +54,10 @@ export default function Signup() {
 
   useEffect(() => {
     if (loading) return
+
+    // Should never happen because nextjs middleware should redirect to dashboard if connected
     if (isConnected) {
       router.push(DASHBOARD_URL)
-      notify({
-        type: 'info',
-        title: "Vous êtes déjà connecté",
-        message: "Redirection vers votre espace personnel",
-      })
       return
     }
 

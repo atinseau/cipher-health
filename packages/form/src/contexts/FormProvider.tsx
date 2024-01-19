@@ -106,11 +106,15 @@ export function FormProvider(props: FormProviderProps) {
     if (si === stepIndex && ssi === subStepIndex) {
       return
     }
-    const beforeStepChangeResult = await beforeStepChange?.(si, ssi)
-    if (!beforeStepChangeResult) {
-      console.warn('[FormProvider] beforeStepChange returned false, cannot change step')
-      return
+
+    if (typeof beforeStepChange === 'function') {
+      const beforeStepChangeResult = await beforeStepChange(si, ssi)
+      if (!beforeStepChangeResult) {
+        console.warn('[FormProvider] beforeStepChange returned false, cannot change step')
+        return
+      }
     }
+
     setStepIndex(si)
     if (typeof ssi !== 'undefined') { // 0 is a valid value
       setSubStepIndex(ssi)

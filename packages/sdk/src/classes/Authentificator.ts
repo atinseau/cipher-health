@@ -1,6 +1,6 @@
 import { Mutex } from "async-mutex";
 import { Client, ClientOptions } from "./Client"
-import type { UserType, UserModel, SignupInfo } from '@cipher-health/api'
+import type { UserType, UserModel, SignupInfo, SigninResult } from '@cipher-health/api'
 import { AuthentificatorAdapter } from "./adapters/AuthentificatorAdapter";
 import { LocalStorageAdapter } from "./adapters/LocalStorageAdapter";
 
@@ -22,6 +22,7 @@ export class Authentificator {
   private mode: UserType = 'CLIENT'
 
   private stwt?: string
+  private twoFactorToken?: string
 
   private DEBUG_MODE = false
 
@@ -148,7 +149,7 @@ export class Authentificator {
       if (await this.isConnected()) {
         return
       }
-      const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/signin', {
+      const [res, error] = await this.client.post<{ data: SigninResult }>('/auth/signin', {
         skipHooks: ['afterRequest'],
         query: {
           type: this.mode || 'CLIENT'
@@ -162,9 +163,18 @@ export class Authentificator {
       if (error) {
         throw error
       }
-      this.setAccessToken(res.data.accessToken)
-      this.setRefreshToken(res.data.refreshToken)
-      this.applyHeaders()
+
+      if (res.data.type === "basic") {
+        this.setAccessToken(res.data.accessToken)
+        this.setRefreshToken(res.data.refreshToken)
+        this.applyHeaders()
+        return
+      }
+
+      if (res.data.type === "2fa") {
+        this.twoFactorToken = res.data.token
+      }
+
     } catch (e) {
       // At this point, the user is not connected
       // and login attempt failed, so refreshing also failed
@@ -172,6 +182,30 @@ export class Authentificator {
       this.clearSession()
       throw e
     }
+  }
+
+  async loginCallback(code: string) {
+    if (!this.twoFactorToken) {
+      throw new Error('Before calling loginCallback, you must call login with email and password')
+    }
+
+    const [res, error] = await this.client.post<{ data: { accessToken: string, refreshToken: string } }>('/auth/signin/callback', {
+      query: {
+        token: this.twoFactorToken
+      },
+      body: {
+        code
+      }
+    })
+
+    if (error) {
+      throw error
+    }
+
+    this.twoFactorToken = undefined
+    this.setAccessToken(res.data.accessToken)
+    this.setRefreshToken(res.data.refreshToken)
+    this.applyHeaders()
   }
 
   async signup(body: z.infer<typeof signupSchema>): Promise<[any, Array<{ key: string, message: string }> | ClientError | null]> {

@@ -182,7 +182,6 @@ export class UserService {
       const result = await this.prismaService.profile.create({
         data: {
           ...payload,
-          
           userId
         }
       })
@@ -196,24 +195,6 @@ export class UserService {
         })
       }
       return createResult(null, false, e.message as string)
-    }
-  }
-
-  async clearPreviousSessions(user: User) {
-    try {
-      await this.prismaService.refreshToken.updateMany({
-        where: {
-          userId: user.id,
-          deletedAt: null
-        },
-        data: {
-          deletedAt: new Date()
-        }
-      })
-      return true
-    } catch (e) {
-      this.loggerService.error(e, 'UserService')
-      return false
     }
   }
 

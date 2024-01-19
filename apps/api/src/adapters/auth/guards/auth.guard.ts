@@ -4,7 +4,7 @@ import { CanActivate, ExecutionContext, HttpStatus, Injectable } from "@nestjs/c
 import { Reflector } from "@nestjs/core";
 import { Request } from "express";
 import { EnableStwtAuth } from "../auth.decorator";
-import { AuthService } from "../auth.service";
+import { AuthService } from "../services/auth.service";
 
 
 @Injectable()

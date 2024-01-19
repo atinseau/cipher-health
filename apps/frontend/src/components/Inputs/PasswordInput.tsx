@@ -15,7 +15,7 @@ import {
 import clsx from "clsx";
 
 
-type PasswordInputProps = TextInputProps & {
+export type PasswordInputProps = TextInputProps & {
   enableStrength?: boolean
 }
 

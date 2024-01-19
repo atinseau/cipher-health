@@ -76,6 +76,8 @@ model User {
   password                String?
   // For 2FA, phone or email
   verified                Boolean   @default(false)
+
+  // It's not a "token" it's just a hashed string that contains the 6 digits code for 2FA
   verificationToken       String?
   lastVerificationRequest DateTime?
 

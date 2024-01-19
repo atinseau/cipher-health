@@ -3,11 +3,9 @@ import { JwtService } from "@/common/jwt/jwt.service";
 import { Injectable } from "@nestjs/common";
 import { User, UserType } from "@prisma/client";
 import { v4 as uuid } from 'uuid'
-import { UserService } from "../user/services/user.service";
 import { createResult } from "@/utils/errors";
 import { Logger } from "@/common/logger/logger.service";
-import { CryptoService } from "@/common/crypto/crypto.service";
-import { IStwt } from "./auth.dto";
+import { IStwt } from "../auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -15,10 +13,26 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
-    private readonly userService: UserService,
     private readonly loggerService: Logger,
-    private readonly cryptoService: CryptoService,
   ) { }
+
+  async clearPreviousSessions(user: User) {
+    try {
+      await this.prismaService.refreshToken.updateMany({
+        where: {
+          userId: user.id,
+          deletedAt: null
+        },
+        data: {
+          deletedAt: new Date()
+        }
+      })
+      return true
+    } catch (e) {
+      this.loggerService.error(e, 'UserService')
+      return false
+    }
+  }
 
   async createTokens(user: User) {
 
@@ -60,7 +74,7 @@ export class AuthService {
       return createResult(null, false, 'Could not logout for unknown reasons')
     }
 
-    const isCleaned = await this.userService.clearPreviousSessions(user)
+    const isCleaned = await this.clearPreviousSessions(user)
     const isBanned = await this.jwtService.addToBlacklist(accessToken)
 
     if (!isCleaned || !isBanned) {

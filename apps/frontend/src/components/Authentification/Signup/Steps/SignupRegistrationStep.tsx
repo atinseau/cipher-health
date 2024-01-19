@@ -54,7 +54,16 @@ export default function SignupRegistrationStep() {
           }
         }}
       />
-      <PasswordField />
+      <PasswordField
+        passwordInputProps={{
+          placeholder: "Votre mot de passe",
+          isRequired: true,
+          enableStrength: true,
+          baseInputProps: {
+            label: "Mot de passe :",
+          }
+        }}
+      />
       <PasswordConfirmationField />
       <Divider />
       <InputGroup className="flex gap-6" baseInputProps={{

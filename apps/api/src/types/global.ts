@@ -11,6 +11,7 @@ declare global {
     interface ProcessEnv {
       ACCESS_TOKEN_SECRET: string
       REFRESH_TOKEN_SECRET: string
+      TWO_FACTOR_SECRET: string
       ACCESS_TOKEN_EXPIRY: string
       REFRESH_TOKEN_EXPIRY: string
       STWT_SECRET: string // Signup Token With Type (stwt)

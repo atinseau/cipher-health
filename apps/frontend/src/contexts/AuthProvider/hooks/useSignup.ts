@@ -7,13 +7,10 @@ import useSignin from "./useSignin";
 export default function useSignup() {
 
   const authentificator = useAuthentificator()
-  const signin = useSignin()
+  const { signin } = useSignin()
 
   const signup = useCallback(async (data: Parameters<typeof authentificator.signup>[0]) => {
     const [res, error] = await authentificator.signup(data)
-
-    // let res = true
-    // let error: any
 
     // Non parseable error
     // instead of other error ({ key, message })
@@ -21,8 +18,9 @@ export default function useSignup() {
       throw error
     }
 
+    // Auto signin on signup to continue the flow without asking the user to signin
     if (!error) {
-      await signin(data.email, data.password)
+      await signin(data.email, data.password, false)
     }
 
     return [res, error] as const

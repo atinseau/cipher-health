@@ -4,6 +4,7 @@ import { Controller } from "react-hook-form";
 
 type CodeFieldProps = {
   codePropertyName?: string
+  onCompleted?: () => void
 }
 
 export default function CodeField(props: CodeFieldProps) {
@@ -15,6 +16,7 @@ export default function CodeField(props: CodeFieldProps) {
     name={codePropertyName}
     control={form.control}
     render={({ field }) => <CodeInput
+      onCompleted={props.onCompleted}
       onChange={field.onChange}
     />}
   />

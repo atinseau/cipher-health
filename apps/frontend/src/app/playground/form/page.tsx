@@ -1,7 +1,5 @@
 import ForgotPassword from "@/components/Authentification/ForgotPassword/ForgotPassword";
 import ForgotPasswordReset from "@/components/Authentification/ForgotPassword/ForgotPasswordReset";
-import SigninCredential from "@/components/Authentification/Signin/SigninCredential";
-import SigninTwoFa from "@/components/Authentification/Signin/SigninTwoFa";
 import Link from "next/link";
 import SignupDescription from "@/components/Authentification/Signup/Steps/SignupWorker/SignupDescription";
 import SignupSignature from "@/components/Authentification/Signup/Steps/SignupWorker/SignupSignature";
@@ -12,21 +10,13 @@ import SignupMedicalIdentifier from "@/components/Authentification/Signup/Steps/
 export default function Page() {
 
   return <div className="flex flex-col gap-32 items-center">
-
     <Link href="/playground">Go to playground</Link>
-
     <SignupDescription />
     <SignupSignature />
-
     <SignupSpeciality />
     <SignupCurriculumVitae />
-
     <SignupMedicalIdentifier />
-
     <ForgotPasswordReset />
     <ForgotPassword />
-    <SigninTwoFa />
-    <SigninCredential />
-
   </div>
 }

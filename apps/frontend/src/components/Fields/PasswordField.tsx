@@ -1,27 +1,24 @@
-import PasswordInput from "@/components/Inputs/PasswordInput";
+import PasswordInput, { PasswordInputProps } from "@/components/Inputs/PasswordInput";
 import { useActiveForm, useFormError } from "@cipher-health/form";
 
 type PasswordFieldProps = {
-  passwordPropertyName?: string
+  name?: string
+  passwordInputProps?: PasswordInputProps
 }
 
 export default function PasswordField(props: PasswordFieldProps) {
 
   const {
-    passwordPropertyName = 'password'
+    name = 'password',
+    passwordInputProps
   } = props
 
   const { form } = useActiveForm()
-  const errors = useFormError(passwordPropertyName)
+  const errors = useFormError(name)
 
   return <PasswordInput
-    baseInputProps={{
-      label: "Votre mot de passe :"
-    }}
-    placeholder="Votre mot de passe"
-    enableStrength
-    isRequired
+    {...passwordInputProps}
     {...errors}
-    {...form.register(passwordPropertyName)}
+    {...form.register(name)}
   />
 }

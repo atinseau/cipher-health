@@ -12,7 +12,7 @@ import { ListQuery, IListQuery } from "@/utils/decorators/searchQuery";
 import { createHttpError, createRawHttpError } from "@/utils/errors";
 import { RequiredAdmin, RequiredPermissions } from "./admin.decorator";
 import { inviteAdminSchema } from "./admin.schema";
-import { AuthService } from "../auth/auth.service";
+import { AuthService } from "../auth/services/auth.service";
 import { MailService } from "@/common/mail/mail.service";
 import { Logger } from "@/common/logger/logger.service";
 import { InviteAdminEmail } from "@/common/mail/templates";

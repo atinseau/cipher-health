@@ -4,7 +4,7 @@ import { UserService } from '../../user/services/user.service';
 import { omit } from 'lodash';
 import { createHttpError, createRawHttpError } from '@/utils/errors';
 import { CryptoService } from '@/common/crypto/crypto.service';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 import { JwtService } from '@/common/jwt/jwt.service';
 import { UserModel, UserToken } from '../../user/user.dto';
 import { UserGuard } from '@/adapters/user/guards/user.guard';
@@ -14,7 +14,8 @@ import { AuthGuard } from '../guards/auth.guard';
 // import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UserType } from '@prisma/client';
 import { dateIsExpired } from '@cipher-health/utils';
-import { SignupInfo } from '../auth.dto';
+import { SigninResult, SignupInfo } from '../auth.dto';
+import { VerifyService } from '../services/verify.service';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +25,7 @@ export class AuthController {
     private readonly cryptoService: CryptoService,
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
+    private readonly verifyService: VerifyService,
   ) { }
 
   @Get('/health')
@@ -198,20 +200,21 @@ export class AuthController {
     }
   }
 
-
+  // When the user is not verified and completed, no need to ask for double authentification
+  // security is not a concern here, because the user cannot do anything until he completes the signup process
+  // so we can safely return a token pairs directly
   @Post('signin')
   @HttpCode(200)
   async signin(
     @Body() body: any,
     @Query('type') type: UserType = 'CLIENT'
-  ) {
+  ): Promise<{ success: boolean, data: SigninResult }> {
     const output = signinSchema.safeParse(body)
 
     if (!output.success)
       throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, output.error.errors)
 
     const result = await this.userService.findByEmail(output.data.email)
-
     if (!result.success) {
       throw createHttpError(result, {
         USER_NOT_FOUND: HttpStatus.NOT_FOUND,
@@ -242,9 +245,54 @@ export class AuthController {
       throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid credentials')
     }
 
+    if (!result.data.verified || !result.data.completed) {
+      // Ban all previous sessions (soft delete all refresh tokens)
+      // Potentially some access tokens could still be valid, but they will be invalid after they expire
+      await this.authService.clearPreviousSessions(result.data)
+
+      return {
+        success: true,
+        data: {
+          type: 'basic',
+          ...await this.authService.createTokens(result.data)
+        }
+      }
+    }
+
+    return {
+      success: true,
+      data: await this.verifyService.create2faSession(result.data)
+    }
+  }
+
+  @Post('signin/callback')
+  async signinCallback(@Query('token') token: string, @Body('code') code: string) {
+
+    if (!token) {
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Please provide a token.')
+    }
+    if (!code) {
+      throw createRawHttpError(HttpStatus.UNPROCESSABLE_ENTITY, 'Verification code is required')
+    }
+
+    const jwtResult = await this.jwtService.verify<UserToken>(token, process.env.TWO_FACTOR_SECRET)
+    if (!jwtResult) {
+      throw createRawHttpError(HttpStatus.UNAUTHORIZED, 'Invalid token.')
+    }
+
+    const result = await this.userService.findById(jwtResult.id)
+    if (!result.success) {
+      throw createHttpError(result, {
+        USER_NOT_FOUND: HttpStatus.NOT_FOUND,
+      })
+    }
+
+    // Try to verify the 2fa session
+    // if it fails, it will throw an error
+    await this.verifyService.approve2faSession(result.data, code)
+
     // Ban all previous sessions (soft delete all refresh tokens)
-    // Potentially some access tokens could still be valid, but they will be invalid after they expire
-    await this.userService.clearPreviousSessions(result.data)
+    await this.authService.clearPreviousSessions(result.data)
 
     return {
       success: true,

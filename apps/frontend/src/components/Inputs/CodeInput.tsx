@@ -8,10 +8,11 @@ const numRegex = /^[0-9\b]+$/
 
 type CodeInputProps = {
   onChange?: (code: string) => void
+  onCompleted?: () => void
   minLength?: number
 }
 
-export default function CodeInput({ onChange, minLength = 6 }: CodeInputProps) {
+export default function CodeInput({ onChange, onCompleted, minLength = 6 }: CodeInputProps) {
 
   const inputRefs = useRef<HTMLInputElement[]>([])
   const [code, setCode] = useState<string[]>([])
@@ -23,6 +24,10 @@ export default function CodeInput({ onChange, minLength = 6 }: CodeInputProps) {
 
     const codeString = code.join('')
     onChange(codeString.length < minLength ? '' : codeString)
+
+    if (codeString.length === minLength) {
+      onCompleted?.()
+    }
   }, [code])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, i: number) => {

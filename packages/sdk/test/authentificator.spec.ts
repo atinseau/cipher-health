@@ -16,6 +16,7 @@ const loginRoute: Route = {
     status: 200,
     data: JSON.stringify({
       data: {
+        type: 'basic',
         accessToken,
         refreshToken
       }
