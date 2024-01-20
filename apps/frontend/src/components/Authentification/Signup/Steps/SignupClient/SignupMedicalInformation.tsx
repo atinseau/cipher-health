@@ -14,10 +14,10 @@ export default function SignupMedicalInformation() {
 
   const createProfile = useCreateProfile()
 
-  const onSubmit: FormStepSubmitHandler = useCallback(async (data, submissionHistory) => {
+  const onSubmit: FormStepSubmitHandler = useCallback(async (data, mergedData) => {
     // Merge all data from previous steps
     const payload = {
-      ...submissionHistory?.map(({ data }) => data).reduce((acc, data) => ({ ...acc, ...data }), {}),
+      ...mergedData,
       ...data
     }
 

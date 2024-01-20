@@ -57,6 +57,11 @@ export default function Signup() {
 
     // Should never happen because nextjs middleware should redirect to dashboard if connected
     if (isConnected) {
+      notify({
+        type: 'info',
+        title: "Vous êtes déjà connecté",
+        message: "Redirection vers votre espace personnel",
+      })
       router.push(DASHBOARD_URL)
       return
     }

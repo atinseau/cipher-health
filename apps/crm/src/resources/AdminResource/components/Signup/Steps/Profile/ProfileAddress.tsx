@@ -31,13 +31,13 @@ export default function ProfileAddress() {
     defaultValues
   })
 
-  const onSubmit: FormStepSubmitHandler = useCallback(async (data, submissionHistory) => {
-    const mergedData = {
-      ...submissionHistory?.map(({ data }) => data).reduce((acc, data) => ({ ...acc, ...data }), {}),
+  const onSubmit: FormStepSubmitHandler = useCallback(async (data, mergedData) => {
+    const payload = {
+      ...mergedData,
       ...data
     }
 
-    const [_, error] = await authentificator.createProfile(mergedData)
+    const [_, error] = await authentificator.createProfile(payload)
     if (error instanceof Error) {
       throw error
     }

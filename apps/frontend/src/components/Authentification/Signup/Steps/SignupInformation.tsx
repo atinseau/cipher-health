@@ -25,7 +25,7 @@ export default function SignupInformation() {
     // defaultValues,
   })
 
-  const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
+  const onSubmit: FormStepSubmitHandler = useCallback(async () => {
     return true
   }, [])
 

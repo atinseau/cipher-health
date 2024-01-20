@@ -219,10 +219,22 @@ export class Authentificator {
     })
 
     if (error && error.status === 409) {
-      return [null, [{
-        message: 'Email already used',
-        key: 'email'
-      }]]
+
+      if (error.type === 'DUPLICATE_PHONE') {
+        return [null, [{
+          message: error.message,
+          key: 'phone'
+        }]]
+      }
+
+      if (error.type === 'DUPLICATE_EMAIL') {
+        return [null, [{
+          message: error.message,
+          key: 'email'
+        }]]
+      }
+
+      return [null, error]
     }
 
     if (error?.status === 422) {
@@ -281,7 +293,7 @@ export class Authentificator {
     this.clearSession()
   }
 
-  private isSoftConnected() {
+  public isSoftConnected() {
     return !!this.accessToken && !!this.refreshToken
   }
 

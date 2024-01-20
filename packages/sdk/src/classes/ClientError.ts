@@ -9,9 +9,11 @@ type ClientErrorOptions = {
 export class ClientError extends Error {
 
   public status: number
+  public type?: string
   public data: any
 
   constructor(options: ClientErrorOptions) {
+
     const error = options?.error?.message || options?.data?.error || options?.data?.errors || options?.data || 'Unknown error'
     let message = error
 
@@ -23,5 +25,6 @@ export class ClientError extends Error {
 
     this.status = options.status
     this.data = error
+    this.type = options?.data?.type
   }
 }

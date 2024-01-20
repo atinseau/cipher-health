@@ -1,13 +1,12 @@
 import { DefaultValues, Path, UseFormProps, useForm, type FieldValues } from "react-hook-form"
 import { BaseSyntheticEvent, useCallback, useEffect, useRef } from "react"
 import { useFormContext } from "./useFormContext"
-import type { SubmissionHistory } from "../contexts/FormProvider"
 
 import { useMount } from '@cipher-health/utils/react'
 
 export type FormStepSubmitHandler<T = any> = (
   data: T,
-  submissionHistory?: SubmissionHistory,
+  mergedData?: Record<string, any>,
   e?: BaseSyntheticEvent<object, any, any>,
 ) => Promise<boolean>
 
@@ -18,6 +17,7 @@ export function useFormStep<
   const {
     stepIndex,
     subStepIndex,
+    mergedValues,
     subscribe,
     unsubscribe,
     submissionHistory,
@@ -79,7 +79,7 @@ export function useFormStep<
       const isExternalSubmission: boolean = (event?.nativeEvent as CustomEvent)?.detail?.external || false
       let result: boolean | Error | null = null
       try {
-        result = await onSubmit(data, submissionHistory, event)
+        result = await onSubmit(data, mergedValues, event)
       } catch (error) {
         result = error
       }

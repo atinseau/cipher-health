@@ -14,22 +14,8 @@ const withAuth = async (request: NextRequest, event: NextFetchEvent, next: () =>
   return next()
 }
 
-const withoutAuth = async (request: NextRequest, event: NextFetchEvent, next: () => Promise<NextResponse>) => {
-  const accessToken = request.cookies.get('accessToken')
-  const refreshToken = request.cookies.get('refreshToken')
-  if (accessToken && refreshToken) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
-  }
-  return next()
-
-}
-
 // If user is not authenticated, redirect to signin if they try to access dashboard
 router.get('/dashboard', withAuth)
-
-// If user is authenticated, redirect to dashboard if they try to access signup or signin
-router.get('/signup', withoutAuth)
-router.get('/signin', withoutAuth)
 
 router.all(() => {
   // default if none of the above matches

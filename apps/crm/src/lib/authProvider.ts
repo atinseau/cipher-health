@@ -2,20 +2,11 @@ import { AuthProvider } from "react-admin";
 import { authentificator } from "../auth";
 
 export const authProvider: AuthProvider = {
-  login: async ({ username, password }) => {
-    // console.log('login')
-    try {
-      await authentificator.login({
-        email: username,
-        password
-      })
-      return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as Error).message);
-    }
+  login: async () => {
+    // Do nothing
+    // login is handled by the Signin custom component
   },
   checkAuth: async () => {
-    // console.log('checkAuth')
     const isConnected = await authentificator.isConnected()
     return isConnected
       ? Promise.resolve()

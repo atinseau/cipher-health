@@ -32,6 +32,11 @@ export default function Signin() {
   useEffect(() => {
     if (loading) return
     if (isConnected) {
+      notify({
+        type: 'info',
+        title: "Vous êtes déjà connecté",
+        message: "Redirection vers votre espace personnel",
+      })
       router.push(DASHBOARD_URL)
     }
   }, [isConnected])

@@ -59,7 +59,8 @@ export const createRawHttpError = (
   let output = typeof message === 'object' && 'error' in message ? message.error.message : message
   let formattedMessage = {
     success: false,
-    [Array.isArray(output) ? 'errors' : 'error']: output
+    [Array.isArray(output) ? 'errors' : 'error']: output,
+    ...message?.error?.type ? { type: message.error.type } : {}
   }
   return new HttpException(formattedMessage, status)
 }

@@ -49,6 +49,7 @@ type FormContextSubscribe = (
 type IFormContext = {
   stepIndex: number
   subStepIndex: number
+  mergedValues?: Record<string, any>
   steps: FormStep[]
   onSubmit: () => void
   onSubmitCallback: OnSubmitCallback
@@ -81,6 +82,7 @@ export function FormProvider(props: FormProviderProps) {
 
   const formRefs = useRef<FormRefs>({})
   const submissionHistoryRef = useRef<SubmissionHistory>([])
+  const mergedValuesRef = useRef<Record<string, any>>({})
 
   const getForm = useCallback((si: number, ssi: number) => {
     return formRefs.current?.[si]?.[ssi]
@@ -109,7 +111,8 @@ export function FormProvider(props: FormProviderProps) {
 
     if (typeof beforeStepChange === 'function') {
       const beforeStepChangeResult = await beforeStepChange(si, ssi)
-      if (!beforeStepChangeResult) {
+      // False is the only way to cancel the step change in beforeStepChange
+      if (beforeStepChangeResult === false) {
         console.warn('[FormProvider] beforeStepChange returned false, cannot change step')
         return
       }
@@ -128,27 +131,24 @@ export function FormProvider(props: FormProviderProps) {
   const addNewSubmissionHistory = useCallback((data: Record<string, any>) => {
     // Update submission history
     // in any case, we need to keep the values of the last step
-    const keepValues = typeof steps[stepIndex].keepValues === 'undefined' ? true : steps[stepIndex].keepValues
-    if (keepValues) {
 
-      // remove this step from the submission history if it exists
-      const index = submissionHistoryRef.current.findIndex((step) => {
-        return step.stepIndex === stepIndex && step.subStepIndex === subStepIndex
-      })
+    // remove this step from the submission history if it exists
+    const index = submissionHistoryRef.current.findIndex((step) => {
+      return step.stepIndex === stepIndex && step.subStepIndex === subStepIndex
+    })
 
-      if (index !== -1) {
-        submissionHistoryRef.current.splice(index, 1)
-      }
-
-      submissionHistoryRef.current.push({
-        data,
-        stepIndex,
-        subStepIndex,
-      })
+    if (index !== -1) {
+      submissionHistoryRef.current.splice(index, 1)
     }
+
+    submissionHistoryRef.current.push({
+      data,
+      stepIndex,
+      subStepIndex,
+    })
   }, [stepIndex, subStepIndex])
 
-  const onSubmitCallback: OnSubmitCallback = useCallback(async ({ result }) => {
+  const onSubmitCallback: OnSubmitCallback = useCallback(async ({ result, data }) => {
     if (result instanceof Error) {
       props.onError?.(result)
       return
@@ -156,6 +156,14 @@ export function FormProvider(props: FormProviderProps) {
     if (!result) {
       console.warn('[FormProvider] Form submission was cancelled: ', result)
       return
+    }
+
+    const keepValues = typeof steps[stepIndex].keepValues === 'undefined' ? true : steps[stepIndex].keepValues
+    if (keepValues) {
+      mergedValuesRef.current = {
+        ...mergedValuesRef.current,
+        ...data
+      }
     }
 
     if (subStepIndex < steps[stepIndex].components.length - 1) {
@@ -238,6 +246,7 @@ export function FormProvider(props: FormProviderProps) {
     stepIndex,
     subStepIndex,
     submissionHistory: submissionHistoryRef.current,
+    mergedValues: mergedValuesRef.current,
     steps,
     onSubmit,
     onSubmitCallback,

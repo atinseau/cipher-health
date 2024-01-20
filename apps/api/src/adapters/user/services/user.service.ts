@@ -57,7 +57,7 @@ export class UserService {
       if (!phone) {
         return createResult(null, false, {
           type: 'PHONE_FORMAT_ERROR',
-          message: 'Invalid phone number'
+          message: 'Phone number format error'
         })
       }
 
