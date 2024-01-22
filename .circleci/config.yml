@@ -167,4 +167,4 @@ workflows:
       # - deploy-api:
       #     context: <<pipeline.git.branch>>
       - deploy-frontend:
-          context: <<pipeline.git.branch>>
+          context: $CIRCLE_BRANCH
