@@ -4,6 +4,7 @@ metadata:
   name: nextjs-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/whitelist-source-range: 82.65.5.17/32
 spec:
   rules:
     - host: {{ .Values.frontend.ingress.host }}
