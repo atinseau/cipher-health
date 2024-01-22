@@ -163,9 +163,7 @@ jobs:
 workflows:
   main-workflow:
     jobs:
-      # - hello-world:
-      #     context: <<pipeline.git.branch>>
-      # - deploy-api:
-      #     context: <<pipeline.git.branch>>
+      - deploy-api:
+          context: <<pipeline.git.branch>>
       - deploy-frontend:
           context: <<pipeline.git.branch>>

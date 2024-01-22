@@ -24,8 +24,8 @@ spec:
           image: {{ .Values.frontend.image.name }}
           resources:
             limits: # TODO: tune those values for best efficiency
-              memory: "256Mi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "1"
           ports:
             - containerPort: 3000
               name: nextjs-port
