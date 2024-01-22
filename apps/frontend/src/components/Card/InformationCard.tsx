@@ -7,7 +7,7 @@ type InformationCardProps = {
 
 export default function InformationCard(props: InformationCardProps) {
   return <div className="bg-indigo-300 rounded-lg flex px-2 py-3 items-center justify-center gap-2">
-    <IoInformationCircleOutline size={20} className="text-indigo-500" />
+    <IoInformationCircleOutline size={20} className="text-indigo-500 min-w-[20px]" />
     {props.children}
   </div>
 }

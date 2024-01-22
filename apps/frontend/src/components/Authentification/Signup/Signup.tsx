@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation'
-import { clientSteps } from "./steps";
+import { clientSteps, mobileClientSteps } from "./steps";
 import SignupForm from "./SignupForm";
 import { createContext, useCallback, useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
@@ -15,8 +15,9 @@ import { AnimatePresence } from "framer-motion";
 
 import { FormProvider, FormStep } from "@cipher-health/form"
 import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
-import { DASHBOARD_URL } from '@/utils/constants';
+import { DASHBOARD_URL, MOBILE_MEDIA_QUERY } from '@/utils/constants';
 import useUser from '@/contexts/AuthProvider/hooks/useUser';
+import { useMediaQuery } from '@cipher-health/utils/react';
 
 type ISignupContext = {
   hydrateSignupInfo: () => Promise<SignupInfo | null>
@@ -30,6 +31,8 @@ export default function Signup() {
   const [stepIndex, setStepIndex] = useState<number>(0)
   const [subStepIndex, setSubStepIndex] = useState<number>(0)
   const { isConnected, loading } = useUser()
+
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY)
 
   const notify = useNotify()
   const router = useRouter()
@@ -66,10 +69,11 @@ export default function Signup() {
       return
     }
 
-    if (steps.length) return // To be sure not to recompute steps
-
     // Compute steps set depending on user type
-    let computedSteps = clientSteps
+    let computedSteps = isMobile
+      ? mobileClientSteps
+      : clientSteps
+
     hydrateSignupInfo().then((signupInfo) => {
       if (signupInfo?.status === "USER_NOT_VERIFIED") {
         setStepIndex(0)
@@ -82,7 +86,10 @@ export default function Signup() {
       }
       setSteps(computedSteps)
     })
-  }, [isConnected])
+  }, [
+    isConnected,
+    isMobile
+  ])
 
   return <AnimatePresence>
     {!steps.length

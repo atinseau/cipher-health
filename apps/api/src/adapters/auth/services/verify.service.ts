@@ -1,7 +1,6 @@
 import { UserService } from "@/adapters/user/services/user.service";
 import { CryptoService } from "@/common/crypto/crypto.service";
 import { JwtService } from "@/common/jwt/jwt.service";
-import { Logger } from "@/common/logger/logger.service";
 import { PhoneService } from "@/common/phone/phone.service";
 import { RandomService } from "@/common/random/random.service";
 import { SigninResult, UserModel } from "@/types";
@@ -20,7 +19,6 @@ export class VerifyService {
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
     private readonly phoneService: PhoneService,
-    private readonly loggerService: Logger,
   ) { }
 
   async createCode() {
@@ -52,9 +50,6 @@ export class VerifyService {
       body: `Your verification code is ${code}`,
       target: user.phone,
     })
-      .catch(() => {
-        this.loggerService.error(`Failed to send verification code to ${user.phone}`, 'VerifyService')
-      })
   }
 
   async create2faSession(user: UserModel): Promise<SigninResult> {

@@ -75,7 +75,7 @@ export default function SignupRegistrationStep() {
       />
       <PasswordConfirmationField />
       <Divider />
-      <InputGroup className="flex gap-6" baseInputProps={{
+      <InputGroup className="flex flex-col md:flex-row gap-6" baseInputProps={{
         label: "Votre numéro de téléphone",
         subLabel: "Votre pays est nécessaire pour valider votre numéro de téléphone"
       }}>

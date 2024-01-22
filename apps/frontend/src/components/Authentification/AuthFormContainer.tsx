@@ -60,13 +60,13 @@ export default function AuthFormContainer<T extends keyof JSX.IntrinsicElements>
 
   return createElement(tag, {
     ...props.containerProps,
-    className: twMerge("flex flex-col gap-8 max-w-[608px] w-full", classNames?.base, props.className),
+    className: twMerge("flex flex-col gap-6 sm:gap-8 max-w-[608px] w-full", classNames?.base, props.className),
     children: <>
       <div className={twMerge(classNames?.header, props?.classNames?.header)}>
-        <h1 className={twMerge("text-xl", classNames?.headerTitle, props?.classNames?.headerTitle)}>{props.title}</h1>
+        <h1 className={twMerge("text-[22px] sm:text-xl", classNames?.headerTitle, props?.classNames?.headerTitle)}>{props.title}</h1>
         {props.subTitle && <p className={twMerge(classNames?.headerSubTitle, props.classNames?.headerSubTitle)}>{props.subTitle}</p>}
       </div>
-      <div className={twMerge("flex flex-col gap-8 w-full", classNames?.content, props?.classNames?.content)}>
+      <div className={twMerge("flex flex-col gap-6 sm:gap-8 w-full", classNames?.content, props?.classNames?.content)}>
         {props.children}
         {props.footer}
       </div>

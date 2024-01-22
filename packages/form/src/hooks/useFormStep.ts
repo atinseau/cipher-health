@@ -10,6 +10,19 @@ export type FormStepSubmitHandler<T = any> = (
   e?: BaseSyntheticEvent<object, any, any>,
 ) => Promise<boolean>
 
+const getDefaultValues = (currentSubmissionData?: Record<string, any>, watchedValues?: Record<string, any>, defaultValues?: Record<string, any>): DefaultValues<any> => {
+  if (currentSubmissionData) {
+    return {
+      ...currentSubmissionData,
+      ...watchedValues
+    }
+  }
+  if (watchedValues && Object.keys(watchedValues).length) {
+    return watchedValues
+  }
+  return defaultValues || {}
+}
+
 export function useFormStep<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
@@ -21,6 +34,7 @@ export function useFormStep<
     subscribe,
     unsubscribe,
     submissionHistory,
+    watchedValues,
     onSubmitCallback,
     setStepIndex,
     setSubStepIndex,
@@ -33,7 +47,11 @@ export function useFormStep<
     reValidateMode: 'onChange',
     ...props,
     // override defaultValues with the current submission data (if any)
-    defaultValues: (getCurrentSubmission()?.data || props?.defaultValues || {}) as DefaultValues<TFieldValues>,
+    defaultValues: getDefaultValues(
+      getCurrentSubmission()?.data,
+      watchedValues,
+      props?.defaultValues
+    ),
   })
 
   const form = useForm(formPropsRef.current)
@@ -67,6 +85,17 @@ export function useFormStep<
       setErrors(currentSubmission.errors, true)
     }
   })
+
+  useEffect(() => {
+    const { unsubscribe } = form.watch((values) => {
+      for (const key in values) {
+        watchedValues[key] = values[key]
+      }
+    })
+    return () => {
+      unsubscribe()
+    }
+  }, [])
 
   const handleSubmit = useCallback((onSubmit: FormStepSubmitHandler) => {
     return form.handleSubmit(async (data, event) => {

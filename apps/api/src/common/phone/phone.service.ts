@@ -52,7 +52,7 @@ export class PhoneService implements OnModuleInit {
           })
 
           const res = await this.client.messages.create({
-            from: '+12058943557',
+            from: '+16592242346',
             to: formatted,
             body: payload.body,
           })

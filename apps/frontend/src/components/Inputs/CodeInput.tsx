@@ -74,7 +74,7 @@ export default function CodeInput({ onChange, onCompleted, minLength = 6 }: Code
   }, [])
 
 
-  return <div className="flex gap-6">
+  return <div className="flex gap-2 sm:gap-6">
     {Array.from({ length: 6 }).map((_, i) => (<input
       key={i}
       maxLength={1}
@@ -86,7 +86,7 @@ export default function CodeInput({ onChange, onCompleted, minLength = 6 }: Code
       }}
       ref={(ref) => inputRefs.current[i] = ref!}
       onChange={(e) => handleInputChange(e, i)}
-      className={clsx("w-[48px] h-[64px] bg-indigo-300 rounded-lg text-center text-2xl")}
+      className={clsx("w-full max-w-[48px] h-[64px] bg-indigo-300 text-indigo-600 rounded-lg text-center text-2xl")}
     />))}
   </div>
 }

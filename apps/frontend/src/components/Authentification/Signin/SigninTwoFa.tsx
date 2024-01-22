@@ -24,10 +24,10 @@ export default function SigninTwoFa() {
     resolver: zodResolver(twoFaSchema)
   })
 
-  const { verify } = useSignin()
+  const { callback } = useSignin()
 
   const onSubmit: FormStepSubmitHandler = useCallback(async (data) => {
-    await verify(data.code)
+    await callback(data.code)
     return true
   }, [])
 

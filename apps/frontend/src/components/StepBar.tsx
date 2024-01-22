@@ -42,6 +42,7 @@ const StepItem = ({ title, isActive, isCompleted, rightLink, leftLink }: StepIte
 
 type StepBarProps = {
   currentStep?: number
+  className?: string
   steps: Array<{
     title: string
     // isActive?: boolean
@@ -49,8 +50,8 @@ type StepBarProps = {
   }>
 }
 
-export default function StepBar({ steps, currentStep = 0 }: StepBarProps) {
-  return <div className="flex items-center w-full justify-center">
+export default function StepBar({ steps, currentStep = 0, className }: StepBarProps) {
+  return <div className={twMerge("flex items-center w-full justify-center", className)}>
     {steps.map((step, index) => <StepItem
       key={index}
       title={step.title}

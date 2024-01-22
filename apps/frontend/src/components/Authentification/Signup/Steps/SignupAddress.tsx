@@ -50,7 +50,7 @@ export default function SignupAddress() {
           placeholder: "Bâtiment, étage, appartement, etc."
         }}
       />
-      <div className="flex gap-6">
+      <div className="flex gap-6 flex-col sm:flex-row">
         <TextField
           name="zipCode"
           textInputProps={{

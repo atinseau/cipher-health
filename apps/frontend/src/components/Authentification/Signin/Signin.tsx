@@ -6,7 +6,7 @@ import SigninTwoFa from "./SigninTwoFa";
 import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
 import { useRouter } from "next/navigation";
 import { DASHBOARD_URL } from "@/utils/constants";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useUser from "@/contexts/AuthProvider/hooks/useUser";
 
 const steps: FormStep[] = [
@@ -28,8 +28,11 @@ export default function Signin() {
   const router = useRouter()
   const { isConnected, loading } = useUser()
 
+  const isConnectedVerification = useRef(false)
+
   // Should never happen because nextjs middleware should redirect to dashboard if connected
   useEffect(() => {
+    if (isConnectedVerification.current) return
     if (loading) return
     if (isConnected) {
       notify({
@@ -39,13 +42,14 @@ export default function Signin() {
       })
       router.push(DASHBOARD_URL)
     }
+
+    // Only run once
+    // to prevent login again if the user successfully logged in
+    isConnectedVerification.current = true
   }, [isConnected])
 
   return <FormProvider
     steps={steps}
-    afterLastStep={() => {
-      router.push(DASHBOARD_URL)
-    }}
     onError={(error) => {
       notify({
         type: 'error',

@@ -2,12 +2,15 @@ import { useAuthentificator } from "@cipher-health/sdk/react";
 import { useCallback } from "react";
 import { authStore, isConnectedAtom, userAtom } from "../authStore";
 import useNotify from "@/contexts/NotificationProvider/hooks/useNotify";
+import { useRouter } from "next/navigation";
+import { DASHBOARD_URL } from "@/utils/constants";
 
 
 export default function useSignin() {
 
   const authentificator = useAuthentificator()
   const notify = useNotify()
+  const router = useRouter()
 
   const signin = useCallback(async (email: string, password: string, twoFactorNotify?: boolean) => {
     await authentificator.login({
@@ -24,7 +27,7 @@ export default function useSignin() {
     }
   }, [])
 
-  const verify = useCallback(async (code: string) => {
+  const callback = useCallback(async (code: string) => {
     await authentificator.loginCallback(code)
     const user = await authentificator.me().catch(() => null)
 
@@ -36,11 +39,12 @@ export default function useSignin() {
         title: 'Connexion réussie',
         message: 'Vous êtes maintenant connecté.'
       })
+      router.push(DASHBOARD_URL)
     }
   }, [])
 
   return {
     signin,
-    verify
+    callback
   }
 }

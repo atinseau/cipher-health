@@ -9,8 +9,49 @@ import SignupDescription from "./Steps/SignupWorker/SignupDescription";
 import SignupMedicalIdentifier from "./Steps/SignupWorker/SignupMedicialIdentifier";
 import SignupSignature from "./Steps/SignupWorker/SignupSignature";
 import SignupSpeciality from "./Steps/SignupWorker/SignupSpeciality";
+import MobileSignupGender from "./Steps/Mobile/MobileSignupGender";
+import MobileSignupInformation from "./Steps/Mobile/MobileSignupInformation";
+import MobileSignupBirth from "./Steps/Mobile/MobileSignupBirth";
 
-
+export const mobileClientSteps: FormStep[] = [
+  {
+    title: 'Identifiants de connexion',
+    keepValues: false,
+    components: [
+      SignupRegistrationStep,
+      SignupTwoFa,
+    ]
+  },
+  {
+    title: "Informations",
+    prev: {
+      scoped: true
+    },
+    components: [
+      MobileSignupGender,
+      MobileSignupInformation,
+      MobileSignupBirth
+    ]
+  },
+  {
+    title: "Votre adresse",
+    prev: {
+      global: true
+    },
+    components: [
+      SignupAddress
+    ]
+  },
+  {
+    title: "Votre prise en charge",
+    prev: {
+      global: true
+    },
+    components: [
+      SignupMedicalInformation
+    ]
+  }
+]
 
 export const clientSteps: FormStep[] = [
   {
@@ -29,12 +70,18 @@ export const clientSteps: FormStep[] = [
   },
   {
     title: "Coordonées",
+    prev: {
+      global: true
+    },
     components: [
       SignupAddress
     ]
   },
   {
     title: "Prise en charge",
+    prev: {
+      global: true
+    },
     components: [
       SignupMedicalInformation
     ],

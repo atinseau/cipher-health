@@ -34,7 +34,7 @@ export default function SignupMedicalInformation() {
     variant="full"
   >
 
-    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="flex gap-6">
+    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="flex gap-6 flex-col sm:flex-row">
       <TextField
         name="socialSecurityNumber"
         textInputProps={{

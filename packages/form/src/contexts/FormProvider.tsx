@@ -1,13 +1,17 @@
 'use client';
 
-import React, { createContext, useCallback, useMemo, useRef, useState } from "react";
+import React, { createContext, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { UseFormProps, UseFormReturn } from "react-hook-form";
 
 export type FormStep = {
   title?: string
   components: React.ComponentType[]
   keepValues?: boolean
-  // scopedValues?: boolean
+  defaultValues?: Record<string, any>
+  prev?: {
+    scoped?: boolean
+    global?: boolean
+  }
 }
 
 export type BeforeStepChangeHandler = (stepIndex: number, subStepIndex?: number) => Promise<any> | any
@@ -56,12 +60,14 @@ type IFormContext = {
   addNewSubmissionHistory: (data: Record<string, any>) => void
   Component: React.ComponentType
   submissionHistory: SubmissionHistory
+  watchedValues: Record<string, any>
   getCurrentSubmission: () => SubmissionHistory[number] | undefined
   getForm: (stepIndex: number, subStepIndex: number) => FormRefs[number][number]
   subscribe: FormContextSubscribe
   unsubscribe: (stepIndex: number, subStepIndex: number) => void
   setStepIndex: React.Dispatch<React.SetStateAction<number>>
   setSubStepIndex: React.Dispatch<React.SetStateAction<number>>
+  goBack: () => void
 }
 
 export const FormContext = createContext({} as IFormContext)
@@ -70,19 +76,40 @@ export function FormProvider(props: FormProviderProps) {
 
   const {
     children,
-    steps,
+    steps: externalSteps,
     initialStepIndex = 0,
     initialSubStepIndex = 0,
     beforeStepChange,
     afterLastStep,
   } = props
 
+  const [steps, setSteps] = useState<FormStep[]>(externalSteps)
   const [stepIndex, setStepIndex] = useState(initialStepIndex)
   const [subStepIndex, setSubStepIndex] = useState(initialSubStepIndex)
 
   const formRefs = useRef<FormRefs>({})
   const submissionHistoryRef = useRef<SubmissionHistory>([])
   const mergedValuesRef = useRef<Record<string, any>>({})
+  const watchedValuesRef = useRef<Record<string, any>>({})
+
+  // Fix out of bounds index when steps are updated externally
+  useLayoutEffect(() => {
+    let newStepIndex = stepIndex
+    let newSubStepIndex = subStepIndex
+
+    if (newStepIndex >= externalSteps.length) {
+      newStepIndex = externalSteps.length - 1
+    }
+    if (newSubStepIndex >= externalSteps[newStepIndex].components.length) {
+      newSubStepIndex = 0
+    }
+
+    setStepIndex(newStepIndex)
+    setSubStepIndex(newSubStepIndex)
+    setSteps(externalSteps)
+  }, [
+    externalSteps,
+  ])
 
   const getForm = useCallback((si: number, ssi: number) => {
     return formRefs.current?.[si]?.[ssi]
@@ -97,7 +124,11 @@ export function FormProvider(props: FormProviderProps) {
     return submissionHistoryRef.current.find((step) => {
       return step.stepIndex === stepIndex && step.subStepIndex === subStepIndex
     })
-  }, [stepIndex, subStepIndex])
+  }, [
+    stepIndex,
+    subStepIndex,
+    steps
+  ])
 
   const changeStep = useCallback(async (stepConfig: { si: number, ssi?: number }) => {
     const {
@@ -126,6 +157,7 @@ export function FormProvider(props: FormProviderProps) {
     beforeStepChange,
     stepIndex,
     subStepIndex,
+    steps
   ])
 
   const addNewSubmissionHistory = useCallback((data: Record<string, any>) => {
@@ -146,7 +178,11 @@ export function FormProvider(props: FormProviderProps) {
       stepIndex,
       subStepIndex,
     })
-  }, [stepIndex, subStepIndex])
+  }, [
+    stepIndex,
+    subStepIndex,
+    steps
+  ])
 
   const onSubmitCallback: OnSubmitCallback = useCallback(async ({ result, data }) => {
     if (result instanceof Error) {
@@ -185,7 +221,11 @@ export function FormProvider(props: FormProviderProps) {
 
     // Last step
     afterLastStep?.()
-  }, [stepIndex, subStepIndex])
+  }, [
+    stepIndex,
+    subStepIndex,
+    steps
+  ])
 
   // This function is only for triggering the submit event externally
   // that's mean the click event is not triggered inside the <form/> component step
@@ -215,7 +255,11 @@ export function FormProvider(props: FormProviderProps) {
     }, {
       once: true
     })
-  }, [stepIndex, subStepIndex])
+  }, [
+    stepIndex,
+    subStepIndex,
+    steps
+  ])
 
   const Component = useMemo(() => {
     const step = steps[stepIndex]
@@ -223,6 +267,7 @@ export function FormProvider(props: FormProviderProps) {
 
     return component
   }, [
+    steps,
     stepIndex,
     subStepIndex,
   ])
@@ -242,11 +287,30 @@ export function FormProvider(props: FormProviderProps) {
     delete formRefs.current[si][ssi]
   }, [])
 
+  const goBack = useCallback(() => {
+    if (subStepIndex > 0) {
+      setSubStepIndex(subStepIndex - 1)
+      return
+    }
+
+    if (stepIndex > 0) {
+      setStepIndex(stepIndex - 1)
+      setSubStepIndex(steps[stepIndex - 1].components.length - 1)
+      return
+    }
+    console.warn('[FormProvider] Cannot go back because we are on the first step')
+  }, [
+    stepIndex,
+    subStepIndex,
+    steps
+  ])
+
   return <FormContext.Provider value={{
     stepIndex,
     subStepIndex,
     submissionHistory: submissionHistoryRef.current,
     mergedValues: mergedValuesRef.current,
+    watchedValues: watchedValuesRef.current,
     steps,
     onSubmit,
     onSubmitCallback,
@@ -256,6 +320,7 @@ export function FormProvider(props: FormProviderProps) {
     subscribe,
     unsubscribe,
     setStepIndex,
+    goBack,
     setSubStepIndex,
     Component,
   }}>

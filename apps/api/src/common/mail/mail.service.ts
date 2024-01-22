@@ -19,6 +19,7 @@ export class MailService implements OnModuleInit {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
+      from: process.env.MAIL_USER,
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASSWORD

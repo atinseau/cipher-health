@@ -34,19 +34,19 @@ export default function SignupTwoFa() {
     return verify(data.code)
   }, [])
 
-  const phone = signupInfo?.status === 'USER_NOT_VERIFIED' ? signupInfo.phone : ''
+  const phone = signupInfo?.status === 'USER_NOT_VERIFIED' ? signupInfo.phone : 'NaN'
 
   return <AuthFormContainer
     title="Lorem ipsum"
     subTitle={phone ? "Merci de rentrer le code reçu par sms au " + getSecretPhoneNumber(phone) + " pour vous connecter " : undefined}
     variant="full"
     classNames={{
-      header: "flex flex-col gap-8",
+      header: "flex flex-col gap-6 sm:gap-8",
       headerSubTitle: "text-base text-black text-center",
       content: "items-center"
     }}
     footer={
-      <><div className="flex gap-2 items-center">
+      <><div className="flex flex-wrap justify-center gap-2 items-center">
         <p>Pas encore reçu ? </p>
         <Button variant="plain">Renvoyer le SMS</Button>
       </div>
