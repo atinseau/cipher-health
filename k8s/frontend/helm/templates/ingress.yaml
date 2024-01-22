@@ -2,6 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nextjs-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: 82.65.5.17
 spec:
   ingressClassName: nginx
   rules:
