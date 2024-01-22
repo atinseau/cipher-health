@@ -1,5 +1,5 @@
 // import { MailService } from "@/common/mail/mail.service";
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Ip } from "@nestjs/common";
 
 
 @Controller()
@@ -10,9 +10,10 @@ export class GlobalController {
   // ) {}
 
   @Get()
-  index() {
+  index(@Ip() ip: string) {
     return {
-      message: 'Welcome to the API'
+      message: 'Welcome to the API',
+      ip
     }
   }
 
