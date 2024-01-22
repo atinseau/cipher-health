@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import { ComponentProps, forwardRef } from "react"
+import { twMerge } from "tailwind-merge"
 
 type Color = string | string[]
 
@@ -55,7 +56,7 @@ export function extendsVariants<
       {...rest}
       {...variantProps}
       ref={ref}
-      className={clsx(className, variantClassName)}
+      className={twMerge(clsx(variantClassName, className))}
       classNames={colorClassNames}
     />
   })

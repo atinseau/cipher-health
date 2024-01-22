@@ -1,5 +1,5 @@
 h1 {
-  font-size: 48px;
+  @apply text-[38px] md:text-[40px];
   line-height: 120%;
   font-weight: 700;
 }

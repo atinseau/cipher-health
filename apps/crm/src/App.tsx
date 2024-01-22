@@ -7,6 +7,7 @@ import { adminResource } from './resources/AdminResource/adminResource';
 import { dataProvider } from './lib/dataProvider';
 import { BrowserRouter } from 'react-router-dom';
 import SigninPage from './resources/AdminResource/components/Signin/SigninPage';
+import { workerResource } from './resources/WorkerResource/workerResource';
 
 
 export const App = () => (
@@ -20,6 +21,7 @@ export const App = () => (
       darkTheme={darkTheme}
     >
       {adminResource}
+      {workerResource}
     </Admin>
   </BrowserRouter>
 );

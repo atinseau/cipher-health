@@ -1,18 +1,16 @@
-'use client';
-
-import Button from "@/components/Button";
-import { SIGNIN_URL, SIGNUP_URL } from "@/utils/constants";
-import { useRouter } from "next/navigation";
-
+import HeroBanner from "@/components/Layout/HeroBanner";
+import PageContainer from "@/components/Layout/PageContainer";
 
 export default function Page() {
 
-  const router = useRouter()
-
-  return <div className="h-screen w-screen flex items-center justify-center">
-    <div className="flex flex-col gap-4">
-      <Button onClick={() => router.push(SIGNUP_URL)}>Inscription</Button>
-      <Button onClick={() => router.push(SIGNIN_URL)}>Connexion</Button>
-    </div>
-  </div>
+  return <PageContainer>
+    <HeroBanner
+      title={<>Connectez-vous à la santé, <span className="text-pink-500">consultez</span> en toute simplicité.</>}
+      description="Lorem ipsum dolor sit amet consectetur. Augue enim risus erat eget tincidunt nibh enim. Placerat egeLorem ipsum dolor sit amet consectetur. Augue enim risus erat eget tincidunt nibh enim. Placerat egestas maecenas quisque posuere ut velit pulvinar sapien. stas maecenas quisque posuere ut velit pulvinar sapien."
+      ctas={[
+        { label: "Prendre rendez-vous" },
+        { label: "Vous êtes praticien ?", className: "md:hidden" }
+      ]}
+    />
+  </PageContainer>
 }
