@@ -31,6 +31,7 @@ commands:
       - run:
           name: Install ghcr.io credentials
           command: |
+            kubeclt create namespace $CIRCLE_BRANCH || true
             kubectl create secret docker-registry regcred \
               -n $CIRCLE_BRANCH \
               --docker-server=https://ghcr.io \
