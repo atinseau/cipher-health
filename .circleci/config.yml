@@ -10,38 +10,41 @@ orbs:
 commands:
   setup-runner:
     steps:
-      - jq/install
+    - jq/install
   setup-k8s:
     steps:
-      - kubernetes/install-kubeconfig:
-          kubeconfig: KUBECONFIG_DATA
-      - run:
-          name: Fix kubeconfig permissions
-          command: chmod go-r ~/.kube/config
-      - kubernetes/install-kubectl
-      - helm/install_helm_client
-      - helm/install_helm_plugin:
-          helm_plugin_url: https://github.com/databus23/helm-diff
-      - run:
-          name: Install ingress-nginx
-          command: |
-            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-            helm repo update
-            helm install ingress-nginx-release ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace || true
-      - run:
-          name: Install ghcr.io credentials
-          command: |
-            kubectl create namespace $CIRCLE_BRANCH || true
-            kubectl create secret docker-registry regcred \
-              -n $CIRCLE_BRANCH \
-              --docker-server=https://ghcr.io \
-              --docker-username=$GITHUB_USERNAME \
-              --docker-password=$CR_PAT \
-              --docker-email=$GITHUB_EMAIL || true
+    - kubernetes/install-kubeconfig:
+        kubeconfig: KUBECONFIG_DATA
+    - run:
+        name: Fix kubeconfig permissions
+        command: chmod go-r ~/.kube/config
+    - kubernetes/install-kubectl
+    - helm/install_helm_client
+    - helm/install_helm_plugin:
+        helm_plugin_url: https://github.com/databus23/helm-diff
+    - run:
+        name: Install haproxy-ingress
+        command: |
+          helm repo add haproxy-ingress https://haproxy-ingress.github.io/charts
+          helm repo update
+          helm upgrade --install haproxy-ingress haproxy-ingress/haproxy-ingress \
+            -f $SCRIPT_DIR/values.yaml \
+            --create-namespace --namespace ingress-controller \
+            --version 0.14.5
+    - run:
+        name: Install ghcr.io credentials
+        command: |
+          kubectl create namespace $CIRCLE_BRANCH || true
+          kubectl create secret docker-registry regcred \
+            -n $CIRCLE_BRANCH \
+            --docker-server=https://ghcr.io \
+            --docker-username=$GITHUB_USERNAME \
+            --docker-password=$CR_PAT \
+            --docker-email=$GITHUB_EMAIL || true
   setup-docker:
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
+    - setup_remote_docker:
+        docker_layer_caching: true
   push-image:
     parameters:
       image-context:
@@ -54,23 +57,23 @@ commands:
         default: ""
         type: string
     steps:
-      - run:
-          name: Build Docker image
-          command: |
-            docker build \
-              -t $GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest \
-              -f <<parameters.image-path>> \
-              <<parameters.image-context>> \
-              <<parameters.extra-args>>
-      - run:
-          name: Push Docker image
-          command: |
-            echo $CR_PAT
-            IMAGE_ID=$(docker images -q $GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest)
-            IMAGE_TAG=ghcr.io/$GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest
-            echo $CR_PAT | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
-            docker tag $IMAGE_ID $IMAGE_TAG
-            docker push $IMAGE_TAG
+    - run:
+        name: Build Docker image
+        command: |
+          docker build \
+            -t $GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest \
+            -f <<parameters.image-path>> \
+            <<parameters.image-context>> \
+            <<parameters.extra-args>>
+    - run:
+        name: Push Docker image
+        command: |
+          echo $CR_PAT
+          IMAGE_ID=$(docker images -q $GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest)
+          IMAGE_TAG=ghcr.io/$GITHUB_USERNAME/<<parameters.image-name>>-$CIRCLE_BRANCH:latest
+          echo $CR_PAT | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+          docker tag $IMAGE_ID $IMAGE_TAG
+          docker push $IMAGE_TAG
   helm-upgrade:
     parameters:
       release-name:
@@ -81,14 +84,14 @@ commands:
         default: ""
         type: string
     steps:
-      - run:
-          name: "Upgrade Helm Chart"
-          command: |
-            helm upgrade \
-              -n $CIRCLE_BRANCH --create-namespace \
-              --install <<parameters.release-name>> <<parameters.chart-path>> \
-              -f ./k8s/values.yaml \
-              <<parameters.extra-args>>
+    - run:
+        name: "Upgrade Helm Chart"
+        command: |
+          helm upgrade \
+            -n $CIRCLE_BRANCH --create-namespace \
+            --install <<parameters.release-name>> <<parameters.chart-path>> \
+            -f ./k8s/values.yaml \
+            <<parameters.extra-args>>
 jobs:
   # hello-world:
   #   docker:
@@ -105,66 +108,66 @@ jobs:
   #       command: echo $MESSAGE <<pipeline.git.branch>>
   deploy-frontend:
     docker:
-      - image: cimg/base:stable
+    - image: cimg/base:stable
     steps:
-      - checkout
-      - setup-runner
-      - setup-k8s
-      - setup-docker
-      - push-image:
-          image-context: .
-          image-path: ./k8s/frontend/docker/build.Dockerfile
-          image-name: ch-frontend
-          extra-args: |
-            --build-arg NEXT_PUBLIC_API_HOST=http://ch-api.$CIRCLE_BRANCH.com \
-            --build-arg API_HOST=http://nestjs-service
-      - helm-upgrade:
-          release-name: ch-frontend
-          chart-path: ./k8s/frontend/helm
-          extra-args: |
-            --set frontend.ingress.host=frontend-$CIRCLE_BRANCH.hygiie.com \
-            --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
-            --set frontend.image.pullSecrets.name=regcred \
-            --set frontend.image.pullPolicy=Always
+    - checkout
+    - setup-runner
+    - setup-k8s
+    - setup-docker
+    - push-image:
+        image-context: .
+        image-path: ./k8s/frontend/docker/build.Dockerfile
+        image-name: ch-frontend
+        extra-args: |
+          --build-arg NEXT_PUBLIC_API_HOST=http://ch-api.$CIRCLE_BRANCH.com \
+          --build-arg API_HOST=http://nestjs-service
+    - helm-upgrade:
+        release-name: ch-frontend
+        chart-path: ./k8s/frontend/helm
+        extra-args: |
+          --set frontend.ingress.host=frontend-$CIRCLE_BRANCH.hygiie.com \
+          --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
+          --set frontend.image.pullSecrets.name=regcred \
+          --set frontend.image.pullPolicy=Always
   deploy-api:
     docker:
-      - image: cimg/base:stable
+    - image: cimg/base:stable
     steps:
-      - checkout
-      - setup-runner
-      - setup-k8s
-      - setup-docker
-      - push-image:
-          image-context: .
-          image-path: ./k8s/api/docker/build.Dockerfile
-          image-name: ch-api
-      - helm-upgrade:
-          release-name: ch-api
-          chart-path: ./k8s/api/helm
-          extra-args: |
-            --set api.ingress.host=ch-api.$CIRCLE_BRANCH.com \
-            --set api.image.name=ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
-            --set api.image.pullSecrets.name=regcred \
-            --set api.image.pullPolicy=Always \
-            --set nestjs.secrets.ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
-            --set nestjs.secrets.REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
-            --set nestjs.secrets.STWT_SECRET=$STWT_SECRET \
-            --set nestjs.secrets.TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
-            --set nestjs.secrets.TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
-            --set nestjs.secrets.MAIL_PASSWORD="$MAIL_PASSWORD" \
-            --set nestjs.secrets.MAIL_USER=$MAIL_USER \
-            --set nestjs.secrets.ADMIN_PASSWORD=$ADMIN_PASSWORD \
-            --set nestjs.secrets.ADMIN_EMAIL=$ADMIN_EMAIL \
-            --set nestjs.configs.ACCESS_TOKEN_EXPIRY=10s \
-            --set nestjs.configs.REFRESH_TOKEN_EXPIRY=7d \
-            --set nestjs.configs.STWT_EXPIRY=1d \
-            --set nestjs.configs.ADMIN_PANEL_URL=https://example.com \
-            --set postgres.secrets.POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-            --set postgres.secrets.POSTGRES_USER=$POSTGRES_USER
+    - checkout
+    - setup-runner
+    - setup-k8s
+    - setup-docker
+    - push-image:
+        image-context: .
+        image-path: ./k8s/api/docker/build.Dockerfile
+        image-name: ch-api
+    - helm-upgrade:
+        release-name: ch-api
+        chart-path: ./k8s/api/helm
+        extra-args: |
+          --set api.ingress.host=ch-api.$CIRCLE_BRANCH.com \
+          --set api.image.name=ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
+          --set api.image.pullSecrets.name=regcred \
+          --set api.image.pullPolicy=Always \
+          --set nestjs.secrets.ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
+          --set nestjs.secrets.REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET \
+          --set nestjs.secrets.STWT_SECRET=$STWT_SECRET \
+          --set nestjs.secrets.TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
+          --set nestjs.secrets.TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
+          --set nestjs.secrets.MAIL_PASSWORD="$MAIL_PASSWORD" \
+          --set nestjs.secrets.MAIL_USER=$MAIL_USER \
+          --set nestjs.secrets.ADMIN_PASSWORD=$ADMIN_PASSWORD \
+          --set nestjs.secrets.ADMIN_EMAIL=$ADMIN_EMAIL \
+          --set nestjs.configs.ACCESS_TOKEN_EXPIRY=10s \
+          --set nestjs.configs.REFRESH_TOKEN_EXPIRY=7d \
+          --set nestjs.configs.STWT_EXPIRY=1d \
+          --set nestjs.configs.ADMIN_PANEL_URL=https://example.com \
+          --set postgres.secrets.POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+          --set postgres.secrets.POSTGRES_USER=$POSTGRES_USER
 workflows:
   main-workflow:
     jobs:
-      # - deploy-api:
-      #     context: <<pipeline.git.branch>>
-      - deploy-frontend:
-          context: $CIRCLE_BRANCH
+    # - deploy-api:
+    #     context: <<pipeline.git.branch>>
+    - deploy-frontend:
+        context: $CIRCLE_BRANCH

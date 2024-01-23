@@ -32,17 +32,23 @@ if ! helm plugin list | grep -q "diff"; then
   helm plugin install https://github.com/databus23/helm-diff
 fi
 
-helm install \
-  ingress-nginx-release ingress-nginx/ingress-nginx \
-  -n ingress-nginx \
-  --create-namespace \
-  2> /dev/null || echo "Ingress-nginx already installed"
+# helm upgrade --install \
+#   ingress-nginx-release ingress-nginx/ingress-nginx \
+#   -n ingress-nginx \
+#   --create-namespace \
+#   -f $SCRIPT_DIR/values.yaml \
+#   2> /dev/null || echo "Ingress-nginx already installed"
+
+helm upgrade --install haproxy-ingress haproxy-ingress/haproxy-ingress \
+  -f $SCRIPT_DIR/values.yaml \
+  --create-namespace --namespace ingress-controller \
+  --version 0.14.5 \
 
 ##########################
 
 # Run all deploy scripts
 
-bash $SCRIPT_DIR/api/deploy.sh
+# bash $SCRIPT_DIR/api/deploy.sh
 bash $SCRIPT_DIR/frontend/deploy.sh
 
 ##########################

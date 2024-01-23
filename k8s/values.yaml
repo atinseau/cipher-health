@@ -1,0 +1,12 @@
+controller:
+  ingressClassResource:
+    enabled: true
+    default: true
+  config:
+    syslog-endpoint: stdout
+    syslog-format: raw
+    forwardfor: update
+  haproxy:
+    enabled: true
+    securityContext:
+      runAsUser: 0

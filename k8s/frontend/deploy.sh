@@ -33,4 +33,4 @@ helm_install \
   $ROOT_DIR/k8s/values.yaml \
   ${HELM_PRINT_TEMPLATE:-0} \
   $HELM_IMAGE_ARGS \
-  --set frontend.ingress.host=ch-frontend.local.com
+  --set frontend.ingress.host=frontend-local.hygiie.com

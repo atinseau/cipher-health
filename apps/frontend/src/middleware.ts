@@ -1,6 +1,6 @@
 // middleware.ts
 import { NextResponse } from "next/server";
-import type { NextRequest, NextFetchEvent } from "next/server";
+import { NextRequest, NextFetchEvent } from "next/server";
 import { createEdgeRouter } from "next-connect";
 
 const router = createEdgeRouter<NextRequest, NextFetchEvent>();
@@ -17,7 +17,10 @@ const withAuth = async (request: NextRequest, event: NextFetchEvent, next: () =>
 // If user is not authenticated, redirect to signin if they try to access dashboard
 router.get('/dashboard', withAuth)
 
-router.all(() => {
+router.all((req) => {
+
+  console.log(req.headers)
+
   // default if none of the above matches
   return NextResponse.next();
 });
