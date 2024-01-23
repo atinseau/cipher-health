@@ -23,14 +23,11 @@ commands:
     - helm/install_helm_plugin:
         helm_plugin_url: https://github.com/databus23/helm-diff
     - run:
-        name: Install haproxy-ingress
+        name: Install ingress-nginx
         command: |
-          helm repo add haproxy-ingress https://haproxy-ingress.github.io/charts
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
-          helm upgrade --install haproxy-ingress haproxy-ingress/haproxy-ingress \
-            -f ./k8s/values.yaml \
-            --create-namespace --namespace ingress-controller \
-            --version 0.14.5
+          helm install ingress-nginx-release ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace || true
     - run:
         name: Install ghcr.io credentials
         command: |

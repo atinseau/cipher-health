@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: nextjs-ingress
 spec:
+  ingressClassName: nginx
   rules:
     - host: {{ .Values.frontend.ingress.host }}
       http:
