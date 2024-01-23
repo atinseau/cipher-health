@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: nextjs-ingress
   annotations:
-    {{- if .Values.ingress.whitelistSourceRange }}
+    {{- if ((.Values.ingress).whitelistSourceRange) }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.ingress.whitelistSourceRange }}
     {{- end }}
 spec:

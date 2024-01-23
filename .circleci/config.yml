@@ -137,7 +137,8 @@ jobs:
           --set frontend.ingress.host=frontend-$CIRCLE_BRANCH.hygiie.com \
           --set frontend.image.name=ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-frontend-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
           --set frontend.image.pullSecrets.name=regcred \
-          --set frontend.image.pullPolicy=Always
+          --set frontend.image.pullPolicy=Always \
+          --set ingress.whitelistSourceRange=$WHITELIST_SOURCE_RANGE
   deploy-api:
     docker:
     - image: cimg/base:stable

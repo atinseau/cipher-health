@@ -10,5 +10,5 @@ controller:
     proxy-real-ip-cidr: "0.0.0.0/0"
 
 # Only apply this on ingress specific deployment (no production)
-ingress:
-  whitelistSourceRange: 82.65.5.17/32
+# ingress:
+#   whitelistSourceRange: ""
