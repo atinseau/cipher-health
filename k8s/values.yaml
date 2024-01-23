@@ -1,0 +1,10 @@
+controller:
+  service:
+    externalTrafficPolicy: "Local"
+    annotations:
+      service.beta.kubernetes.io/ovh-loadbalancer-proxy-protocol: "v2"
+  config:
+    use-proxy-protocol: "true"
+    real-ip-header: "proxy_protocol"
+    proxy-real-ip-cidr: "0.0.0.0/0"
+    whitelist-source-range: 82.65.5.17/32
