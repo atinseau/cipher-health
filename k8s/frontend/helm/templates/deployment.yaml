@@ -19,13 +19,19 @@ spec:
         - name: {{ .Values.frontend.image.pullSecrets.name }}
       {{- end }}
       containers:
-        - name: nextjs-container
-          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
-          image: {{ .Values.frontend.image.name }}
-          resources:
-            limits: # TODO: tune those values for best efficiency
-              memory: "512Mi"
-              cpu: "1"
+        # - name: nextjs-container
+        #   imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        #   image: {{ .Values.frontend.image.name }}
+        #   resources:
+        #     limits: # TODO: tune those values for best efficiency
+        #       memory: "512Mi"
+        #       cpu: "1"
+        #   ports:
+        #     - containerPort: 3000
+        #       name: nextjs-port
+        - name: echo
+          image: mendhak/http-https-echo
           ports:
-            - containerPort: 3000
-              name: nextjs-port
+          - containerPort: 8080
+            name: nextjs-port
+          

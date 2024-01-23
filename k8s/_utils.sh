@@ -175,7 +175,7 @@ function local_deploy() {
       --set ${NAMESPACE}.image.name=${IMAGE_NAME}:${IMAGE_TAG} \
       --set ${NAMESPACE}.image.pullPolicy=Never \
     "
-    helm uninstall $RELEASE
+    helm uninstall $RELEASE -n local
   fi
 
   LOCAL_DEPLOY_RETURN=$LOCAL_HELM_ARGS

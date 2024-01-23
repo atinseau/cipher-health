@@ -39,7 +39,8 @@ fi
 #   -f $SCRIPT_DIR/values.yaml \
 #   2> /dev/null || echo "Ingress-nginx already installed"
 
-helm upgrade --install haproxy-ingress haproxy-ingress/haproxy-ingress \
+helm uninstall haproxy-ingress -n ingress-controller
+helm install haproxy-ingress haproxy-ingress/haproxy-ingress \
   -f $SCRIPT_DIR/values.yaml \
   --create-namespace --namespace ingress-controller \
   --version 0.14.5 \

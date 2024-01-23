@@ -3,8 +3,6 @@ kind: Service
 metadata:
   name: nextjs-service
 spec:
-  externalTrafficPolicy: Local
-  type: NodePort
   selector:
     app: nextjs
   ports:
