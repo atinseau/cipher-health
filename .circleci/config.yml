@@ -107,6 +107,7 @@ jobs:
   #       name: Print context variables
   #       command: echo $MESSAGE <<pipeline.git.branch>>
   deploy-frontend:
+    circleci_ip_ranges: true
     docker:
     - image: cimg/base:stable
     steps:
@@ -133,6 +134,7 @@ jobs:
           --set frontend.image.pullSecrets.name=regcred \
           --set frontend.image.pullPolicy=Always
   deploy-api:
+    circleci_ip_ranges: true
     docker:
     - image: cimg/base:stable
     steps:
