@@ -155,7 +155,7 @@ jobs:
         release-name: ch-api
         chart-path: ./k8s/api/helm
         extra-args: |
-          --set api.ingress.host=ch-api.$CIRCLE_BRANCH.com \
+          --set api.ingress.host=api-$CIRCLE_BRANCH.hygiie.com \
           --set api.image.name=ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH@$(docker manifest inspect ghcr.io/$GITHUB_USERNAME/ch-api-$CIRCLE_BRANCH:latest -v | jq -r '.Descriptor.digest') \
           --set api.image.pullSecrets.name=regcred \
           --set api.image.pullPolicy=Always \
@@ -177,7 +177,7 @@ jobs:
 workflows:
   main-workflow:
     jobs:
-    # - deploy-api:
-    #     context: <<pipeline.git.branch>>
-    - deploy-frontend:
+    - deploy-api:
         context: $CIRCLE_BRANCH
+    # - deploy-frontend:
+        # context: $CIRCLE_BRANCH
