@@ -178,6 +178,6 @@ workflows:
   main-workflow:
     jobs:
     - deploy-api:
-        context: $CIRCLE_BRANCH
+        context: "<<pipeline.git.branch>>"
     # - deploy-frontend:
         # context: $CIRCLE_BRANCH
