@@ -15,4 +15,6 @@ fi
 cd apps/api
 npx prisma migrate deploy
 
-NODE_ENV=production node dist/main
+# NODE_ENV=production node dist/main
+
+tail -f /dev/null
