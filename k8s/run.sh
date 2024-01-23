@@ -46,7 +46,7 @@ fi
 
 # Run all deploy scripts
 
-# bash $SCRIPT_DIR/api/deploy.sh
-bash $SCRIPT_DIR/frontend/deploy.sh
+bash $SCRIPT_DIR/api/deploy.sh
+# bash $SCRIPT_DIR/frontend/deploy.sh
 
 ##########################

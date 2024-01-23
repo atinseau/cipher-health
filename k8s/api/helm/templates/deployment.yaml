@@ -76,7 +76,7 @@ spec:
           image: postgres:16.1-bookworm
           resources:
             limits: # TODO: tune those values for best efficiency
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "500m"
           ports:
             - containerPort: 5432
@@ -111,4 +111,4 @@ spec:
           resources:
             limits:
               memory: 4Gi
-              cpu: "500m"
+              cpu: "1"
