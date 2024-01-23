@@ -28,7 +28,7 @@ commands:
           helm repo add haproxy-ingress https://haproxy-ingress.github.io/charts
           helm repo update
           helm upgrade --install haproxy-ingress haproxy-ingress/haproxy-ingress \
-            -f $SCRIPT_DIR/values.yaml \
+            -f ./k8s/values.yaml \
             --create-namespace --namespace ingress-controller \
             --version 0.14.5
     - run:
