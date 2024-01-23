@@ -122,7 +122,7 @@ jobs:
           --build-arg NEXT_PUBLIC_API_HOST=http://ch-api.$CIRCLE_BRANCH.com \
           --build-arg API_HOST=http://nestjs-service
     - helm-upgrade:
-        release-name: ch-frontend
+        release-name: ch-frontend-$CIRCLE_BRANCH
         chart-path: ./k8s/frontend/helm
         extra-args: |
           --set frontend.ingress.host=frontend-$CIRCLE_BRANCH.hygiie.com \
