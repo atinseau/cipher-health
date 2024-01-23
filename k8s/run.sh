@@ -36,24 +36,11 @@ HELM_DIFF=$(helm diff upgrade ingress-nginx-release ingress-nginx/ingress-nginx 
 if [ "$HELM_DIFF" -gt 0 ]; then
   helm upgrade --install \
     ingress-nginx-release ingress-nginx/ingress-nginx \
+    -f $SCRIPT_DIR/values.yaml \
     -n ingress-nginx --create-namespace || true
 else
   echo "No changes detected in ingress-nginx-release"
 fi
-
-exit 1
-
-helm install \
-  ingress-nginx-release ingress-nginx/ingress-nginx \
-  -n ingress-nginx \
-  --create-namespace \
-  -f $SCRIPT_DIR/values.yaml \
-  2> /dev/null || echo "Ingress-nginx already installed"
-
-# helm upgrade --install haproxy-ingress haproxy-ingress/haproxy-ingress \
-#   -f $SCRIPT_DIR/values.yaml \
-#   --create-namespace --namespace ingress-controller \
-#   --version 0.14.5
 
 ##########################
 

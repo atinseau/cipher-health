@@ -27,10 +27,12 @@ commands:
         command: |
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
-          HELM_DIFF=$(helm diff upgrade ingress-nginx-release ingress-nginx/ingress-nginx -f k8s/values.yaml -n ingress-nginx --allow-unreleased | wc -l)
+          HELM_DIFF=$(helm diff upgrade ingress-nginx-release ingress-nginx/ingress-nginx -f k8s/config/patch-ingress-controller.yaml -f k8s/values.yaml -n ingress-nginx --allow-unreleased | wc -l)
           if [ "$HELM_DIFF" -gt 0 ]; then
             helm upgrade --install \
               ingress-nginx-release ingress-nginx/ingress-nginx \
+              -f k8s/config/patch-ingress-controller.yaml \
+              -f k8s/values.yaml \
               -n ingress-nginx --create-namespace || true
           else
             echo "No changes detected in ingress-nginx-release"
