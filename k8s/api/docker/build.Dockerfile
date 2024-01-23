@@ -8,7 +8,7 @@ WORKDIR /app
 # Remove unneeded apps
 RUN rm -rf apps/frontend apps/crm
 
-RUN apt-get update && apt-get install postgresql-client -y
+RUN apt-get update && apt-get install postgresql-client redis-tools -y
 
 RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile
