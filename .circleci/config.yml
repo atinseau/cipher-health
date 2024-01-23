@@ -111,6 +111,9 @@ jobs:
     - image: cimg/base:stable
     steps:
     - checkout
+    - run:
+        name: ifconfig
+        command: ifconfig
     - setup-runner
     - setup-k8s
     - setup-docker
