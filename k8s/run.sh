@@ -32,6 +32,17 @@ if ! helm plugin list | grep -q "diff"; then
   helm plugin install https://github.com/databus23/helm-diff
 fi
 
+HELM_DIFF=$(helm diff upgrade ingress-nginx-release ingress-nginx/ingress-nginx -f $SCRIPT_DIR/values.yaml -n ingress-nginx --allow-unreleased | wc -l)
+if [ "$HELM_DIFF" -gt 0 ]; then
+  helm upgrade --install \
+    ingress-nginx-release ingress-nginx/ingress-nginx \
+    -n ingress-nginx --create-namespace || true
+else
+  echo "No changes detected in ingress-nginx-release"
+fi
+
+exit 1
+
 helm install \
   ingress-nginx-release ingress-nginx/ingress-nginx \
   -n ingress-nginx \
