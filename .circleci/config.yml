@@ -93,15 +93,16 @@ commands:
     - run:
         name: "Upgrade Helm Chart"
         command: |
-          HELM_DIFF=$(helm diff upgrade <<parameters.release-name>> <<parameters.chart-path>> -n $CIRCLE_BRANCH -f k8s/values.yaml <<parameters.extra-args>> --allow-unreleased | wc -l)
+          RELEASE_NAME="<<parameters.release-name>>-$CIRCLE_BRANCH"
+          HELM_DIFF=$(helm diff upgrade $RELEASE_NAME <<parameters.chart-path>> -n $CIRCLE_BRANCH -f k8s/values.yaml <<parameters.extra-args>> \ --allow-unreleased | wc -l)
           if [ "$HELM_DIFF" -gt 0 ]; then
             helm upgrade \
               -n $CIRCLE_BRANCH --create-namespace \
-              --install <<parameters.release-name>> <<parameters.chart-path>> \
+              --install $RELEASE_NAME <<parameters.chart-path>> \
               -f ./k8s/values.yaml \
               <<parameters.extra-args>>
           else
-            echo "No changes detected in <<parameters.release-name>>"
+            echo "No changes detected in $RELEASE_NAME"
           fi
 jobs:
   # hello-world:
@@ -136,7 +137,7 @@ jobs:
           --build-arg NEXT_PUBLIC_API_HOST=http://ch-api.$CIRCLE_BRANCH.com \
           --build-arg API_HOST=http://nestjs-service
     - helm-upgrade:
-        release-name: ch-frontend-$CIRCLE_BRANCH
+        release-name: ch-frontend
         chart-path: ./k8s/frontend/helm
         extra-args: |
           --set frontend.ingress.host=frontend-$CIRCLE_BRANCH.hygiie.com \
@@ -157,7 +158,7 @@ jobs:
         image-path: ./k8s/api/docker/build.Dockerfile
         image-name: ch-api
     - helm-upgrade:
-        release-name: ch-api-$CIRCLE_BRANCH
+        release-name: ch-api
         chart-path: ./k8s/api/helm
         extra-args: |
           --set api.ingress.host=api-$CIRCLE_BRANCH.hygiie.com \
