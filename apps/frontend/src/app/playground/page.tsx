@@ -18,6 +18,46 @@ import DrawInput from "@/components/Inputs/DrawInput";
 import AvatarInput from "@/components/Inputs/AvatarInput";
 import Notif from "@/components/Notif";
 
+function Buttons() {
+  return <>
+    <div className="flex gap-2 flex-col items-center">
+      <p>Filled (default)</p>
+
+      <div className="flex gap-2">
+        <Button>Se connecter</Button>
+        <Button isDisabled>Se connecter</Button>
+      </div>
+
+      <div className="flex gap-2">
+        <Button variant="filled" color="secondary">Se connecter</Button>
+        <Button variant="filled" color="secondary" isDisabled>Se connecter</Button>
+      </div>
+
+    </div>
+
+    <div className="flex gap-2 flex-col items-center">
+      <p>Outlined</p>
+
+      <div className="flex gap-2">
+        <Button variant="outlined">Se connecter</Button>
+        <Button variant="outlined" isDisabled>Se connecter</Button>
+      </div>
+
+    </div>
+
+    <div className="flex gap-2 flex-col items-center">
+      <p>Plain</p>
+
+      <div className="flex gap-2">
+        <Button variant="plain">Se connecter</Button>
+        <Button variant="plain" isDisabled>Se connecter</Button>
+      </div>
+
+    </div>
+  </>
+
+}
+
 export default function Page() {
 
   const [file, setFile] = useState<File | undefined>(undefined)
@@ -25,10 +65,12 @@ export default function Page() {
 
   return <div className="flex p-4 gap-10 flex-col items-center">
 
+    <Buttons />
+
     <Notif
       type="file"
       title="Salut"
-      // message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
+    // message="Lorem ipsum dolor sit amet consectetur. Urna tellus in enim iaculis risus fermentum id sagittis risus. Tempor varius ut cras sit. Tempor auctor rhoncus eu varius dictumst mi eget. "
     />
 
     <Notif

@@ -61,7 +61,8 @@ export default function AvatarInput(props: AvatarInputProps) {
       </div>
       <Button
         as="label"
-        className="!rounded-full p-2 h-[auto] min-w-[auto] min-h-[auto] absolute bottom-[5px] right-[5px]"
+        customSize
+        className="!rounded-full p-2 absolute bottom-[5px] right-[5px]"
         startContent={<IoCameraOutline size={20} />}
       >
         <input

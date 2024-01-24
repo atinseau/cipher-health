@@ -152,7 +152,7 @@ jobs:
         image-path: ./k8s/api/docker/build.Dockerfile
         image-name: ch-api
     - helm-upgrade:
-        release-name: ch-api
+        release-name: ch-api-$CIRCLE_BRANCH
         chart-path: ./k8s/api/helm
         extra-args: |
           --set api.ingress.host=api-$CIRCLE_BRANCH.hygiie.com \

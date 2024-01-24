@@ -3,6 +3,7 @@ import { LuUser } from "react-icons/lu";
 import Logo from "../Logo";
 import Image from "next/image";
 import PageItem from "./PageItem";
+import Link from "next/link";
 
 
 export default function Header() {
@@ -18,19 +19,23 @@ export default function Header() {
     <nav>
       <ul className="flex gap-6 items-center">
         <li className="hidden md:block">
-          <Button
-            variant="plain"
-            className="no-underline font-roboto"
-          >
-            Vous êtes un praticien
-          </Button>
+          <Link href="/signin">
+            <Button
+              variant="plain"
+              className="no-underline font-roboto"
+            >
+              Vous êtes un praticien
+            </Button>
+          </Link>
         </li>
         <li>
-          <Button
-            startContent={<LuUser />}
-          >
-            Se connecter
-          </Button>
+          <Link href="/signin">
+            <Button
+              startContent={<LuUser />}
+            >
+              Se connecter
+            </Button>
+          </Link>
         </li>
       </ul>
     </nav>
