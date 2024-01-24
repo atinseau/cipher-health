@@ -28,14 +28,14 @@ export default function HeroBanner(props: HeroBannerProps) {
         </Button>)}
       </div>
     </div>
-    <div className="w-full h-full relative">
-      <span className="absolute bg-indigo-500 w-[50px] h-[50px] md:w-[99px] md:h-[99px] rounded-full left-[27px] bottom-[20px] md:left-[54px] md:bottom-10" />
+    <div className="w-full h-full relative overflow-hidden">
+      <span className="absolute bg-indigo-500 w-[50px] h-[50px] md:w-[99px] md:h-[99px] rounded-full left-[10%] bottom-[15px] md:left-[54px] md:bottom-10" />
       <Image
         width={385}
         height={429}
         src="/assets/svg/shape-home-1.svg"
         alt="Svg de la bannière"
-        className="absolute w-[190px] md:w-auto left:[7px] top-0 md:left-[14px] md:top-[18px]"
+        className="absolute w-[39%] md:w-auto left-[2%] top-0 md:left-[14px] md:top-[18px]"
       />
       <Image
         priority

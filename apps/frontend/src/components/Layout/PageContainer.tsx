@@ -1,3 +1,4 @@
+import Footer from "./Footer";
 import Header from "./Header";
 
 
@@ -10,5 +11,6 @@ export default function PageContainer({ children }: PageContainerProps) {
   return <div className="flex flex-col items-center mx-auto">
     <Header />
     {children}
+    <Footer />
   </div>
 }

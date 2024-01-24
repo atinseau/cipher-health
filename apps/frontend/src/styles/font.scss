@@ -5,13 +5,13 @@ h1 {
 }
 
 h2 {
-  font-size: 40px;
+  @apply text-[32px] md:text-[40px];
   line-height: 120%;
   font-weight: 700;
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 18px;
   line-height: 120%;
   font-weight: 700;
 }

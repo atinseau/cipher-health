@@ -18,9 +18,6 @@ const withAuth = async (request: NextRequest, event: NextFetchEvent, next: () =>
 router.get('/dashboard', withAuth)
 
 router.all((req) => {
-
-  console.log(req.headers)
-
   // default if none of the above matches
   return NextResponse.next();
 });

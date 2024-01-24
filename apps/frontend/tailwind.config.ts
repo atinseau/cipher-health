@@ -18,8 +18,11 @@ const config: Config = {
       fontSize: {
         sm: '12px',
         base: '16px',
+        md: '18px',
         lg: '20px',
         xl: '24px',
+        '2xl': '32px',
+        '3xl': '40px',
       },
       lineHeight: {
         base: '120%'
@@ -28,11 +31,18 @@ const config: Config = {
         sofiaProSoft: ['var(--font-sofia-pro-soft)'],
         roboto: ['var(--font-roboto)'],
       },
+      screens: {
+        '2xl': '1440px'
+      },
       borderRadius: {
         sm: '4px'
       },
       colors: {
         black: '#2D2D2D',
+        purple: {
+          400: '#EACCF6',
+          500: "#9700D1",
+        },
         indigo: {
           200: "#F6F6FF",
           300: "#EEEAFF",
