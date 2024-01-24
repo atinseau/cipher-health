@@ -93,11 +93,16 @@ commands:
     - run:
         name: "Upgrade Helm Chart"
         command: |
-          helm upgrade \
-            -n $CIRCLE_BRANCH --create-namespace \
-            --install <<parameters.release-name>> <<parameters.chart-path>> \
-            -f ./k8s/values.yaml \
-            <<parameters.extra-args>>
+          HELM_DIFF=$(helm diff upgrade <<parameters.release-name>> <<parameters.chart-path>> -n $CIRCLE_BRANCH -f k8s/values.yaml <<parameters.extra-args>> --allow-unreleased | wc -l)
+          if [ "$HELM_DIFF" -gt 0 ]; then
+            helm upgrade \
+              -n $CIRCLE_BRANCH --create-namespace \
+              --install <<parameters.release-name>> <<parameters.chart-path>> \
+              -f ./k8s/values.yaml \
+              <<parameters.extra-args>>
+          else
+            echo "No changes detected in <<parameters.release-name>>"
+          fi
 jobs:
   # hello-world:
   #   docker:
